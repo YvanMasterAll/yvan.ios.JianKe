@@ -7,3 +7,20 @@
 //
 
 import Foundation
+
+public enum Result {
+    case ok(message: String)
+    case empty
+    case failed(message: String)
+}
+
+extension Result {
+    var isVaild: Bool {
+        switch self {
+        case .ok:
+            return true
+        default:
+            return false
+        }
+    }
+}

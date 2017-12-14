@@ -14,7 +14,21 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     var window: UIWindow?
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
-        // Override point for customization after application launch.
+        
+        //测试
+        Environment.clear()
+        
+        let viewController = ViewController()
+        self.window?.rootViewController = viewController
+        self.window?.makeKeyAndVisible()
+        
+        //判断用户是否登录
+        if !Environment.tokenExists {
+            let LoginStoryBoard = UIStoryboard(name: "Login", bundle: nil)
+            let loginViewController = LoginStoryBoard.instantiateViewController(withIdentifier: "Login")
+            self.window?.rootViewController?.present(loginViewController, animated: false, completion: nil)
+        }
+        
         return true
     }
 
