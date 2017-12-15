@@ -12,6 +12,10 @@ import UIKit
 //尺寸
 let SW = UIScreen.main.bounds.size.width
 let SH = UIScreen.main.bounds.size.height
+let TarBarHeight: CGFloat = 40
+
+//版本信息
+let AppVersion = Bundle.main.infoDictionary!["CFBundleShortVersionString"] as! String
 
 //颜色
 let ColorPrimary = UIColor(rgb: 0x0f88eb) //主色

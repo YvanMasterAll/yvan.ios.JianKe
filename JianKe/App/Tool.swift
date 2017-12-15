@@ -153,3 +153,27 @@ extension String {
         return self.addingPercentEncoding(withAllowedCharacters: .urlHostAllowed)!
     }
 }
+
+//日期扩展
+extension Date {
+    //日期转字符串
+    static func toString(date: Date = Date(), dateFormat: String = "yyyy-MM-dd HH:mm:ss") -> String {
+        let timeZone = TimeZone.init(identifier: "UTC")
+        let formatter = DateFormatter()
+        formatter.timeZone = timeZone
+        formatter.locale = Locale.init(identifier: "zh_CN")
+        formatter.dateFormat = dateFormat
+        
+        return formatter.string(from: date)
+    }
+    //字符串转日期
+    static func toDate(dateString: String, dateFormat: String = "yyyy-MM-dd HH:mm:ss") -> Date {
+        let timeZone = TimeZone.init(identifier: "UTC")
+        let formatter = DateFormatter()
+        formatter.timeZone = timeZone
+        formatter.locale = Locale.init(identifier: "zh_CN")
+        formatter.dateFormat = dateFormat
+        
+        return formatter.date(from: dateString)!
+    }
+}

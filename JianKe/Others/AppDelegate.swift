@@ -14,22 +14,57 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     var window: UIWindow?
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
+        //创建窗口
+        self.window = UIWindow(frame: UIScreen.main.bounds)
         
-        //测试
-        Environment.clear()
+        //测试 - 清空存储信息
+        //Environment.clear()
         
-        let viewController = ViewController()
-        self.window?.rootViewController = viewController
-        self.window?.makeKeyAndVisible()
-        
-        //判断用户是否登录
-        if !Environment.tokenExists {
-            let LoginStoryBoard = UIStoryboard(name: "Login", bundle: nil)
-            let loginViewController = LoginStoryBoard.instantiateViewController(withIdentifier: "Login")
-            self.window?.rootViewController?.present(loginViewController, animated: false, completion: nil)
+        //判断首次启动
+        if Environment.isFirstLaunch {
+            print("first launch")
+        } else {
+            if Environment.isFirstLaunchOfNewVersion {
+                print("new version")
+            } else {
+                print("no version updated")
+            }
         }
+
+        //初始化 TabBar
+        setupTabBar()
+        
+        //判断用户登录
+//        if !Environment.tokenExists {
+//            let LoginStoryBoard = UIStoryboard(name: "Login", bundle: nil)
+//            let loginViewController = LoginStoryBoard.instantiateViewController(withIdentifier: "Login")
+//            self.window?.rootViewController?.present(loginViewController, animated: false, completion: nil)
+//        }
         
         return true
+    }
+    
+    //初始化 TabBar
+    func setupTabBar() {
+        let tabBarController = UITabBarController()
+        tabBarController.tabBar.backgroundColor = UIColor.white
+        //ViewControllers
+        let homeStoryBoard = UIStoryboard(name: "Home", bundle: nil)
+        let homeViewController = homeStoryBoard.instantiateViewController(withIdentifier: "Home")
+        tabBarController.viewControllers = [homeViewController]
+        //TabBars
+        homeViewController.tabBarItem = UITabBarItem(title: "排行榜", image: UIImage(named: "home_grey600"), selectedImage: UIImage(named: "home_primary"))
+        tabBarController.tabBar.frame.size = CGSize(width: SW, height: TarBarHeight)
+        //TabBar Top Shadow
+        tabBarController.tabBar.layer.shadowOffset = CGSize(width: 0, height: 0)
+        tabBarController.tabBar.layer.shadowColor = GMColor.grey600Color().cgColor
+        tabBarController.tabBar.layer.shadowOpacity = 0.5
+        tabBarController.tabBar.layer.shadowRadius = 2
+        let path = UIBezierPath(roundedRect: CGRect(x: 0, y: -2, width: SW, height: 2), cornerRadius: 0)
+        tabBarController.tabBar.layer.shadowPath = path.cgPath
+        
+        self.window?.rootViewController = tabBarController
+        self.window?.makeKeyAndVisible()
     }
 
     func applicationWillResignActive(_ application: UIApplication) {
