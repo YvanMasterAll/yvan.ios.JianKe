@@ -1,9 +1,10 @@
 use_frameworks!
 
-target 'JianKe' do
+target 'ShuTu' do
 	pod 'RxSwift'
 	pod 'RxCocoa'
 	pod 'RxDataSources'
 	pod 'Moya/RxSwift'
 	pod 'ObjectMapper'
+	pod 'MJRefresh'
 end
