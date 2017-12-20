@@ -15,10 +15,12 @@ import RxDataSources
 //刷新状态
 public enum RefreshStatus {
     case none
+    case noData
     case beginHeaderRefresh
     case endHeaderRefresh
     case beginFooterRefresh
     case endFooterRefresh
+    case endRefreshWithoutData
 }
 
 public protocol HomeViewModelInput {
@@ -38,6 +40,7 @@ public class HomeViewModel: HomeViewModelInput, HomeViewModelOutput, HomeViewMod
     fileprivate let disposeBag: DisposeBag!
     fileprivate let tableView: UITableView!
     fileprivate var refreshStateObserver = Variable<RefreshStatus>(.none)
+    fileprivate var emptyZone: EmptyZone!
     //inputs
     public var refreshNewData = PublishSubject<Bool>()
     //outputs
@@ -46,12 +49,13 @@ public class HomeViewModel: HomeViewModelInput, HomeViewModelOutput, HomeViewMod
     public var inputs: HomeViewModelInput { return self }
     public var outputs: HomeViewModelOutput { return self }
     
-    init(disposeBag: DisposeBag, tableView: UITableView) {
+    init(disposeBag: DisposeBag, tableView: UITableView, emptyZone: EmptyZone) {
         //服务
         let service = NewsService.instance
         //初始化
         self.disposeBag = disposeBag
         self.tableView = tableView
+        self.emptyZone = emptyZone
         //Rx
         sections = models.asObservable()
             .map{ models -> [HomeSectionModel] in
@@ -69,11 +73,16 @@ public class HomeViewModel: HomeViewModelInput, HomeViewModelOutput, HomeViewMod
                             if data.stories != nil {
                                 self.models.value.removeAll()
                                 self.models.value = data.stories!
+                                //结束刷新
+                                self.refreshStateObserver.value = .endHeaderRefresh
+                            } else {
+                                //没有数据
+                                self.refreshStateObserver.value = .noData
                             }
-                            //结束刷新
-                            self.refreshStateObserver.value = .endHeaderRefresh
                         })
                         .disposed(by: self.disposeBag)
+                    //拉取轮播数据
+                    
                 } else {//加载更多
                     self.pageIndex += 1
                     let date = Date.toString(date: Date(timeIntervalSinceNow: -Double(self.pageIndex) * 24 * 60 * 60), dateFormat: "yyyyMMdd")
@@ -82,9 +91,12 @@ public class HomeViewModel: HomeViewModelInput, HomeViewModelOutput, HomeViewMod
                         .subscribe(onNext: { data in
                             if data.stories != nil {
                                 self.models.value += data.stories!
+                                //结束刷新
+                                self.refreshStateObserver.value = .endFooterRefresh
+                            } else {//没有更多数据
+                                //结束刷新
+                                self.refreshStateObserver.value = .endRefreshWithoutData
                             }
-                            //结束刷新
-                            self.refreshStateObserver.value = .endFooterRefresh
                         })
                         .disposed(by: self.disposeBag)
                 }
@@ -93,23 +105,45 @@ public class HomeViewModel: HomeViewModelInput, HomeViewModelOutput, HomeViewMod
         refreshStateObserver.asObservable()
             .subscribe(onNext: { state in
                 switch state {
+                case .noData:
+                    self.showEmptyZone()
+                    break
                 case .beginHeaderRefresh:
-                    tableView.mj_header.beginRefreshing()
                     break
                 case .endHeaderRefresh:
-                    tableView.mj_header.endRefreshing()
+                    self.tableView.switchRefreshHeader(to: .normal(.success, 0))
                     break
                 case .beginFooterRefresh:
-                    tableView.mj_footer.beginRefreshing()
                     break
                 case .endFooterRefresh:
-                    tableView.mj_footer.endRefreshing()
+                    self.tableView.switchRefreshFooter(to: .normal)
+                    break
+                case .endRefreshWithoutData:
+                    self.tableView.switchRefreshFooter(to: .noMoreData)
                     break
                 default:
                     break
                 }
             })
             .disposed(by: disposeBag)
+        //EmptyZone 点击事件
+        self.emptyZone.emptyZoneClicked = {
+            self.hideEmptyZone()
+        }
+    }
+}
+
+extension HomeViewModel {
+    //显示 & 隐藏 Empty Zone
+    fileprivate func showEmptyZone() {
+        self.tableView.switchRefreshHeader(to: .normal(.none, 0))
+        tableView.isHidden = true
+        self.emptyZone.show()
+    }
+    fileprivate func hideEmptyZone() {
+        self.emptyZone.hide()
+        tableView.isHidden = false
+        self.tableView.switchRefreshHeader(to: .refreshing)
     }
 }
 

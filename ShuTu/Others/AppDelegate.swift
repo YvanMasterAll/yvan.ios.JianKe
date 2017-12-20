@@ -53,14 +53,17 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         let homeViewController = homeStoryBoard.instantiateViewController(withIdentifier: "Home")
         tabBarController.viewControllers = [homeViewController]
         //TabBars
-        homeViewController.tabBarItem = UITabBarItem(title: "排行榜", image: UIImage(named: "home_grey600"), selectedImage: UIImage(named: "home_primary"))
+        homeViewController.tabBarItem = UITabBarItem(title: "首页", image: UIImage(named: "icon_home_grey600"), selectedImage: UIImage(named: "icon_home_primary"))
+        homeViewController.tabBarItem.imageInsets.top = -4
+        homeViewController.tabBarItem.titlePositionAdjustment.vertical = -2
+        homeViewController.tabBarItem.setTitleTextAttributes([NSAttributedStringKey.font: UIFont.systemFont(ofSize: 11)], for: .normal)
         tabBarController.tabBar.frame.size = CGSize(width: SW, height: TarBarHeight)
         //TabBar Top Shadow
         tabBarController.tabBar.layer.shadowOffset = CGSize(width: 0, height: 0)
         tabBarController.tabBar.layer.shadowColor = GMColor.grey600Color().cgColor
         tabBarController.tabBar.layer.shadowOpacity = 0.5
         tabBarController.tabBar.layer.shadowRadius = 2
-        let path = UIBezierPath(roundedRect: CGRect(x: 0, y: -2, width: SW, height: 2), cornerRadius: 0)
+        let path = UIBezierPath(roundedRect: CGRect(x: 0, y: -1, width: SW, height: 1), cornerRadius: 0)
         tabBarController.tabBar.layer.shadowPath = path.cgPath
         
         self.window?.rootViewController = tabBarController

@@ -10,16 +10,34 @@ import UIKit
 import RxCocoa
 import RxSwift
 import RxDataSources
-import MJRefresh
 
 class HomeViewController: UIViewController {
 
     @IBOutlet weak var tableView: UITableView!
+    @IBOutlet weak var searchBar: UIView!
+    @IBOutlet weak var pagerView: FSPagerView! {
+        didSet {
+            self.pagerView.register(FSPagerViewCell.self, forCellWithReuseIdentifier: "cell")
+            self.pagerView.itemSize = .zero
+        }
+    }
+    @IBOutlet weak var pageControl: FSPageControl! {
+        didSet {
+            self.pageControl.backgroundColor = .clear
+            self.pageControl.numberOfPages = self.imageNames.count
+            self.pageControl.contentHorizontalAlignment = .right
+            self.pageControl.contentInsets = UIEdgeInsets(top: 0, left: 20, bottom: 0, right: 20)
+        }
+    }
     
     //声明区
     fileprivate let disposeBag = DisposeBag()
     fileprivate var viewModel: HomeViewModel!
     fileprivate var dataSource: RxTableViewSectionedReloadDataSource<HomeSectionModel>!
+    fileprivate var emptyZone: EmptyZone!
+    
+    //私有成员
+    fileprivate let imageNames = ["1","2","3","4","5","6","7"]
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -38,17 +56,24 @@ class HomeViewController: UIViewController {
 extension HomeViewController {
     //初始化
     fileprivate func setupUI() {
+        //EmptyZone
+        self.emptyZone = EmptyZone(frame: self.view.frame)
+        self.view.addSubview(emptyZone)
         //消除底部视图
         self.tableView.tableFooterView = UIView()
-        //MJRefresh
-        self.tableView.mj_header = MJRefreshNormalHeader(refreshingTarget: self, refreshingAction: #selector(self.headerRefresh))
-        self.tableView.mj_header.isAutomaticallyChangeAlpha = true
-        self.tableView.mj_footer = MJRefreshAutoFooter(refreshingTarget: self, refreshingAction: #selector(self.footerRefresh))
+        //PullToRefreshKit
+        let firstHeader = FirstRefreshHeader()
+        self.tableView.configRefreshHeader(with: firstHeader, action: {
+            self.viewModel.inputs.refreshNewData.onNext(true)
+        })
+        self.tableView.configRefreshFooter(with: FirstRefreshFooter(), action: {
+            self.viewModel.inputs.refreshNewData.onNext(false)
+        })
     }
     //绑定 Rx
     fileprivate func bindRx() {
         //ViewModel
-        viewModel =  HomeViewModel(disposeBag: self.disposeBag, tableView: self.tableView)
+        viewModel =  HomeViewModel(disposeBag: self.disposeBag, tableView: self.tableView, emptyZone: emptyZone)
         //TableView
         tableView.rx.setDelegate(self)
             .disposed(by: disposeBag)
@@ -63,17 +88,32 @@ extension HomeViewController {
             .drive(tableView.rx.items(dataSource: dataSource))
             .disposed(by: disposeBag)
         //刷新
-        viewModel.inputs.refreshNewData.onNext(true)
-    }
-    //#selector - mj_header & mj_footer
-    @objc fileprivate func headerRefresh() {
-        viewModel.inputs.refreshNewData.onNext(true)
-    }
-    @objc fileprivate func footerRefresh() {
-        viewModel.inputs.refreshNewData.onNext(false)
+        self.tableView.switchRefreshHeader(to: .refreshing)
     }
 }
 
-extension HomeViewController: UITableViewDelegate {
-    
+extension HomeViewController: UITableViewDelegate, FSPagerViewDelegate, FSPagerViewDataSource {
+    //FSPagerViewDataSource & FSPagerViewDelegate
+    public func numberOfItems(in pagerView: FSPagerView) -> Int {
+        return self.imageNames.count
+    }
+    public func pagerView(_ pagerView: FSPagerView, cellForItemAt index: Int) -> FSPagerViewCell {
+        let cell = pagerView.dequeueReusableCell(withReuseIdentifier: "cell", at: index)
+        cell.imageView?.image = UIImage(named: self.imageNames[index])
+        cell.imageView?.contentMode = .scaleAspectFill
+        cell.imageView?.clipsToBounds = true
+        return cell
+    }
+    func pagerView(_ pagerView: FSPagerView, didSelectItemAt index: Int) {
+        pagerView.deselectItem(at: index, animated: true)
+        pagerView.scrollToItem(at: index, animated: true)
+        self.pageControl.currentPage = index
+    }
+    func pagerViewDidScroll(_ pagerView: FSPagerView) {
+        guard self.pageControl.currentPage != pagerView.currentIndex else {
+            return
+        }
+        self.pageControl.currentPage = pagerView.currentIndex // Or Use KVO with property "currentIndex"
+    }
 }
+

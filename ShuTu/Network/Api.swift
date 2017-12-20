@@ -19,6 +19,47 @@ public var GithubProvider = MoyaProvider<GitHubApi>(
 //ZhiHu Provider
 public var ZhihuProvider = MoyaProvider<ZhihuApi>()
 
+//Test Provider
+public var TestProvider = MoyaProvider<TestApi>()
+
+//Test Api
+public enum TestApi {
+    case test
+}
+extension TestApi: TargetType {
+    //The target's base `URL`
+    public var baseURL: URL {
+        return URL(string: "http://47.94.111.82/v")!
+    }
+    //The path to be appended to `baseURL` to form the full `URL`.
+    public var path: String {
+        switch self {
+        case .test:
+            return "test"
+        }
+    }
+    //The HTTP method used in the request.
+    public var method: Moya.Method {
+        return .get
+    }
+    //The headers to be incoded in the request.
+    public var headers: [String : String]? {
+        return nil
+    }
+    //Provides stub data for use in testing.
+    public var sampleData: Data {
+        return "".data(using: String.Encoding.utf8)!
+    }
+    //The type of HTTP task to be performed.
+    public var task: Task {
+        return .requestPlain
+    }
+    //Whether or not to perform Alamofire validation. Defaults to `false`.
+    public var validate: Bool {
+        return false
+    }
+}
+
 //ZhiHu API
 public enum ZhihuApi {
     case getLaunchImg

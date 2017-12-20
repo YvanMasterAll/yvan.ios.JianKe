@@ -6,5 +6,4 @@ target 'ShuTu' do
 	pod 'RxDataSources'
 	pod 'Moya/RxSwift'
 	pod 'ObjectMapper'
-	pod 'MJRefresh'
 end

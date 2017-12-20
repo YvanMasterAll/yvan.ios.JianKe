@@ -66,3 +66,10 @@ class NewsService {
             .observeOn(MainScheduler.instance)
     }
 }
+
+class TestService {
+    //单例
+    static let instance = TestService()
+    private init() {}
+    
+}
