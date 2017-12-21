@@ -20,13 +20,14 @@ public var GithubProvider = MoyaProvider<GitHubApi>(
 public var ZhihuProvider = MoyaProvider<ZhihuApi>()
 
 //Test Provider
-public var TestProvider = MoyaProvider<TestApi>()
+public var ShuTuProvider = MoyaProvider<ShuTuApi>()
 
 //Test Api
-public enum TestApi {
+public enum ShuTuApi {
     case test
+    case carousel
 }
-extension TestApi: TargetType {
+extension ShuTuApi: TargetType {
     //The target's base `URL`
     public var baseURL: URL {
         return URL(string: "http://47.94.111.82/v")!
@@ -36,6 +37,8 @@ extension TestApi: TargetType {
         switch self {
         case .test:
             return "test"
+        case .carousel:
+            return "carousel"
         }
     }
     //The HTTP method used in the request.

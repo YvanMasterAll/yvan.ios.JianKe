@@ -10,6 +10,7 @@ import UIKit
 import RxCocoa
 import RxSwift
 import RxDataSources
+import Kingfisher
 
 class HomeViewController: UIViewController {
 
@@ -17,14 +18,14 @@ class HomeViewController: UIViewController {
     @IBOutlet weak var searchBar: UIView!
     @IBOutlet weak var pagerView: FSPagerView! {
         didSet {
-            self.pagerView.register(FSPagerViewCell.self, forCellWithReuseIdentifier: "cell")
+            self.pagerView.register(FSPagerViewCell.self, forCellWithReuseIdentifier: "pagerCell")
             self.pagerView.itemSize = .zero
         }
     }
     @IBOutlet weak var pageControl: FSPageControl! {
         didSet {
             self.pageControl.backgroundColor = .clear
-            self.pageControl.numberOfPages = self.imageNames.count
+            self.pageControl.numberOfPages = 0
             self.pageControl.contentHorizontalAlignment = .right
             self.pageControl.contentInsets = UIEdgeInsets(top: 0, left: 20, bottom: 0, right: 20)
         }
@@ -35,9 +36,6 @@ class HomeViewController: UIViewController {
     fileprivate var viewModel: HomeViewModel!
     fileprivate var dataSource: RxTableViewSectionedReloadDataSource<HomeSectionModel>!
     fileprivate var emptyZone: EmptyZone!
-    
-    //私有成员
-    fileprivate let imageNames = ["1","2","3","4","5","6","7"]
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -57,10 +55,10 @@ extension HomeViewController {
     //初始化
     fileprivate func setupUI() {
         //EmptyZone
-        self.emptyZone = EmptyZone(frame: self.view.frame)
-        self.view.addSubview(emptyZone)
-        //消除底部视图
-        self.tableView.tableFooterView = UIView()
+        self.emptyZone = EmptyZone(target: self.view, frame: self.tableView.frame)
+        //TableView
+        self.tableView.tableFooterView = UIView() //消除底部视图
+        self.tableView.separatorStyle = .none //消除分割线
         //PullToRefreshKit
         let firstHeader = FirstRefreshHeader()
         self.tableView.configRefreshHeader(with: firstHeader, action: {
@@ -73,14 +71,17 @@ extension HomeViewController {
     //绑定 Rx
     fileprivate func bindRx() {
         //ViewModel
-        viewModel =  HomeViewModel(disposeBag: self.disposeBag, tableView: self.tableView, emptyZone: emptyZone)
+        viewModel =  HomeViewModel(disposeBag: self.disposeBag, tableView: self.tableView, emptyZone: emptyZone, pagerView: pagerView)
         //TableView
         tableView.rx.setDelegate(self)
             .disposed(by: disposeBag)
         dataSource = RxTableViewSectionedReloadDataSource<HomeSectionModel>(
             configureCell: { ds, tv, ip, item in
-                let cell = tv.dequeueReusableCell(withIdentifier: "Cell", for: ip)
-                cell.textLabel?.text = item.title
+                let cell = tv.dequeueReusableCell(withIdentifier: "cell", for: ip) as! HomeTableViewCell
+                cell.title.text = item.title
+                cell.desc.text = item.title! + item.title! + item.title!
+                //计算 desc label 高度
+                cell.setupConstraint()
                 return cell
             }
         )
@@ -95,11 +96,14 @@ extension HomeViewController {
 extension HomeViewController: UITableViewDelegate, FSPagerViewDelegate, FSPagerViewDataSource {
     //FSPagerViewDataSource & FSPagerViewDelegate
     public func numberOfItems(in pagerView: FSPagerView) -> Int {
-        return self.imageNames.count
+        self.pageControl.numberOfPages = self.viewModel.carsouselData.count
+        return self.viewModel.carsouselData.count
     }
     public func pagerView(_ pagerView: FSPagerView, cellForItemAt index: Int) -> FSPagerViewCell {
-        let cell = pagerView.dequeueReusableCell(withReuseIdentifier: "cell", at: index)
-        cell.imageView?.image = UIImage(named: self.imageNames[index])
+        let cell = pagerView.dequeueReusableCell(withReuseIdentifier: "pagerCell", at: index)
+        let imageUrl = URL(string: self.viewModel.carsouselData[index].image!)
+        //Kingfisher
+        cell.imageView?.kf.setImage(with: imageUrl, placeholder: UIImage(named: "image_placeholder"), options: nil, progressBlock: nil, completionHandler: nil)
         cell.imageView?.contentMode = .scaleAspectFill
         cell.imageView?.clipsToBounds = true
         return cell
@@ -114,6 +118,18 @@ extension HomeViewController: UITableViewDelegate, FSPagerViewDelegate, FSPagerV
             return
         }
         self.pageControl.currentPage = pagerView.currentIndex // Or Use KVO with property "currentIndex"
+    }
+    //TableViewDelegate
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        tableView.deselectRow(at: indexPath, animated: true)
+        // 取消cell选中状态
+        tableView.deselectRow(at: indexPath, animated: true)
+    }
+    func tableView(_ tableView: UITableView, estimatedHeightForRowAt indexPath: IndexPath) -> CGFloat {
+        return 100
+    }
+    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        return UITableViewAutomaticDimension
     }
 }
 

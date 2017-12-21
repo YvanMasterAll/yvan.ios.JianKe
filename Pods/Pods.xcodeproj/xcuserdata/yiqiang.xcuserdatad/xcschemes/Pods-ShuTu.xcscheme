@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Scheme
-   LastUpgradeVersion = "0910"
+   LastUpgradeVersion = "0700"
    version = "1.3">
    <BuildAction
       parallelizeBuildables = "YES"
@@ -14,7 +14,7 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "AF428A3B9903A5BA84728E9C21885EBE"
+               BlueprintIdentifier = "813A151E80F6876C092BFA868266A3A6"
                BuildableName = "Pods_ShuTu.framework"
                BlueprintName = "Pods-ShuTu"
                ReferencedContainer = "container:Pods.xcodeproj">
@@ -47,7 +47,7 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "AF428A3B9903A5BA84728E9C21885EBE"
+            BlueprintIdentifier = "813A151E80F6876C092BFA868266A3A6"
             BuildableName = "Pods_ShuTu.framework"
             BlueprintName = "Pods-ShuTu"
             ReferencedContainer = "container:Pods.xcodeproj">

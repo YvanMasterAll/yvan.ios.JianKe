@@ -6,6 +6,7 @@
     <dependencies>
         <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="13527"/>
+        <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -18,7 +19,7 @@
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="trA-nP-RhU" customClass="I">
+                            <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="trA-nP-RhU">
                                 <rect key="frame" x="0.0" y="66" width="375" height="601"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <view key="tableHeaderView" contentMode="scaleToFill" id="hbs-A3-HHC">
@@ -61,22 +62,92 @@
                                     </constraints>
                                 </view>
                                 <prototypes>
-                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" restorationIdentifier="Cell" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="Cell" textLabel="6ww-P4-3nw" style="IBUITableViewCellStyleDefault" id="Bi4-Le-0dg">
-                                        <rect key="frame" x="0.0" y="208" width="375" height="44"/>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" restorationIdentifier="Cell" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="cell" rowHeight="136" id="Bi4-Le-0dg" customClass="HomeTableViewCell" customModule="ShuTu" customModuleProvider="target">
+                                        <rect key="frame" x="0.0" y="208" width="375" height="136"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="Bi4-Le-0dg" id="JHb-Rz-hNl">
-                                            <rect key="frame" x="0.0" y="0.0" width="375" height="43.5"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="375" height="135.5"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
-                                                <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" insetsLayoutMarginsFromSafeArea="NO" text="Title" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="6ww-P4-3nw">
-                                                    <rect key="frame" x="15" y="0.0" width="345" height="43.5"/>
-                                                    <autoresizingMask key="autoresizingMask"/>
-                                                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                                <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="logo" translatesAutoresizingMaskIntoConstraints="NO" id="Jfg-KH-Yh3">
+                                                    <rect key="frame" x="16" y="8" width="20" height="20"/>
+                                                    <constraints>
+                                                        <constraint firstAttribute="width" constant="20" id="Vgv-YA-DPs"/>
+                                                        <constraint firstAttribute="height" constant="20" id="YxI-0d-4Fe"/>
+                                                    </constraints>
+                                                </imageView>
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="热门内容，来自：互联网" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="0L9-7q-w6B">
+                                                    <rect key="frame" x="40" y="12" width="280" height="12"/>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="10"/>
+                                                    <color key="textColor" red="0.61960784313725492" green="0.61960784313725492" blue="0.61960784313725492" alpha="1" colorSpace="calibratedRGB"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="为什么 H&amp;M 最终决定上天猫开店了？" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="otM-Go-2gZ">
+                                                    <rect key="frame" x="14" y="34" width="240" height="17"/>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                                     <nil key="textColor"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="别说了，我去年在杭州武林银泰的HM买衣服，付款的时候我向收银员展示支付二维码。收银员很高冷的说，对不起，我们这里不接受支付宝付款，我们是外" textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Yml-6u-kqy">
+                                                    <rect key="frame" x="14" y="57" width="341" height="40"/>
+                                                    <constraints>
+                                                        <constraint firstAttribute="height" constant="40" id="Gej-D6-Smz"/>
+                                                    </constraints>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="11"/>
+                                                    <color key="textColor" red="0.12941176470588234" green="0.12941176470588234" blue="0.12941176470588234" alpha="1" colorSpace="calibratedRGB"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="5.3K 声援 · 882 殊途 · " textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Aao-I7-ySo">
+                                                    <rect key="frame" x="14" y="105" width="96.5" height="11"/>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="9"/>
+                                                    <color key="textColor" red="0.61960784313725492" green="0.61960784313725492" blue="0.61960784313725492" alpha="1" colorSpace="calibratedRGB"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="关注问题" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="inU-By-qnK">
+                                                    <rect key="frame" x="110.5" y="105" width="37" height="11"/>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="9"/>
+                                                    <color key="textColor" red="0.61960784310000006" green="0.61960784310000006" blue="0.61960784310000006" alpha="1" colorSpace="calibratedRGB"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Dzn-RK-bEe">
+                                                    <rect key="frame" x="0.0" y="125.5" width="375" height="10"/>
+                                                    <color key="backgroundColor" red="0.98039215686274506" green="0.98039215686274506" blue="0.98039215686274506" alpha="1" colorSpace="calibratedRGB"/>
+                                                    <constraints>
+                                                        <constraint firstAttribute="height" constant="10" id="GZM-6I-esg"/>
+                                                    </constraints>
+                                                </view>
                                             </subviews>
+                                            <constraints>
+                                                <constraint firstItem="Dzn-RK-bEe" firstAttribute="top" secondItem="Aao-I7-ySo" secondAttribute="bottom" constant="9.5" id="0Ek-yF-cMx"/>
+                                                <constraint firstItem="otM-Go-2gZ" firstAttribute="leading" secondItem="JHb-Rz-hNl" secondAttribute="leading" constant="14" id="7XQ-eB-b6d"/>
+                                                <constraint firstItem="0L9-7q-w6B" firstAttribute="top" secondItem="JHb-Rz-hNl" secondAttribute="top" constant="12" id="Ehv-Qp-RDR"/>
+                                                <constraint firstAttribute="trailing" secondItem="Yml-6u-kqy" secondAttribute="trailing" constant="20" id="Gr7-Dh-Erx"/>
+                                                <constraint firstItem="Yml-6u-kqy" firstAttribute="leading" secondItem="JHb-Rz-hNl" secondAttribute="leading" constant="14" id="HRL-AC-edm"/>
+                                                <constraint firstItem="Jfg-KH-Yh3" firstAttribute="leading" secondItem="JHb-Rz-hNl" secondAttribute="leading" constant="16" id="L6F-En-LRR"/>
+                                                <constraint firstItem="0L9-7q-w6B" firstAttribute="leading" secondItem="Jfg-KH-Yh3" secondAttribute="trailing" constant="4" id="OsJ-l0-k0c"/>
+                                                <constraint firstItem="Dzn-RK-bEe" firstAttribute="leading" secondItem="JHb-Rz-hNl" secondAttribute="leading" id="PdI-4d-I2S"/>
+                                                <constraint firstItem="Yml-6u-kqy" firstAttribute="top" secondItem="otM-Go-2gZ" secondAttribute="bottom" constant="6" id="T2i-Bo-rsa"/>
+                                                <constraint firstAttribute="trailing" secondItem="Dzn-RK-bEe" secondAttribute="trailing" id="VZA-gd-DvS"/>
+                                                <constraint firstItem="inU-By-qnK" firstAttribute="leading" secondItem="Aao-I7-ySo" secondAttribute="trailing" id="VjG-jf-lYs"/>
+                                                <constraint firstAttribute="trailingMargin" secondItem="0L9-7q-w6B" secondAttribute="trailing" constant="40" id="WUj-fI-SZQ"/>
+                                                <constraint firstAttribute="bottom" secondItem="Dzn-RK-bEe" secondAttribute="bottom" id="Zs1-qb-mTJ"/>
+                                                <constraint firstItem="Aao-I7-ySo" firstAttribute="top" secondItem="Yml-6u-kqy" secondAttribute="bottom" constant="8" id="aza-lC-jXA"/>
+                                                <constraint firstItem="inU-By-qnK" firstAttribute="top" secondItem="Yml-6u-kqy" secondAttribute="bottom" constant="8" id="cjR-DI-7cM"/>
+                                                <constraint firstItem="Aao-I7-ySo" firstAttribute="leading" secondItem="JHb-Rz-hNl" secondAttribute="leading" constant="14" id="pm1-NY-nzm"/>
+                                                <constraint firstItem="Jfg-KH-Yh3" firstAttribute="top" secondItem="JHb-Rz-hNl" secondAttribute="top" constant="8" id="tRT-gc-FcH"/>
+                                                <constraint firstItem="otM-Go-2gZ" firstAttribute="top" secondItem="Jfg-KH-Yh3" secondAttribute="bottom" constant="6" id="vbV-Gk-y39"/>
+                                            </constraints>
                                         </tableViewCellContentView>
+                                        <connections>
+                                            <outlet property="category" destination="0L9-7q-w6B" id="vj8-Ce-ncS"/>
+                                            <outlet property="desc" destination="Yml-6u-kqy" id="8FZ-o3-XAF"/>
+                                            <outlet property="descHeightConstraint" destination="Gej-D6-Smz" id="vbZ-v2-IAg"/>
+                                            <outlet property="divider" destination="Dzn-RK-bEe" id="lo0-dN-zR3"/>
+                                            <outlet property="follow" destination="inU-By-qnK" id="fYH-XA-AUt"/>
+                                            <outlet property="score" destination="Aao-I7-ySo" id="4oL-UF-UCk"/>
+                                            <outlet property="thumbnail" destination="Jfg-KH-Yh3" id="a3a-oU-KZV"/>
+                                            <outlet property="title" destination="otM-Go-2gZ" id="eUR-g8-RIs"/>
+                                        </connections>
                                     </tableViewCell>
                                 </prototypes>
                             </tableView>

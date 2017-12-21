@@ -44,3 +44,17 @@ public struct NewsStory: Mappable {
         title <- map["title"]
     }
 }
+
+public struct NewsImage: Mappable {
+    
+    var id: Int?
+    var image: String?
+    
+    public init(){}
+    public init?(map: Map) {}
+    
+    public mutating func mapping(map: Map) {
+        id <- map["id"]
+        image <- map["image"]
+    }
+}

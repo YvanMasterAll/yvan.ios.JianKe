@@ -9,43 +9,76 @@
 import Foundation
 import UIKit
 
-typealias EmptyZoneClicked = () -> Void
+@objc protocol EmptyZoneDelegate {
+    @objc optional func emptyZoneClicked()
+    @objc optional func emptyZoneImage() -> String
+}
 
-class EmptyZone: UIView {
+public enum EmptyZoneType {
+    case empty
+    case loading
+}
+
+class EmptyZone {
     
     //声明区
-    var emptyZoneClicked: EmptyZoneClicked?
+    weak var delegate: EmptyZoneDelegate?
+    fileprivate var EmptyView: UIView!
+    fileprivate var target: UIView!
+    fileprivate var frame: CGRect!
+    fileprivate var imageView: UIImageView!
     
-    override init(frame: CGRect) {
-        super.init(frame: frame)
-        
+    init(target: UIView, frame: CGRect) {
+        self.target = target
+        self.frame = frame
+
         setupUI()
     }
     
-    required init?(coder aDecoder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-    
     //显示 & 隐藏
-    func show() {
-        self.isHidden = false
+    func show(type: EmptyZoneType) {
+        setupEmptyViewContent(type: type)
+        self.EmptyView.isHidden = false
     }
     func hide() {
-        self.isHidden = true
+        self.EmptyView.isHidden = true
     }
 }
 
 extension EmptyZone {
     //初始化
     fileprivate func setupUI() {
-        self.backgroundColor = UIColor.purple
-        self.isHidden = true
+        //EmptyView
+        self.EmptyView = UIView(frame: self.frame)
+        target.addSubview(self.EmptyView)
+        self.EmptyView.backgroundColor = UIColor.white
+        self.EmptyView.isHidden = true
         //添加点击事件
         let tapGes = UITapGestureRecognizer(target: self, action: #selector(self.clicked))
-        self.addGestureRecognizer(tapGes)
+        self.EmptyView.addGestureRecognizer(tapGes)
+    }
+    fileprivate func setupEmptyViewContent(type: EmptyZoneType) {
+        //清空
+        for view in self.EmptyView.subviews {
+            view.removeFromSuperview()
+        }
+        
+        switch type {
+        case .empty:
+            if let imageName = self.delegate?.emptyZoneImage?() {
+                self.imageView = UIImageView(image: UIImage(named: imageName))
+            } else {
+                self.imageView = UIImageView(image: UIImage(named: "image_empty"))
+            }
+            self.EmptyView.addSubview(self.imageView)
+            self.imageView.center = self.EmptyView.center
+            break
+        case .loading:
+            break
+        }
     }
     //点击事件
     @objc fileprivate func clicked() {
-        self.emptyZoneClicked?()
+        self.delegate?.emptyZoneClicked?()
     }
 }

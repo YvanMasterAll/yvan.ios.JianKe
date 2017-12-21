@@ -65,6 +65,14 @@ class NewsService {
             .asObservable()
             .observeOn(MainScheduler.instance)
     }
+    
+    //拉取轮播图片
+    func getNewsCarousel() -> Observable<[NewsImage]>{
+        return ShuTuProvider.rx.request(.carousel)
+            .mapArray(NewsImage.self)
+            .asObservable()
+            .observeOn(MainScheduler.instance)
+    }
 }
 
 class TestService {

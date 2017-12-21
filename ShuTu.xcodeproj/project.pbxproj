@@ -76,6 +76,7 @@
 		C6C1308F1FE3ABB500E2B21D /* HomeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6C1308E1FE3ABB500E2B21D /* HomeViewController.swift */; };
 		C6C130911FE3ABCD00E2B21D /* HomeViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6C130901FE3ABCD00E2B21D /* HomeViewModel.swift */; };
 		C6C130941FE3CDD500E2B21D /* News.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6C130931FE3CDD500E2B21D /* News.swift */; };
+		C6CD27401FEBC27500CF87A8 /* HomeTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6CD273F1FEBC27500CF87A8 /* HomeTableViewCell.swift */; };
 		C6E273901FEA77FE00D78520 /* FSPagerViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6E273891FEA77FC00D78520 /* FSPagerViewCell.swift */; };
 		C6E273911FEA77FE00D78520 /* FSPagerViewTransformer.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6E2738A1FEA77FC00D78520 /* FSPagerViewTransformer.swift */; };
 		C6E273921FEA77FE00D78520 /* FSPagerCollectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6E2738B1FEA77FD00D78520 /* FSPagerCollectionView.swift */; };
@@ -184,6 +185,7 @@
 		C6C1308E1FE3ABB500E2B21D /* HomeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeViewController.swift; sourceTree = "<group>"; };
 		C6C130901FE3ABCD00E2B21D /* HomeViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeViewModel.swift; sourceTree = "<group>"; };
 		C6C130931FE3CDD500E2B21D /* News.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = News.swift; sourceTree = "<group>"; };
+		C6CD273F1FEBC27500CF87A8 /* HomeTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeTableViewCell.swift; sourceTree = "<group>"; };
 		C6E273891FEA77FC00D78520 /* FSPagerViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FSPagerViewCell.swift; sourceTree = "<group>"; };
 		C6E2738A1FEA77FC00D78520 /* FSPagerViewTransformer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FSPagerViewTransformer.swift; sourceTree = "<group>"; };
 		C6E2738B1FEA77FD00D78520 /* FSPagerCollectionView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FSPagerCollectionView.swift; sourceTree = "<group>"; };
@@ -512,6 +514,7 @@
 			isa = PBXGroup;
 			children = (
 				C6B84B2D1FEA8178000B74A4 /* SearchView.swift */,
+				C6CD273F1FEBC27500CF87A8 /* HomeTableViewCell.swift */,
 			);
 			path = V;
 			sourceTree = "<group>";
@@ -717,6 +720,7 @@
 				"${SRCROOT}/Pods/Target Support Files/Pods-ShuTu/Pods-ShuTu-frameworks.sh",
 				"${BUILT_PRODUCTS_DIR}/Alamofire/Alamofire.framework",
 				"${BUILT_PRODUCTS_DIR}/Differentiator/Differentiator.framework",
+				"${BUILT_PRODUCTS_DIR}/Kingfisher/Kingfisher.framework",
 				"${BUILT_PRODUCTS_DIR}/Moya/Moya.framework",
 				"${BUILT_PRODUCTS_DIR}/ObjectMapper/ObjectMapper.framework",
 				"${BUILT_PRODUCTS_DIR}/Result/Result.framework",
@@ -728,6 +732,7 @@
 			outputPaths = (
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Alamofire.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Differentiator.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Kingfisher.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Moya.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/ObjectMapper.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Result.framework",
@@ -790,6 +795,7 @@
 				C68983D51FDF8DB200C53E95 /* Protocol.swift in Sources */,
 				C66B37E61FE2C3EE004117A8 /* PKHUDWideBaseView.swift in Sources */,
 				C6C130911FE3ABCD00E2B21D /* HomeViewModel.swift in Sources */,
+				C6CD27401FEBC27500CF87A8 /* HomeTableViewCell.swift in Sources */,
 				C68983D91FDF8DED00C53E95 /* Api.swift in Sources */,
 				C68983B21FDF784D00C53E95 /* SwiftIcons.swift in Sources */,
 				C68983D71FDF8DD300C53E95 /* Service.swift in Sources */,

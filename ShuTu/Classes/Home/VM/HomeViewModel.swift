@@ -41,21 +41,24 @@ public class HomeViewModel: HomeViewModelInput, HomeViewModelOutput, HomeViewMod
     fileprivate let tableView: UITableView!
     fileprivate var refreshStateObserver = Variable<RefreshStatus>(.none)
     fileprivate var emptyZone: EmptyZone!
+    fileprivate var pagerView: FSPagerView!
     //inputs
     public var refreshNewData = PublishSubject<Bool>()
     //outputs
     public var sections: Driver<[HomeSectionModel]>
+    public var carsouselData = [NewsImage]()
     //get
     public var inputs: HomeViewModelInput { return self }
     public var outputs: HomeViewModelOutput { return self }
     
-    init(disposeBag: DisposeBag, tableView: UITableView, emptyZone: EmptyZone) {
+    init(disposeBag: DisposeBag, tableView: UITableView, emptyZone: EmptyZone, pagerView: FSPagerView) {
         //服务
         let service = NewsService.instance
         //初始化
         self.disposeBag = disposeBag
         self.tableView = tableView
         self.emptyZone = emptyZone
+        self.pagerView = pagerView
         //Rx
         sections = models.asObservable()
             .map{ models -> [HomeSectionModel] in
@@ -82,7 +85,14 @@ public class HomeViewModel: HomeViewModelInput, HomeViewModelOutput, HomeViewMod
                         })
                         .disposed(by: self.disposeBag)
                     //拉取轮播数据
-                    
+                    service.getNewsCarousel()
+                        .subscribe(onNext: { data in
+                            if data.count != 0 {
+                                self.carsouselData = data
+                                self.pagerView.reloadData()
+                            }
+                        })
+                        .disposed(by: self.disposeBag)
                 } else {//加载更多
                     self.pageIndex += 1
                     let date = Date.toString(date: Date(timeIntervalSinceNow: -Double(self.pageIndex) * 24 * 60 * 60), dateFormat: "yyyyMMdd")
@@ -106,7 +116,7 @@ public class HomeViewModel: HomeViewModelInput, HomeViewModelOutput, HomeViewMod
             .subscribe(onNext: { state in
                 switch state {
                 case .noData:
-                    self.showEmptyZone()
+                    self.showEmptyZone(type: .empty)
                     break
                 case .beginHeaderRefresh:
                     break
@@ -126,24 +136,27 @@ public class HomeViewModel: HomeViewModelInput, HomeViewModelOutput, HomeViewMod
                 }
             })
             .disposed(by: disposeBag)
-        //EmptyZone 点击事件
-        self.emptyZone.emptyZoneClicked = {
-            self.hideEmptyZone()
-        }
+        self.emptyZone.delegate = self
     }
 }
 
 extension HomeViewModel {
     //显示 & 隐藏 Empty Zone
-    fileprivate func showEmptyZone() {
+    fileprivate func showEmptyZone(type: EmptyZoneType) {
         self.tableView.switchRefreshHeader(to: .normal(.none, 0))
         tableView.isHidden = true
-        self.emptyZone.show()
+        self.emptyZone.show(type: type)
     }
     fileprivate func hideEmptyZone() {
         self.emptyZone.hide()
         tableView.isHidden = false
         self.tableView.switchRefreshHeader(to: .refreshing)
+    }
+}
+
+extension HomeViewModel: EmptyZoneDelegate {
+    func emptyZoneClicked() {
+        self.hideEmptyZone()
     }
 }
 
