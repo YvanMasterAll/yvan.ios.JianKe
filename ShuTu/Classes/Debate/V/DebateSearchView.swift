@@ -1,5 +1,5 @@
 //
-//  SearchView.swift
+//  DebateSearchView.swift
 //  ShuTu
 //
 //  Created by yiqiang on 2017/12/20.
@@ -8,7 +8,7 @@
 
 import UIKit
 
-class SearchView: UIView {
+class DebateSearchView: UIView {
 
     override init(frame: CGRect) {
         super.init(frame: frame)

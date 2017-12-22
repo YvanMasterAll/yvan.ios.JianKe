@@ -53,25 +53,27 @@ class UserService {
     
 }
 
-class NewsService {
+class DebateService {
     //单例
-    static let instance = NewsService()
+    static let instance = DebateService()
     private init() {}
     
-    //拉取 News
-    func getNewsByDate(_ date: String = Date.toString(date: Date(), dateFormat: "yyyyMMdd")) -> Observable<News> {
-        return ZhihuProvider.rx.request(.getMoreNews(date))
-            .mapObject(News.self)
+    //拉取 Debate
+    func getDebate(id: Int) -> Observable<[Debate]> {
+        return ShuTuProvider.rx.request(.debate(id: id))
+            .mapArray(Debate.self)
             .asObservable()
             .observeOn(MainScheduler.instance)
+            .catchErrorJustReturn([])
     }
     
     //拉取轮播图片
-    func getNewsCarousel() -> Observable<[NewsImage]>{
+    func getDebateCarousel() -> Observable<[DebateImage]>{
         return ShuTuProvider.rx.request(.carousel)
-            .mapArray(NewsImage.self)
+            .mapArray(DebateImage.self)
             .asObservable()
             .observeOn(MainScheduler.instance)
+            .catchErrorJustReturn([])
     }
 }
 

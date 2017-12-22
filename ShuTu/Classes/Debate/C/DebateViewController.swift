@@ -1,5 +1,5 @@
 //
-//  HomeViewController.swift
+//  DebateViewController.swift
 //  JianKe
 //
 //  Created by yiqiang on 2017/12/15.
@@ -12,7 +12,7 @@ import RxSwift
 import RxDataSources
 import Kingfisher
 
-class HomeViewController: UIViewController {
+class DebateViewController: UIViewController {
 
     @IBOutlet weak var tableView: UITableView!
     @IBOutlet weak var searchBar: UIView!
@@ -33,9 +33,9 @@ class HomeViewController: UIViewController {
     
     //声明区
     fileprivate let disposeBag = DisposeBag()
-    fileprivate var viewModel: HomeViewModel!
-    fileprivate var dataSource: RxTableViewSectionedReloadDataSource<HomeSectionModel>!
-    fileprivate var emptyZone: EmptyZone!
+    fileprivate var viewModel: DebateViewModel!
+    fileprivate var dataSource: RxTableViewSectionedReloadDataSource<DebateSectionModel>!
+    fileprivate var emptyView: EmptyView!
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -44,6 +44,13 @@ class HomeViewController: UIViewController {
         setupUI()
         bindRx()
     }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        
+        //隐藏导航栏
+        self.navigationController?.setNavigationBarHidden(true, animated: false)
+    }
 
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
@@ -51,11 +58,11 @@ class HomeViewController: UIViewController {
 
 }
 
-extension HomeViewController {
+extension DebateViewController {
     //初始化
     fileprivate func setupUI() {
-        //EmptyZone
-        self.emptyZone = EmptyZone(target: self.view, frame: self.tableView.frame)
+        //EmptyView
+        self.emptyView = EmptyView(target: self.view, frame: CGRect(x: 0, y: 66, width: SW, height: SH - 66 - TarBarHeight))
         //TableView
         self.tableView.tableFooterView = UIView() //消除底部视图
         self.tableView.separatorStyle = .none //消除分割线
@@ -71,20 +78,32 @@ extension HomeViewController {
     //绑定 Rx
     fileprivate func bindRx() {
         //ViewModel
-        viewModel =  HomeViewModel(disposeBag: self.disposeBag, tableView: self.tableView, emptyZone: emptyZone, pagerView: pagerView)
+        viewModel =  DebateViewModel(disposeBag: self.disposeBag, tableView: self.tableView, emptyView: emptyView, pagerView: pagerView)
         //TableView
         tableView.rx.setDelegate(self)
             .disposed(by: disposeBag)
-        dataSource = RxTableViewSectionedReloadDataSource<HomeSectionModel>(
+        dataSource = RxTableViewSectionedReloadDataSource<DebateSectionModel>(
             configureCell: { ds, tv, ip, item in
-                let cell = tv.dequeueReusableCell(withIdentifier: "cell", for: ip) as! HomeTableViewCell
+                let cell = tv.dequeueReusableCell(withIdentifier: "cell", for: ip) as! DebateTableViewCell
                 cell.title.text = item.title
-                cell.desc.text = item.title! + item.title! + item.title!
+                cell.desc.text = item.desc
+                cell.thumbnail.kf.setImage(with: URL(string: item.thumbnail!))
+                cell.score.text = "\(item.yc ?? 0) 声援 · \(item.sc ?? 0) 殊途 · "
                 //计算 desc label 高度
                 cell.setupConstraint()
                 return cell
             }
         )
+        self.tableView.rx
+            .modelSelected(Debate.self)
+            .subscribe(onNext: { data in
+                //跳转至详情
+                let debateStoryBoard = UIStoryboard(name: "Debate", bundle: nil)
+                let debateDetailVC = debateStoryBoard.instantiateViewController(withIdentifier: "DebateDetail") as! DebateDetailViewController
+                debateDetailVC.section = data
+                self.navigationController?.pushViewController(debateDetailVC, animated: true)
+            })
+            .disposed(by: disposeBag)
         viewModel.outputs.sections.asDriver()
             .drive(tableView.rx.items(dataSource: dataSource))
             .disposed(by: disposeBag)
@@ -93,7 +112,7 @@ extension HomeViewController {
     }
 }
 
-extension HomeViewController: UITableViewDelegate, FSPagerViewDelegate, FSPagerViewDataSource {
+extension DebateViewController: UITableViewDelegate, FSPagerViewDelegate, FSPagerViewDataSource {
     //FSPagerViewDataSource & FSPagerViewDelegate
     public func numberOfItems(in pagerView: FSPagerView) -> Int {
         self.pageControl.numberOfPages = self.viewModel.carsouselData.count
@@ -122,7 +141,7 @@ extension HomeViewController: UITableViewDelegate, FSPagerViewDelegate, FSPagerV
     //TableViewDelegate
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
-        // 取消cell选中状态
+        //取消cell选中状态
         tableView.deselectRow(at: indexPath, animated: true)
     }
     func tableView(_ tableView: UITableView, estimatedHeightForRowAt indexPath: IndexPath) -> CGFloat {

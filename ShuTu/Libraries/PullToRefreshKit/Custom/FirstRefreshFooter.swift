@@ -30,6 +30,9 @@ class FirstRefreshFooter: UIView, RefreshableFooter {
         setUpCircleLayer()
         textlabel.text = "上拉加载更多"
         shapeLayer.isHidden = true
+        
+        //隐藏 footer
+        self.isHidden = true
     }
     
     override func layoutSubviews() {
@@ -88,6 +91,9 @@ class FirstRefreshFooter: UIView, RefreshableFooter {
     }
     
     func didBeginRefreshing() {
+        //显示 footer
+        self.isHidden = false
+        
         textlabel.text = "正在加载中..."
         let rotateAnimation = CABasicAnimation(keyPath: "transform.rotation.z")
         rotateAnimation.toValue = NSNumber(value: Double.pi * 2.0)

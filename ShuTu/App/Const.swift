@@ -13,7 +13,6 @@ import UIKit
 let SW = UIScreen.main.bounds.size.width
 let SH = UIScreen.main.bounds.size.height
 let TarBarHeight: CGFloat = 40
-let LabelHeightMax: CGFloat = 40
 
 //版本信息
 let AppVersion = Bundle.main.infoDictionary!["CFBundleShortVersionString"] as! String

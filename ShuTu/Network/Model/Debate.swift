@@ -1,5 +1,5 @@
 //
-//  news.swift
+//  debate.swift
 //  JianKe
 //
 //  Created by yiqiang on 2017/12/15.
@@ -9,22 +9,30 @@
 import Foundation
 import ObjectMapper
 
-public struct News: Mappable{
+public struct Debate: Mappable{
     
-    var date: String?
-    var stories: [NewsStory]?
+    var id: Int?
+    var thumbnail: String?
+    var title: String?
+    var desc: String?
+    var yc: Int?
+    var sc: Int?
     
     public init(){}
     public init?(map: Map){}
     
     public mutating func mapping(map: Map)
     {
-        date <- map["date"]
-        stories <- map["stories"]
+        id <- map["id"]
+        thumbnail <- map["thumbnail"]
+        title <- map["title"]
+        desc <- map["desc"]
+        yc <- map["yc"]
+        sc <- map["sc"]
     }
 }
 
-public struct NewsStory: Mappable {
+public struct DebateStory: Mappable {
     
     var id: Int?
     var images: [String]?
@@ -45,7 +53,7 @@ public struct NewsStory: Mappable {
     }
 }
 
-public struct NewsImage: Mappable {
+public struct DebateImage: Mappable {
     
     var id: Int?
     var image: String?

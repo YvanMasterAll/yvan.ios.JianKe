@@ -7,4 +7,6 @@ target 'ShuTu' do
 	pod 'Moya/RxSwift'
 	pod 'ObjectMapper'
 	pod 'Kingfisher'
+	pod 'SnapKit'
+	pod 'PMSuperButton'
 end

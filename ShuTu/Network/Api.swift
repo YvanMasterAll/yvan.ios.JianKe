@@ -26,6 +26,7 @@ public var ShuTuProvider = MoyaProvider<ShuTuApi>()
 public enum ShuTuApi {
     case test
     case carousel
+    case debate(id: Int)
 }
 extension ShuTuApi: TargetType {
     //The target's base `URL`
@@ -38,7 +39,9 @@ extension ShuTuApi: TargetType {
         case .test:
             return "test"
         case .carousel:
-            return "carousel"
+            return "debate/carousel"
+        case .debate(let id):
+            return "debate/\(id)"
         }
     }
     //The HTTP method used in the request.

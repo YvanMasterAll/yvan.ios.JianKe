@@ -9,6 +9,7 @@ PODS:
     - Moya/Core
     - RxSwift (~> 4.0)
   - ObjectMapper (3.1.0)
+  - PMSuperButton (2.0.4)
   - Result (3.2.4)
   - RxCocoa (4.0.0):
     - RxSwift (~> 4.0)
@@ -17,14 +18,17 @@ PODS:
     - RxCocoa (~> 4.0)
     - RxSwift (~> 4.0)
   - RxSwift (4.0.0)
+  - SnapKit (4.0.0)
 
 DEPENDENCIES:
   - Kingfisher
   - Moya/RxSwift
   - ObjectMapper
+  - PMSuperButton
   - RxCocoa
   - RxDataSources
   - RxSwift
+  - SnapKit
 
 SPEC CHECKSUMS:
   Alamofire: f41a599bd63041760b26d393ec1069d9d7b917f4
@@ -32,11 +36,13 @@ SPEC CHECKSUMS:
   Kingfisher: 62a43e03047a1ac5159d0be3ac62673ef4b99cc3
   Moya: 9e621707ff754eeb51ff3ec51a3d54e517c0733a
   ObjectMapper: 20505058f54e5c3ca69e1d6de9897d152a5369a6
+  PMSuperButton: 148f52039b68d13b9335a3e8af81f37aec55cfa8
   Result: d2d07204ce72856f1fd9130bbe42c35a7b0fea10
   RxCocoa: d62846ca96495d862fa4c59ea7d87e5031d7340e
   RxDataSources: cb7c31e652a87ebb919da45f716bbb87b3765f6b
   RxSwift: fd680d75283beb5e2559486f3c0ff852f0d35334
+  SnapKit: a42d492c16e80209130a3379f73596c3454b7694
 
-PODFILE CHECKSUM: 649fe106a49726b73699531e9adb274188f07825
+PODFILE CHECKSUM: 5e6ce3fe06ab8f9c9266d8ae63467786d055d4fc
 
 COCOAPODS: 1.3.1

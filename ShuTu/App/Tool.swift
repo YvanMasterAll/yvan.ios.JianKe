@@ -190,4 +190,11 @@ extension UILabel {
             return (self.text! as NSString).boundingRect(with: CGSize(width: CGFloat(MAXFLOAT), height: 0), options: .usesLineFragmentOrigin, attributes: [NSAttributedStringKey.font : self.font], context: nil).width
         }
     }
+    func heightOfLines(by: Int) -> CGFloat {
+        var s = ""
+        for i in 0..<by {
+            s += "\(i)"
+        }
+        return (s as NSString).boundingRect(with: CGSize(width: 1, height:CGFloat(MAXFLOAT)), options: .usesLineFragmentOrigin, attributes: [NSAttributedStringKey.font : self.font], context: nil).height
+    }
 }

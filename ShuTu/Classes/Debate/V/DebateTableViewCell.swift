@@ -1,5 +1,5 @@
 //
-//  HomeTableViewCell.swift
+//  DebateTableViewCell.swift
 //  ShuTu
 //
 //  Created by yiqiang on 2017/12/21.
@@ -8,7 +8,7 @@
 
 import UIKit
 
-class HomeTableViewCell: UITableViewCell {
+class DebateTableViewCell: UITableViewCell {
 
     @IBOutlet weak var divider: UIView!
     @IBOutlet weak var follow: UILabel!
@@ -32,7 +32,7 @@ class HomeTableViewCell: UITableViewCell {
 
 }
 
-extension HomeTableViewCell {
+extension DebateTableViewCell {
     //初始化
     fileprivate func setupUI() {
         //为分割线上边框
@@ -40,12 +40,16 @@ extension HomeTableViewCell {
         ilayer.frame = CGRect(x: 0, y: 0, width: SW, height: 1)
         ilayer.backgroundColor = GMColor.grey100Color().cgColor
         self.divider.layer.addSublayer(ilayer)
+        //头像圆形
+        self.thumbnail.layer.cornerRadius = self.thumbnail.frame.size.width / 2
+        self.thumbnail.layer.masksToBounds = true
     }
     //添加约束
     public func setupConstraint() {
         let height = self.desc.height
-        if height > LabelHeightMax {
-            self.descHeightConstraint.constant = LabelHeightMax
+        let heightMax = self.desc.heightOfLines(by: 3)
+        if height > heightMax {
+            self.descHeightConstraint.constant = heightMax
         } else {
             self.descHeightConstraint.constant = height
         }

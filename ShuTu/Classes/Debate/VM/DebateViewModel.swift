@@ -1,5 +1,5 @@
 //
-//  HomeViewModel.swift
+//  DebateViewModel.swift
 //  JianKe
 //
 //  Created by yiqiang on 2017/12/15.
@@ -23,46 +23,46 @@ public enum RefreshStatus {
     case endRefreshWithoutData
 }
 
-public protocol HomeViewModelInput {
+public protocol DebateViewModelInput {
     var refreshNewData: PublishSubject<Bool>{ get }
 }
-public protocol HomeViewModelOutput {
-    var sections: Driver<[HomeSectionModel]>{ get }
+public protocol DebateViewModelOutput {
+    var sections: Driver<[DebateSectionModel]>{ get }
 }
-public protocol HomeViewModelType {
-    var inputs: HomeViewModelInput { get }
-    var outputs: HomeViewModelOutput { get }
+public protocol DebateViewModelType {
+    var inputs: DebateViewModelInput { get }
+    var outputs: DebateViewModelOutput { get }
 }
-public class HomeViewModel: HomeViewModelInput, HomeViewModelOutput, HomeViewModelType {
+public class DebateViewModel: DebateViewModelInput, DebateViewModelOutput, DebateViewModelType {
     //声明区
     fileprivate var pageIndex = 0
-    fileprivate let models = Variable<[NewsStory]>([])
+    fileprivate let models = Variable<[Debate]>([])
     fileprivate let disposeBag: DisposeBag!
     fileprivate let tableView: UITableView!
     fileprivate var refreshStateObserver = Variable<RefreshStatus>(.none)
-    fileprivate var emptyZone: EmptyZone!
+    fileprivate var emptyView: EmptyView!
     fileprivate var pagerView: FSPagerView!
     //inputs
     public var refreshNewData = PublishSubject<Bool>()
     //outputs
-    public var sections: Driver<[HomeSectionModel]>
-    public var carsouselData = [NewsImage]()
+    public var sections: Driver<[DebateSectionModel]>
+    public var carsouselData = [DebateImage]()
     //get
-    public var inputs: HomeViewModelInput { return self }
-    public var outputs: HomeViewModelOutput { return self }
+    public var inputs: DebateViewModelInput { return self }
+    public var outputs: DebateViewModelOutput { return self }
     
-    init(disposeBag: DisposeBag, tableView: UITableView, emptyZone: EmptyZone, pagerView: FSPagerView) {
+    init(disposeBag: DisposeBag, tableView: UITableView, emptyView: EmptyView, pagerView: FSPagerView) {
         //服务
-        let service = NewsService.instance
+        let service = DebateService.instance
         //初始化
         self.disposeBag = disposeBag
         self.tableView = tableView
-        self.emptyZone = emptyZone
+        self.emptyView = emptyView
         self.pagerView = pagerView
         //Rx
         sections = models.asObservable()
-            .map{ models -> [HomeSectionModel] in
-                return [HomeSectionModel(items: models)]
+            .map{ models -> [DebateSectionModel] in
+                return [DebateSectionModel(items: models)]
             }
             .asDriver(onErrorJustReturn: [])
         refreshNewData.asObserver()
@@ -71,11 +71,11 @@ public class HomeViewModel: HomeViewModelInput, HomeViewModelOutput, HomeViewMod
                     //初始化
                     self.pageIndex = 0
                     //拉取数据
-                    service.getNewsByDate()
+                    service.getDebate(id: self.pageIndex)
                         .subscribe(onNext: { data in
-                            if data.stories != nil {
+                            if data.count > 0 {
                                 self.models.value.removeAll()
-                                self.models.value = data.stories!
+                                self.models.value = data
                                 //结束刷新
                                 self.refreshStateObserver.value = .endHeaderRefresh
                             } else {
@@ -85,7 +85,7 @@ public class HomeViewModel: HomeViewModelInput, HomeViewModelOutput, HomeViewMod
                         })
                         .disposed(by: self.disposeBag)
                     //拉取轮播数据
-                    service.getNewsCarousel()
+                    service.getDebateCarousel()
                         .subscribe(onNext: { data in
                             if data.count != 0 {
                                 self.carsouselData = data
@@ -95,12 +95,11 @@ public class HomeViewModel: HomeViewModelInput, HomeViewModelOutput, HomeViewMod
                         .disposed(by: self.disposeBag)
                 } else {//加载更多
                     self.pageIndex += 1
-                    let date = Date.toString(date: Date(timeIntervalSinceNow: -Double(self.pageIndex) * 24 * 60 * 60), dateFormat: "yyyyMMdd")
                     //拉取数据
-                    service.getNewsByDate(date)
+                    service.getDebate(id: self.pageIndex)
                         .subscribe(onNext: { data in
-                            if data.stories != nil {
-                                self.models.value += data.stories!
+                            if data.count > 0 {
+                                self.models.value += data
                                 //结束刷新
                                 self.refreshStateObserver.value = .endFooterRefresh
                             } else {//没有更多数据
@@ -116,7 +115,7 @@ public class HomeViewModel: HomeViewModelInput, HomeViewModelOutput, HomeViewMod
             .subscribe(onNext: { state in
                 switch state {
                 case .noData:
-                    self.showEmptyZone(type: .empty)
+                    self.showEmptyView(type: .empty)
                     break
                 case .beginHeaderRefresh:
                     break
@@ -136,38 +135,38 @@ public class HomeViewModel: HomeViewModelInput, HomeViewModelOutput, HomeViewMod
                 }
             })
             .disposed(by: disposeBag)
-        self.emptyZone.delegate = self
+        self.emptyView.delegate = self
     }
 }
 
-extension HomeViewModel {
+extension DebateViewModel {
     //显示 & 隐藏 Empty Zone
-    fileprivate func showEmptyZone(type: EmptyZoneType) {
+    fileprivate func showEmptyView(type: EmptyViewType) {
         self.tableView.switchRefreshHeader(to: .normal(.none, 0))
         tableView.isHidden = true
-        self.emptyZone.show(type: type)
+        self.emptyView.show(type: type)
     }
-    fileprivate func hideEmptyZone() {
-        self.emptyZone.hide()
+    fileprivate func hideEmptyView() {
+        self.emptyView.hide()
         tableView.isHidden = false
         self.tableView.switchRefreshHeader(to: .refreshing)
     }
 }
 
-extension HomeViewModel: EmptyZoneDelegate {
-    func emptyZoneClicked() {
-        self.hideEmptyZone()
+extension DebateViewModel: EmptyViewDelegate {
+    func emptyViewClicked() {
+        self.hideEmptyView()
     }
 }
 
-public struct HomeSectionModel {
+public struct DebateSectionModel {
     public var items: [item]
 }
 
-extension HomeSectionModel: SectionModelType {
-    public typealias item = NewsStory
+extension DebateSectionModel: SectionModelType {
+    public typealias item = Debate
     
-    public init(original: HomeSectionModel, items: [HomeSectionModel.item]) {
+    public init(original: DebateSectionModel, items: [DebateSectionModel.item]) {
         self = original
         self.items = items
     }

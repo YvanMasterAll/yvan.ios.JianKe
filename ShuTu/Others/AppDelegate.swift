@@ -49,14 +49,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         let tabBarController = UITabBarController()
         tabBarController.tabBar.backgroundColor = UIColor.white
         //ViewControllers
-        let homeStoryBoard = UIStoryboard(name: "Home", bundle: nil)
-        let homeViewController = homeStoryBoard.instantiateViewController(withIdentifier: "Home")
-        tabBarController.viewControllers = [homeViewController]
+        let debateStoryBoard = UIStoryboard(name: "Debate", bundle: nil)
+        let debateNavigationController = debateStoryBoard.instantiateViewController(withIdentifier: "Debate") as! UINavigationController
+        tabBarController.viewControllers = [debateNavigationController]
         //TabBars
-        homeViewController.tabBarItem = UITabBarItem(title: "首页", image: UIImage(named: "icon_home_grey600"), selectedImage: UIImage(named: "icon_home_primary"))
-        homeViewController.tabBarItem.imageInsets.top = -4
-        homeViewController.tabBarItem.titlePositionAdjustment.vertical = -2
-        homeViewController.tabBarItem.setTitleTextAttributes([NSAttributedStringKey.font: UIFont.systemFont(ofSize: 11)], for: .normal)
+        debateNavigationController.tabBarItem = UITabBarItem(title: "首页", image: UIImage(named: "icon_home_grey600"), selectedImage: UIImage(named: "icon_home_primary"))
+        debateNavigationController.tabBarItem.imageInsets.top = -4
+        debateNavigationController.tabBarItem.titlePositionAdjustment.vertical = -2
+        debateNavigationController.tabBarItem.setTitleTextAttributes([NSAttributedStringKey.font: UIFont.systemFont(ofSize: 11)], for: .normal)
         tabBarController.tabBar.frame.size = CGSize(width: SW, height: TarBarHeight)
         //TabBar Top Shadow
         tabBarController.tabBar.layer.shadowOffset = CGSize(width: 0, height: 0)
