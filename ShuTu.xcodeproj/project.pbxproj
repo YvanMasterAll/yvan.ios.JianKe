@@ -13,6 +13,8 @@
 		C61B9F7C1FDE9ECF00471B72 /* ShuTuTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C61B9F7B1FDE9ECF00471B72 /* ShuTuTests.swift */; };
 		C61B9F871FDE9ECF00471B72 /* ShuTuUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C61B9F861FDE9ECF00471B72 /* ShuTuUITests.swift */; };
 		C625605C1FE220240073564A /* Tool.swift in Sources */ = {isa = PBXBuildFile; fileRef = C625605B1FE220240073564A /* Tool.swift */; };
+		C633BDB61FEF72A7009CD1DC /* Answer.swift in Sources */ = {isa = PBXBuildFile; fileRef = C633BDB51FEF72A7009CD1DC /* Answer.swift */; };
+		C633BDB81FEF745C009CD1DC /* DebateDetailViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C633BDB71FEF745C009CD1DC /* DebateDetailViewModel.swift */; };
 		C666EAE21FDEB4D000ABADFB /* GMColor.swift in Sources */ = {isa = PBXBuildFile; fileRef = C666EAE11FDEB4D000ABADFB /* GMColor.swift */; };
 		C666EAE41FDEB4FC00ABADFB /* Const.swift in Sources */ = {isa = PBXBuildFile; fileRef = C666EAE31FDEB4FC00ABADFB /* Const.swift */; };
 		C666EAE61FDEC67A00ABADFB /* Environment.swift in Sources */ = {isa = PBXBuildFile; fileRef = C666EAE51FDEC67A00ABADFB /* Environment.swift */; };
@@ -35,6 +37,10 @@
 		C66B37EE1FE2C3EE004117A8 /* PKHUDSquareBaseView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C66B37DB1FE2C3EE004117A8 /* PKHUDSquareBaseView.swift */; };
 		C66B37EF1FE2C3EE004117A8 /* PKHUDErrorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C66B37DC1FE2C3EE004117A8 /* PKHUDErrorView.swift */; };
 		C66B37F01FE2C3EE004117A8 /* Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = C66B37DE1FE2C3EE004117A8 /* Info.plist */; };
+		C67ED67F1FEE367B008E4853 /* DebateDetailCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = C67ED67D1FEE367B008E4853 /* DebateDetailCollectionViewCell.swift */; };
+		C67ED6801FEE367B008E4853 /* DebateDetailCollectionViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = C67ED67E1FEE367B008E4853 /* DebateDetailCollectionViewCell.xib */; };
+		C67ED6831FEE3C88008E4853 /* DebateDetailAnswerTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = C67ED6811FEE3C88008E4853 /* DebateDetailAnswerTableViewCell.swift */; };
+		C67ED6841FEE3C88008E4853 /* DebateDetailAnswerTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = C67ED6821FEE3C88008E4853 /* DebateDetailAnswerTableViewCell.xib */; };
 		C68983B21FDF784D00C53E95 /* SwiftIcons.swift in Sources */ = {isa = PBXBuildFile; fileRef = C68983B11FDF784D00C53E95 /* SwiftIcons.swift */; };
 		C68983BF1FDF78A400C53E95 /* Emoji.ttf in Resources */ = {isa = PBXBuildFile; fileRef = C68983B31FDF78A200C53E95 /* Emoji.ttf */; };
 		C68983C01FDF78A400C53E95 /* Ionicons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = C68983B41FDF78A200C53E95 /* Ionicons.ttf */; };
@@ -120,6 +126,8 @@
 		C61B9F861FDE9ECF00471B72 /* ShuTuUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShuTuUITests.swift; sourceTree = "<group>"; };
 		C61B9F881FDE9ECF00471B72 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		C625605B1FE220240073564A /* Tool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tool.swift; sourceTree = "<group>"; };
+		C633BDB51FEF72A7009CD1DC /* Answer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Answer.swift; sourceTree = "<group>"; };
+		C633BDB71FEF745C009CD1DC /* DebateDetailViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebateDetailViewModel.swift; sourceTree = "<group>"; };
 		C666EAE11FDEB4D000ABADFB /* GMColor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GMColor.swift; sourceTree = "<group>"; };
 		C666EAE31FDEB4FC00ABADFB /* Const.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Const.swift; sourceTree = "<group>"; };
 		C666EAE51FDEC67A00ABADFB /* Environment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Environment.swift; sourceTree = "<group>"; };
@@ -143,6 +151,10 @@
 		C66B37DC1FE2C3EE004117A8 /* PKHUDErrorView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PKHUDErrorView.swift; sourceTree = "<group>"; };
 		C66B37DD1FE2C3EE004117A8 /* PKHUD.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PKHUD.h; sourceTree = "<group>"; };
 		C66B37DE1FE2C3EE004117A8 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		C67ED67D1FEE367B008E4853 /* DebateDetailCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebateDetailCollectionViewCell.swift; sourceTree = "<group>"; };
+		C67ED67E1FEE367B008E4853 /* DebateDetailCollectionViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = DebateDetailCollectionViewCell.xib; sourceTree = "<group>"; };
+		C67ED6811FEE3C88008E4853 /* DebateDetailAnswerTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebateDetailAnswerTableViewCell.swift; sourceTree = "<group>"; };
+		C67ED6821FEE3C88008E4853 /* DebateDetailAnswerTableViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = DebateDetailAnswerTableViewCell.xib; sourceTree = "<group>"; };
 		C68983B11FDF784D00C53E95 /* SwiftIcons.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftIcons.swift; sourceTree = "<group>"; };
 		C68983B31FDF78A200C53E95 /* Emoji.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = Emoji.ttf; sourceTree = "<group>"; };
 		C68983B41FDF78A200C53E95 /* Ionicons.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = Ionicons.ttf; sourceTree = "<group>"; };
@@ -417,6 +429,7 @@
 			children = (
 				C68983DA1FDF97A100C53E95 /* Auth.swift */,
 				C6C130931FE3CDD500E2B21D /* Debate.swift */,
+				C633BDB51FEF72A7009CD1DC /* Answer.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -509,6 +522,7 @@
 			isa = PBXGroup;
 			children = (
 				C6C130901FE3ABCD00E2B21D /* DebateViewModel.swift */,
+				C633BDB71FEF745C009CD1DC /* DebateDetailViewModel.swift */,
 			);
 			path = VM;
 			sourceTree = "<group>";
@@ -518,6 +532,10 @@
 			children = (
 				C6B84B2D1FEA8178000B74A4 /* DebateSearchView.swift */,
 				C6CD273F1FEBC27500CF87A8 /* DebateTableViewCell.swift */,
+				C67ED67D1FEE367B008E4853 /* DebateDetailCollectionViewCell.swift */,
+				C67ED67E1FEE367B008E4853 /* DebateDetailCollectionViewCell.xib */,
+				C67ED6811FEE3C88008E4853 /* DebateDetailAnswerTableViewCell.swift */,
+				C67ED6821FEE3C88008E4853 /* DebateDetailAnswerTableViewCell.xib */,
 			);
 			path = V;
 			sourceTree = "<group>";
@@ -656,6 +674,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C67ED6841FEE3C88008E4853 /* DebateDetailAnswerTableViewCell.xib in Resources */,
 				C68983C41FDF78A400C53E95 /* OpenIconic.ttf in Resources */,
 				C66B37ED1FE2C3EE004117A8 /* Images.xcassets in Resources */,
 				C68983C31FDF78A400C53E95 /* MaterialIcons.ttf in Resources */,
@@ -674,6 +693,7 @@
 				C68983C01FDF78A400C53E95 /* Ionicons.ttf in Resources */,
 				C6929C211FEA9F9F00D74A0C /* arrow_down@3x.png in Resources */,
 				C6929C241FEA9F9F00D74A0C /* success@3x.png in Resources */,
+				C67ED6801FEE367B008E4853 /* DebateDetailCollectionViewCell.xib in Resources */,
 				C666EAE81FDEC6C200ABADFB /* LaunchScreen.storyboard in Resources */,
 				C68983BF1FDF78A400C53E95 /* Emoji.ttf in Resources */,
 				C61B9F6E1FDE9ECE00471B72 /* Assets.xcassets in Resources */,
@@ -732,6 +752,7 @@
 				"${BUILT_PRODUCTS_DIR}/RxDataSources/RxDataSources.framework",
 				"${BUILT_PRODUCTS_DIR}/RxSwift/RxSwift.framework",
 				"${BUILT_PRODUCTS_DIR}/SnapKit/SnapKit.framework",
+				"${BUILT_PRODUCTS_DIR}/XLPagerTabStrip/XLPagerTabStrip.framework",
 			);
 			name = "[CP] Embed Pods Frameworks";
 			outputPaths = (
@@ -746,6 +767,7 @@
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RxDataSources.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RxSwift.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SnapKit.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/XLPagerTabStrip.framework",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -790,6 +812,7 @@
 				C68E275B1FE94931003144AB /* GeneralFactory.swift in Sources */,
 				C6929C201FEA9F9F00D74A0C /* Left.swift in Sources */,
 				C6929C1A1FEA9F9F00D74A0C /* Availability.swift in Sources */,
+				C67ED67F1FEE367B008E4853 /* DebateDetailCollectionViewCell.swift in Sources */,
 				C66B37EB1FE2C3EE004117A8 /* WindowRootViewController.swift in Sources */,
 				C6929C1B1FEA9F9F00D74A0C /* Header.swift in Sources */,
 				C66B37E51FE2C3EE004117A8 /* PKHUDAssets.swift in Sources */,
@@ -824,6 +847,7 @@
 				C66B37E21FE2C3EE004117A8 /* FrameView.swift in Sources */,
 				C68983DD1FDF983000C53E95 /* LoginViewModel.swift in Sources */,
 				C66B37EC1FE2C3EE004117A8 /* PKHUDProgressView.swift in Sources */,
+				C633BDB81FEF745C009CD1DC /* DebateDetailViewModel.swift in Sources */,
 				C6929C1D1FEA9F9F00D74A0C /* Utils.swift in Sources */,
 				C666EAE21FDEB4D000ABADFB /* GMColor.swift in Sources */,
 				C6E273941FEA77FE00D78520 /* FSPageControl.swift in Sources */,
@@ -831,6 +855,8 @@
 				C6FF409E1FEAB07000AA1542 /* FirstRefreshFooter.swift in Sources */,
 				C68983DB1FDF97A100C53E95 /* Auth.swift in Sources */,
 				C6929C1F1FEA9F9F00D74A0C /* ElasticRefreshControl.swift in Sources */,
+				C633BDB61FEF72A7009CD1DC /* Answer.swift in Sources */,
+				C67ED6831FEE3C88008E4853 /* DebateDetailAnswerTableViewCell.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

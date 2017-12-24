@@ -71,7 +71,7 @@ public class DebateViewModel: DebateViewModelInput, DebateViewModelOutput, Debat
                     //初始化
                     self.pageIndex = 0
                     //拉取数据
-                    service.getDebate(id: self.pageIndex)
+                    service.getDebate(pageIndex: self.pageIndex)
                         .subscribe(onNext: { data in
                             if data.count > 0 {
                                 self.models.value.removeAll()
@@ -79,7 +79,7 @@ public class DebateViewModel: DebateViewModelInput, DebateViewModelOutput, Debat
                                 //结束刷新
                                 self.refreshStateObserver.value = .endHeaderRefresh
                             } else {
-                                //没有数据
+                                //请求错误
                                 self.refreshStateObserver.value = .noData
                             }
                         })
@@ -96,7 +96,7 @@ public class DebateViewModel: DebateViewModelInput, DebateViewModelOutput, Debat
                 } else {//加载更多
                     self.pageIndex += 1
                     //拉取数据
-                    service.getDebate(id: self.pageIndex)
+                    service.getDebate(pageIndex: self.pageIndex)
                         .subscribe(onNext: { data in
                             if data.count > 0 {
                                 self.models.value += data
@@ -144,7 +144,7 @@ extension DebateViewModel {
     fileprivate func showEmptyView(type: EmptyViewType) {
         self.tableView.switchRefreshHeader(to: .normal(.none, 0))
         tableView.isHidden = true
-        self.emptyView.show(type: type)
+        self.emptyView.show(type: type, frame: self.tableView.frame)
     }
     fileprivate func hideEmptyView() {
         self.emptyView.hide()

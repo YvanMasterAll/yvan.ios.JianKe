@@ -62,7 +62,7 @@ extension DebateViewController {
     //初始化
     fileprivate func setupUI() {
         //EmptyView
-        self.emptyView = EmptyView(target: self.view, frame: CGRect(x: 0, y: 66, width: SW, height: SH - 66 - TarBarHeight))
+        self.emptyView = EmptyView(target: self.view)
         //TableView
         self.tableView.tableFooterView = UIView() //消除底部视图
         self.tableView.separatorStyle = .none //消除分割线

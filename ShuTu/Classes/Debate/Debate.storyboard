@@ -242,7 +242,7 @@
             </objects>
             <point key="canvasLocation" x="896.79999999999995" y="42.728635682158924"/>
         </scene>
-        <!--Debate Detail View Controller-->
+        <!--Data Source-->
         <scene sceneID="JRR-kq-yr2">
             <objects>
                 <viewController storyboardIdentifier="DebateDetail" id="9DQ-V1-JFC" customClass="DebateDetailViewController" customModule="ShuTu" customModuleProvider="target" sceneMemberID="viewController">
@@ -422,14 +422,35 @@
                                     <constraint firstItem="EHy-4M-Pzl" firstAttribute="leading" secondItem="lAD-OF-vJP" secondAttribute="leading" constant="14" id="zGz-SK-Mqm"/>
                                 </constraints>
                             </view>
+                            <segmentedControl opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" selectedSegmentIndex="0" translatesAutoresizingMaskIntoConstraints="NO" id="arh-Mf-yqb">
+                                <rect key="frame" x="127" y="259.5" width="121" height="29"/>
+                                <segments>
+                                    <segment title="First"/>
+                                    <segment title="Second"/>
+                                </segments>
+                            </segmentedControl>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Kfs-UO-7k3" customClass="FSPagerView" customModule="ShuTu" customModuleProvider="target">
+                                <rect key="frame" x="0.0" y="291.5" width="375" height="375.5"/>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <connections>
+                                    <outlet property="dataSource" destination="9DQ-V1-JFC" id="H4J-8y-04i"/>
+                                    <outlet property="delegate" destination="9DQ-V1-JFC" id="Gz4-8M-ZqL"/>
+                                </connections>
+                            </view>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
                             <constraint firstItem="lAD-OF-vJP" firstAttribute="top" secondItem="RIy-cZ-por" secondAttribute="bottom" constant="10" id="4Md-ON-4bH"/>
+                            <constraint firstItem="arh-Mf-yqb" firstAttribute="centerX" secondItem="ZOk-Ys-RJ2" secondAttribute="centerX" id="5X8-Od-gd6"/>
+                            <constraint firstItem="85s-mu-RYs" firstAttribute="trailing" secondItem="Kfs-UO-7k3" secondAttribute="trailing" id="DFD-hv-tJf"/>
+                            <constraint firstItem="Kfs-UO-7k3" firstAttribute="top" secondItem="arh-Mf-yqb" secondAttribute="bottom" constant="4" id="HOS-oN-dc8"/>
                             <constraint firstItem="85s-mu-RYs" firstAttribute="trailing" secondItem="lAD-OF-vJP" secondAttribute="trailing" id="J8L-UZ-IxU"/>
                             <constraint firstItem="85s-mu-RYs" firstAttribute="trailing" secondItem="RIy-cZ-por" secondAttribute="trailing" id="SyK-A5-L5U"/>
+                            <constraint firstItem="85s-mu-RYs" firstAttribute="bottom" secondItem="Kfs-UO-7k3" secondAttribute="bottom" id="TDH-zz-fer"/>
+                            <constraint firstItem="Kfs-UO-7k3" firstAttribute="leading" secondItem="85s-mu-RYs" secondAttribute="leading" id="V6Q-n4-8EK"/>
                             <constraint firstItem="RIy-cZ-por" firstAttribute="leading" secondItem="85s-mu-RYs" secondAttribute="leading" id="hlJ-NZ-Ixo"/>
                             <constraint firstItem="lAD-OF-vJP" firstAttribute="leading" secondItem="ZOk-Ys-RJ2" secondAttribute="leading" id="xIF-CX-GYV"/>
+                            <constraint firstItem="arh-Mf-yqb" firstAttribute="top" secondItem="lAD-OF-vJP" secondAttribute="bottom" constant="4" id="ydr-li-zIS"/>
                             <constraint firstItem="RIy-cZ-por" firstAttribute="top" secondItem="ZOk-Ys-RJ2" secondAttribute="top" id="yl8-Yz-Afl"/>
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="85s-mu-RYs"/>
@@ -447,7 +468,9 @@
                         <outlet property="navigationBar" destination="RIy-cZ-por" id="aeD-SJ-jhI"/>
                         <outlet property="navigationBarLeftImage" destination="5YL-xA-Gvw" id="j7u-p1-uhO"/>
                         <outlet property="navigationBarTitle" destination="ALx-nu-7NM" id="ZFE-gQ-ulJ"/>
+                        <outlet property="pagerView" destination="Kfs-UO-7k3" id="fHK-q0-tUK"/>
                         <outlet property="score" destination="Oc9-zq-hyd" id="NQS-Tv-Tm2"/>
+                        <outlet property="segmentControl" destination="arh-Mf-yqb" id="QU9-pi-eje"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="qvE-bT-NMD" userLabel="First Responder" sceneMemberID="firstResponder"/>

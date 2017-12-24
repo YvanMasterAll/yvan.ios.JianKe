@@ -26,7 +26,12 @@ public var ShuTuProvider = MoyaProvider<ShuTuApi>()
 public enum ShuTuApi {
     case test
     case carousel
-    case debate(id: Int)
+    case debate(pageIndex: Int)
+    case answer(id: Int, pageIndex: Int, side: AnswerSide)
+}
+public enum AnswerSide: String {
+    case SY = "y"
+    case ST = "s"
 }
 extension ShuTuApi: TargetType {
     //The target's base `URL`
@@ -40,12 +45,15 @@ extension ShuTuApi: TargetType {
             return "test"
         case .carousel:
             return "debate/carousel"
-        case .debate(let id):
-            return "debate/\(id)"
+        case .debate(let pageIndex):
+            return "debate/\(pageIndex)"
+        case .answer(let id, let pageIndex, let side):
+            return "debate/answer/\(side.rawValue)/\(id)/\(pageIndex)"
         }
     }
     //The HTTP method used in the request.
     public var method: Moya.Method {
+        print(self.path)
         return .get
     }
     //The headers to be incoded in the request.

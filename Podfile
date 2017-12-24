@@ -6,7 +6,8 @@ target 'ShuTu' do
 	pod 'RxDataSources'
 	pod 'Moya/RxSwift'
 	pod 'ObjectMapper'
-	pod 'Kingfisher'
-	pod 'SnapKit'
-	pod 'PMSuperButton'
+	pod 'Kingfisher' #缓存方案
+	pod 'SnapKit' #约束工具
+	pod 'PMSuperButton' #Ripple Button
+	pod 'XLPagerTabStrip' #Tab View
 end

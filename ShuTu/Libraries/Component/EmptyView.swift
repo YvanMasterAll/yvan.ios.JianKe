@@ -15,6 +15,7 @@ import UIKit
 }
 
 public enum EmptyViewType {
+    case none
     case empty
     case loading
 }
@@ -25,12 +26,10 @@ class EmptyView {
     weak var delegate: EmptyViewDelegate?
     fileprivate var view: UIView!
     fileprivate var target: UIView!
-    fileprivate var frame: CGRect!
     fileprivate var imageView: UIImageView!
     
-    init(target: UIView, frame: CGRect) {
+    init(target: UIView) {
         self.target = target
-        self.frame = frame
 
         setupUI()
     }
@@ -39,8 +38,8 @@ class EmptyView {
 
 extension EmptyView {
     //显示 & 隐藏
-    func show(type: EmptyViewType) {
-        setupEmptyViewContent(type: type)
+    func show(type: EmptyViewType, frame: CGRect) {
+        setupEmptyViewContent(type: type, frame: frame)
         self.view.isHidden = false
     }
     func hide() {
@@ -49,7 +48,7 @@ extension EmptyView {
     //初始化
     fileprivate func setupUI() {
         //EmptyView
-        self.view = UIView(frame: self.frame)
+        self.view = UIView(frame: CGRect.zero)
         target.addSubview(self.view)
         self.view.backgroundColor = UIColor.white
         self.view.isHidden = true
@@ -57,11 +56,13 @@ extension EmptyView {
         let tapGes = UITapGestureRecognizer(target: self, action: #selector(self.clicked))
         self.view.addGestureRecognizer(tapGes)
     }
-    fileprivate func setupEmptyViewContent(type: EmptyViewType) {
+    fileprivate func setupEmptyViewContent(type: EmptyViewType, frame: CGRect) {
         //清空
         for view in self.view.subviews {
             view.removeFromSuperview()
         }
+        //填充 View
+        self.view.frame = frame
         
         switch type {
         case .empty:
@@ -74,6 +75,8 @@ extension EmptyView {
             self.imageView.center = self.view.center
             break
         case .loading:
+            break
+        default:
             break
         }
     }

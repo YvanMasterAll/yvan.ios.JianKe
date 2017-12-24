@@ -59,12 +59,24 @@ class DebateService {
     private init() {}
     
     //拉取 Debate
-    func getDebate(id: Int) -> Observable<[Debate]> {
-        return ShuTuProvider.rx.request(.debate(id: id))
+    func getDebate(pageIndex: Int) -> Observable<[Debate]> {
+        return ShuTuProvider.rx.request(.debate(pageIndex: pageIndex))
             .mapArray(Debate.self)
             .asObservable()
             .observeOn(MainScheduler.instance)
             .catchErrorJustReturn([])
+    }
+    
+    //拉取回答
+    func getAnswer(id: Int, pageIndex: Int, side: AnswerSide) -> Observable<([Answer], Result)> {
+        return ShuTuProvider.rx.request(.answer(id: id, pageIndex: pageIndex, side: side))
+            .mapArray(Answer.self)
+            .asObservable()
+            .observeOn(MainScheduler.instance)
+            .map{ data in
+                return (data, Ok001)
+            }
+            .catchErrorJustReturn(([], Error001))
     }
     
     //拉取轮播图片

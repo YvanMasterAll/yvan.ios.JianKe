@@ -23,12 +23,23 @@ class DebateDetailViewController: UIViewController {
     @IBOutlet weak var descLabelHeightConstraint: NSLayoutConstraint!
     @IBOutlet weak var descFolder: UILabel!
     @IBOutlet weak var actionView: UIView!
+    @IBOutlet weak var segmentControl: UISegmentedControl!
+    @IBOutlet weak var pagerView: FSPagerView! {
+        didSet {
+            //self.pagerView.register(DebateDetailCollectionViewCell.self, forCellWithReuseIdentifier: "pagerCell")
+            self.pagerView.register(UINib(nibName: "DebateDetailCollectionViewCell", bundle: nil), forCellWithReuseIdentifier: "pagerCell")
+            self.pagerView.itemSize = .zero
+        }
+    }
     
     //声明区
     open var section: Debate!
     
     //私有成员
     fileprivate var fold: Bool = true
+    fileprivate var viewModel: DebateDetailViewModel! {
+        return DebateDetailViewModel(section: self.section)
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -56,6 +67,9 @@ extension DebateDetailViewController {
         //NavigationBarView
         GeneralFactory.generateRectShadow(layer: self.navigationBar.layer, rect: CGRect(x: 0, y: self.navigationBar.frame.size.height, width: SW, height: 0.5), color: GMColor.grey900Color().cgColor)
         self.navigationBarLeftImage.setIcon(icon: .fontAwesome(.angleLeft), textColor: GMColor.grey900Color(), backgroundColor: UIColor.clear, size: nil)
+        self.navigationBarLeftImage.isUserInteractionEnabled = true
+        let goBackTapGes = UITapGestureRecognizer(target: self, action: #selector(self.goBack))
+        self.navigationBarLeftImage.addGestureRecognizer(goBackTapGes)
         //Buttons
         self.inviteButton.setImage(UIImage(icon: .fontAwesome(.userPlus), size: CGSize(width: 14, height: 14), textColor: GMColor.grey600Color(), backgroundColor: UIColor.clear), for: .normal)
         self.answerButton.setImage(UIImage(icon: .fontAwesome(.edit), size: CGSize(width: 14, height: 14), textColor: GMColor.grey600Color(), backgroundColor: UIColor.clear), for: .normal)
@@ -95,5 +109,44 @@ extension DebateDetailViewController {
             
             self.fold = true
         }
+    }
+    //NavigationBarItem Action
+    @objc fileprivate func goBack() {
+        if (navigationController != nil) {
+            navigationController?.popViewController(animated: true)
+        } else {
+            dismiss(animated: true, completion: nil)
+        }
+    }
+}
+
+extension DebateDetailViewController: FSPagerViewDelegate, FSPagerViewDataSource {
+    //FSPagerViewDataSource & FSPagerViewDelegate
+    public func numberOfItems(in pagerView: FSPagerView) -> Int {
+        return 2
+    }
+    public func pagerView(_ pagerView: FSPagerView, cellForItemAt index: Int) -> FSPagerViewCell {
+        let cell = pagerView.dequeueReusableCell(withReuseIdentifier: "pagerCell", at: index) as! DebateDetailCollectionViewCell
+        //Side
+        if index == 0 {
+            cell.side = .SY
+        } else {
+            cell.side = .ST
+        }
+        //传入 VM
+        if cell.viewModel == nil {
+            cell.viewModel = self.viewModel
+        }
+        //传入 Model
+        cell.section = self.section
+        
+        return cell
+    }
+    func pagerView(_ pagerView: FSPagerView, didSelectItemAt index: Int) {
+        pagerView.deselectItem(at: index, animated: true)
+        pagerView.scrollToItem(at: index, animated: true)
+    }
+    func pagerViewDidScroll(_ pagerView: FSPagerView) {
+        
     }
 }
