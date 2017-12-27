@@ -11,6 +11,10 @@ import RxDataSources
 import RxCocoa
 import RxSwift
 
+protocol DebateDetailCollectionViewCellDelegate {
+    func scrollViewDidScroll(_ scrollView: UIScrollView, _ offset: CGPoint)
+}
+
 class DebateDetailCollectionViewCell: FSPagerViewCell {
 
     @IBOutlet weak var tableView: UITableView! {
@@ -28,10 +32,14 @@ class DebateDetailCollectionViewCell: FSPagerViewCell {
         }
     }
     public var section: Debate!
+    public var delegate: DebateDetailCollectionViewCellDelegate?
+    public var navigationController: UINavigationController!
     //私有成员
     fileprivate var disposeBag = DisposeBag()
     fileprivate var dataSource: RxTableViewSectionedReloadDataSource<DebateDetailSectionModel>!
     fileprivate var emptyView: EmptyView!
+    fileprivate var currentOffset = CGPoint(x: 0, y: 0)
+    fileprivate var isDraged = false
     
     override func awakeFromNib() {
         super.awakeFromNib()
@@ -59,8 +67,8 @@ extension DebateDetailCollectionViewCell {
         self.tableView.tableFooterView = UIView() //消除底部视图
         self.tableView.separatorStyle = .none //消除分割线
         //PullToRefreshKit
-        let firstHeader = FirstRefreshHeader()
-        self.tableView.configRefreshHeader(with: firstHeader, action: {
+        let secondHeader = SecondRefreshHeader()
+        self.tableView.configRefreshHeader(with: secondHeader, action: {
             switch self.side {
             case .SY:
                 self.viewModel.inputsY.refreshNewData.onNext(true)
@@ -89,15 +97,28 @@ extension DebateDetailCollectionViewCell {
         dataSource = RxTableViewSectionedReloadDataSource<DebateDetailSectionModel>(
             configureCell: { ds, tv, ip, item in
                 let cell = tv.dequeueReusableCell(withIdentifier: "answerCell", for: ip) as! DebateDetailAnswerTableViewCell
-                //                    cell.title.text = item.title
-                //                    cell.desc.text = item.desc
-                //                    cell.thumbnail.kf.setImage(with: URL(string: item.thumbnail!))
-                //                    cell.score.text = "\(item.yc ?? 0) 声援 · \(item.sc ?? 0) 殊途 · "
-                //                    //计算 desc label 高度
-                //                    cell.setupConstraint()
+                cell.thumbnail.kf.setImage(with: URL(string: item.thumbnail!))
+                cell.name.text = item.username
+                cell.answer.text = item.answer
+                cell.score.text = "\(item.ac ?? 0 ) 赞同 · \(item.cc ?? 0) 评论"
+                //计算 answer label 高度
+                cell.setupConstraint()
+                
                 return cell
             }
         )
+        self.tableView.rx
+            .modelSelected(Answer.self)
+            .subscribe(onNext: { data in
+                //跳转至详情
+                let debateStoryBoard = UIStoryboard(name: "Debate", bundle: nil)
+                let debateAnswerVC = debateStoryBoard.instantiateViewController(withIdentifier: "DebateAnswerDetail") as! DebateAnswerDetailViewController
+                debateAnswerVC.section = data
+                debateAnswerVC.section.title = self.section.title
+                
+                self.navigationController?.pushViewController(debateAnswerVC, animated: true)
+            })
+            .disposed(by: disposeBag)
         //Side
         switch self.side {
         case .SY:
@@ -163,10 +184,22 @@ extension DebateDetailCollectionViewCell: UITableViewDelegate, EmptyViewDelegate
         //取消cell选中状态
         tableView.deselectRow(at: indexPath, animated: true)
     }
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        if !self.isDraged || scrollView.contentOffset.y < 0 { return }
+        let offset = CGPoint(x: scrollView.contentOffset.x - currentOffset.x, y: scrollView.contentOffset.y - currentOffset.y)
+        currentOffset = scrollView.contentOffset
+        self.delegate?.scrollViewDidScroll(scrollView, offset)
+    }
+    func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
+        currentOffset = scrollView.contentOffset
+        self.isDraged = true
+    }
+    func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
+        self.isDraged = false
+    }
     //EmptyView Delegate
     func emptyViewClicked() {
         self.hideEmptyView()
     }
-    
 }
 

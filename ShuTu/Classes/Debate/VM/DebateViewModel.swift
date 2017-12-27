@@ -68,6 +68,7 @@ public class DebateViewModel: DebateViewModelInput, DebateViewModelOutput, Debat
         refreshNewData.asObserver()
             .subscribe(onNext: { full in
                 if full {//头部刷新
+                    self.refreshStateObserver.value = .endFooterRefresh
                     //初始化
                     self.pageIndex = 0
                     //拉取数据

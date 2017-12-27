@@ -20,13 +20,14 @@ class DebateDetailViewController: UIViewController {
     @IBOutlet weak var inviteButton: UIButton!
     @IBOutlet weak var answerButton: UIButton!
     @IBOutlet weak var answerScore: UILabel!
+    @IBOutlet weak var topView: UIView!
+    @IBOutlet weak var topViewTopConstraint: NSLayoutConstraint!
     @IBOutlet weak var descLabelHeightConstraint: NSLayoutConstraint!
     @IBOutlet weak var descFolder: UILabel!
     @IBOutlet weak var actionView: UIView!
     @IBOutlet weak var segmentControl: UISegmentedControl!
     @IBOutlet weak var pagerView: FSPagerView! {
         didSet {
-            //self.pagerView.register(DebateDetailCollectionViewCell.self, forCellWithReuseIdentifier: "pagerCell")
             self.pagerView.register(UINib(nibName: "DebateDetailCollectionViewCell", bundle: nil), forCellWithReuseIdentifier: "pagerCell")
             self.pagerView.itemSize = .zero
         }
@@ -40,6 +41,7 @@ class DebateDetailViewController: UIViewController {
     fileprivate var viewModel: DebateDetailViewModel! {
         return DebateDetailViewModel(section: self.section)
     }
+    fileprivate var currentOffset = CGPoint.zero
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -61,9 +63,12 @@ class DebateDetailViewController: UIViewController {
 }
 
 extension DebateDetailViewController {
-    
     //初始化
     fileprivate func setupUI() {
+        //Tabbar
+        self.hidesBottomBarWhenPushed = true
+        //SegmentControl
+        self.segmentControl.addTarget(self, action: #selector(self.segmentControlChanged), for: UIControlEvents.valueChanged)
         //NavigationBarView
         GeneralFactory.generateRectShadow(layer: self.navigationBar.layer, rect: CGRect(x: 0, y: self.navigationBar.frame.size.height, width: SW, height: 0.5), color: GMColor.grey900Color().cgColor)
         self.navigationBarLeftImage.setIcon(icon: .fontAwesome(.angleLeft), textColor: GMColor.grey900Color(), backgroundColor: UIColor.clear, size: nil)
@@ -118,15 +123,50 @@ extension DebateDetailViewController {
             dismiss(animated: true, completion: nil)
         }
     }
+    //SegmengControl Changed
+    @objc fileprivate func segmentControlChanged(sender: UISegmentedControl) {
+        self.pagerView.scrollToItem(at: sender.selectedSegmentIndex, animated: true)
+    }
 }
 
-extension DebateDetailViewController: FSPagerViewDelegate, FSPagerViewDataSource {
+extension DebateDetailViewController: FSPagerViewDelegate, FSPagerViewDataSource, DebateDetailCollectionViewCellDelegate {
     //FSPagerViewDataSource & FSPagerViewDelegate
+    func scrollViewDidScroll(_ scrollView: UIScrollView, _ offset: CGPoint) {
+        //通过代理 TableView 滚动实现 TopView 的滚动
+        let currentOffsetY = offset.y
+        let topViewOffsetY = self.topViewTopConstraint.constant
+        let topViewOffsetMin: CGFloat = 10
+        let topViewOffsetMax = -self.topView.frame.height
+        if currentOffsetY > 0 {
+            if topViewOffsetY > topViewOffsetMax {
+                var offsetY: CGFloat = topViewOffsetY - currentOffsetY
+                offsetY = offsetY < topViewOffsetMax ? topViewOffsetMax:offsetY
+                self.topViewTopConstraint.constant = offsetY
+                self.topView.setNeedsUpdateConstraints()
+            }
+        } else {
+            if topViewOffsetY < topViewOffsetMin {
+                var offsetY: CGFloat = topViewOffsetY - currentOffsetY
+                offsetY = offsetY > 10 ? 10:offsetY
+                self.topViewTopConstraint.constant = offsetY
+                self.topView.setNeedsUpdateConstraints()
+            }
+        }
+    }
     public func numberOfItems(in pagerView: FSPagerView) -> Int {
         return 2
     }
+    func pagerViewDidScroll(_ pagerView: FSPagerView) {
+        //SegmentControl
+        guard self.segmentControl.selectedSegmentIndex != pagerView.currentIndex else {
+            return
+        }
+        self.segmentControl.selectedSegmentIndex = pagerView.currentIndex
+    }
     public func pagerView(_ pagerView: FSPagerView, cellForItemAt index: Int) -> FSPagerViewCell {
         let cell = pagerView.dequeueReusableCell(withReuseIdentifier: "pagerCell", at: index) as! DebateDetailCollectionViewCell
+        cell.delegate = self
+        cell.navigationController = self.navigationController
         //Side
         if index == 0 {
             cell.side = .SY
@@ -145,8 +185,5 @@ extension DebateDetailViewController: FSPagerViewDelegate, FSPagerViewDataSource
     func pagerView(_ pagerView: FSPagerView, didSelectItemAt index: Int) {
         pagerView.deselectItem(at: index, animated: true)
         pagerView.scrollToItem(at: index, animated: true)
-    }
-    func pagerViewDidScroll(_ pagerView: FSPagerView) {
-        
     }
 }

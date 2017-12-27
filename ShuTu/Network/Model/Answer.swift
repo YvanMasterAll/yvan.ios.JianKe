@@ -13,9 +13,12 @@ public struct Answer: Mappable {
     
     var id: Int?
     var userid: Int?
+    var debateId: Int?
+    var title: String?
     var username: String?
     var thumbnail: String?
     var answer: String?
+    var side: String?
     var ac: Int?
     var cc: Int?
     

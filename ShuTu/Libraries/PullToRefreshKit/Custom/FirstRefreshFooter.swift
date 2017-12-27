@@ -15,8 +15,9 @@ class FirstRefreshFooter: UIView, RefreshableFooter {
     override init(frame: CGRect) {
         super.init(frame: frame)
         addSubview(containerView)
-        textlabel.font = UIFont.systemFont(ofSize: 15)
+        textlabel.font = UIFont.systemFont(ofSize: 13)
         textlabel.textColor = UIColor.darkGray
+        containerView.addSubview(textlabel)
         containerView.layer.cornerRadius = 4.0;
         containerView.layer.masksToBounds = true
         containerView.layer.shadowOffset = CGSize(width: 2.0, height: 2.0)
@@ -24,9 +25,8 @@ class FirstRefreshFooter: UIView, RefreshableFooter {
         containerView.layer.shadowColor = UIColor.black.cgColor;
         containerView.layer.shadowOpacity = 0.20;
         containerView.layer.addSublayer(shapeLayer)
-        containerView.layer.borderColor = UIColor.black.withAlphaComponent(0.2).cgColor
-        containerView.layer.borderWidth = 0.5
-        containerView.addSubview(textlabel)
+//        containerView.layer.borderColor = UIColor.black.withAlphaComponent(0.2).cgColor
+//        containerView.layer.borderWidth = 0.5
         setUpCircleLayer()
         textlabel.text = "上拉加载更多"
         shapeLayer.isHidden = true

@@ -60,6 +60,7 @@ class DebateDetailViewModel {
         self.inputsY.refreshNewData.asObserver()
             .subscribe(onNext: { full in
                 if full {//头部刷新
+                    self.answerY.refreshStateObserver.value = .endFooterRefresh
                     //初始化
                     self.answerY.pageIndex = 0
                     //拉取数据
@@ -139,6 +140,7 @@ class DebateDetailViewModel {
         self.inputsS.refreshNewData.asObserver()
             .subscribe(onNext: { full in
                 if full {//头部刷新
+                    self.answerS.refreshStateObserver.value = .endFooterRefresh
                     //初始化
                     self.answerS.pageIndex = 0
                     //拉取数据

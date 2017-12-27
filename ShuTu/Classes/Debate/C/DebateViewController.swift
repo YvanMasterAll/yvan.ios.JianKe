@@ -101,7 +101,11 @@ extension DebateViewController {
                 let debateStoryBoard = UIStoryboard(name: "Debate", bundle: nil)
                 let debateDetailVC = debateStoryBoard.instantiateViewController(withIdentifier: "DebateDetail") as! DebateDetailViewController
                 debateDetailVC.section = data
+                
+                //隐藏 Tabbar
+                self.hidesBottomBarWhenPushed = true
                 self.navigationController?.pushViewController(debateDetailVC, animated: true)
+                self.hidesBottomBarWhenPushed = false
             })
             .disposed(by: disposeBag)
         viewModel.outputs.sections.asDriver()

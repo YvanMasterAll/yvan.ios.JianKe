@@ -46,7 +46,7 @@ extension LoginViewController {
         if enabled {
             self.loginButton.backgroundColor = ColorPrimary
         } else {
-            self.loginButton.backgroundColor = ColorPrimary.lighter(amount: 0.3)
+            self.loginButton.backgroundColor = ColorPrimary.lighterByHSL(amount: 0.3)
         }
     }
     

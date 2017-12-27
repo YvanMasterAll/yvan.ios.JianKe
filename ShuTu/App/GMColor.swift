@@ -23,12 +23,28 @@ extension UIColor {
     }
     
     //颜色变亮 - 0.0~1.0
-    public final func lighter(amount: CGFloat = 0.2) -> UIColor {
+    public final func lighterByHSL(amount: CGFloat = 0.2) -> UIColor {
         return HSL(color: self).lighter(amount: amount).toUIColor()
     }
+    public final func lighter(by percentage: CGFloat = 0.3) -> UIColor {
+        var r: CGFloat = 0, g: CGFloat = 0, b: CGFloat = 0, a: CGFloat = 0
+        self.getRed(&r, green: &g, blue: &b, alpha: &a)
+        return UIColor(red: min(r + percentage, 1.0),
+                     green: min(g + percentage, 1.0),
+                     blue: min(b + percentage, 1.0),
+                     alpha: a)
+    }
     //颜色变暗 - 0.0~1.0
-    public final func darkened(amount: CGFloat = 0.2) -> UIColor {
+    public final func darkenByHSL(amount: CGFloat = 0.2) -> UIColor {
         return HSL(color: self).darker(amount: amount).toUIColor()
+    }
+    public final func darken(by percentage: CGFloat = 0.2) -> UIColor {
+        var r: CGFloat = 0, g: CGFloat = 0, b: CGFloat = 0, a: CGFloat = 0
+        self.getRed(&r, green: &g, blue: &b, alpha: &a)
+        return UIColor(red: max(r - percentage, 0),
+                       green: max(g - percentage, 0),
+                       blue: max(b - percentage, 0),
+                       alpha: a)
     }
     //调整色相 - -360~360
     public final func hued(amount: CGFloat) -> UIColor {
