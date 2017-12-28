@@ -13,7 +13,9 @@ class DebateDetailAnswerTableViewCell: UITableViewCell {
     @IBOutlet weak var thumbnail: UIImageView!
     @IBOutlet weak var score: UILabel!
     @IBOutlet weak var answer: UILabel!
-    @IBOutlet weak var answerHeightConstraint: NSLayoutConstraint!
+    
+    //私有成员
+    fileprivate var isInit = false
     
     override func awakeFromNib() {
         super.awakeFromNib()
@@ -35,12 +37,21 @@ extension DebateDetailAnswerTableViewCell {
     }
     //添加约束
     public func setupConstraint() {
+        guard self.isInit else {
+            return
+        }
+        self.isInit = true //防止重复添加约束
+        
         let height = self.answer.height
         let heightMax = self.answer.heightOfLines(by: 3)
         if height > heightMax {
-            self.answerHeightConstraint.constant = heightMax
+            self.answer.snp.makeConstraints{ make in
+                make.height.equalTo(heightMax)
+            }
         } else {
-            self.answerHeightConstraint.constant = height
+            self.answer.snp.makeConstraints{ make in
+                make.height.equalTo(height)
+            }
         }
         self.answer.setNeedsUpdateConstraints()
     }

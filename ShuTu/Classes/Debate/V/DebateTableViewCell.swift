@@ -19,6 +19,9 @@ class DebateTableViewCell: UITableViewCell {
     @IBOutlet weak var category: UILabel!
     @IBOutlet weak var descHeightConstraint: NSLayoutConstraint!
     
+    //私有成员
+    fileprivate var isInit = false
+    
     override func awakeFromNib() {
         super.awakeFromNib()
         
@@ -46,6 +49,11 @@ extension DebateTableViewCell {
     }
     //添加约束
     public func setupConstraint() {
+        guard !self.isInit else {
+            return
+        }
+        self.isInit = true //防止重复添加约束
+        
         let height = self.desc.height
         let heightMax = self.desc.heightOfLines(by: 3)
         if height > heightMax {

@@ -8,6 +8,7 @@
 
 import Foundation
 import UIKit
+import SnapKit
 
 @objc protocol EmptyViewDelegate {
     @objc optional func emptyViewClicked()
@@ -17,7 +18,11 @@ import UIKit
 public enum EmptyViewType {
     case none
     case empty
-    case loading
+    case loading(type: EmptyViewLoadingType)
+}
+
+public enum EmptyViewLoadingType {
+    case rotate
 }
 
 class EmptyView {
@@ -72,13 +77,47 @@ extension EmptyView {
                 self.imageView = UIImageView(image: UIImage(named: "image_empty"))
             }
             self.view.addSubview(self.imageView)
-            self.imageView.center = self.view.center
+            self.imageView.snp.makeConstraints { make in
+                make.center.equalTo(self.view)
+            }
+            
             break
-        case .loading:
+        case .loading(let type):
+            setupLoading(type: type)
             break
         default:
             break
         }
+    }
+    fileprivate func setupLoading(type: EmptyViewLoadingType) {
+        switch type {
+        case .rotate:
+            if let imageName = self.delegate?.emptyViewImage?() {
+                self.imageView = UIImageView(image: UIImage(named: imageName))
+            } else {
+                self.imageView = UIImageView(image: UIImage(named: "loading"))
+            }
+            self.view.addSubview(self.imageView)
+            self.imageView.snp.makeConstraints { make in
+                make.center.equalTo(self.view)
+            }
+            
+            let animation = rotateAnimation()
+            self.imageView.layer.add(animation, forKey: nil)
+            
+            break
+        }
+    }
+    //Animations
+    fileprivate func rotateAnimation() -> CABasicAnimation {
+        let animation = CABasicAnimation()
+        animation.keyPath = "transform.rotation.z"
+        animation.duration = 0.8
+        animation.isCumulative = true
+        animation.toValue = CGFloat.pi * 2
+        animation.repeatCount = MAXFLOAT
+        animation.isRemovedOnCompletion = false
+        return animation
     }
     //点击事件
     @objc fileprivate func clicked() {

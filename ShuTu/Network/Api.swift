@@ -28,6 +28,7 @@ public enum ShuTuApi {
     case carousel
     case debate(pageIndex: Int)
     case answer(id: Int, pageIndex: Int, side: AnswerSide)
+    case answerDetail(id: Int)
 }
 public enum AnswerSide: String {
     case SY = "y"
@@ -49,6 +50,8 @@ extension ShuTuApi: TargetType {
             return "debate/\(pageIndex)"
         case .answer(let id, let pageIndex, let side):
             return "debate/answer/\(side.rawValue)/\(id)/\(pageIndex)"
+        case .answerDetail(let id):
+            return "debate/answer/detail/\(id)"
         }
     }
     //The HTTP method used in the request.

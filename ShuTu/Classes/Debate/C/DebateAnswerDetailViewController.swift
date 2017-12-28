@@ -8,6 +8,9 @@
 
 import UIKit
 import PMSuperButton
+import RxSwift
+import RxCocoa
+import WebKit
 
 class DebateAnswerDetailViewController: UIViewController {
     
@@ -19,7 +22,7 @@ class DebateAnswerDetailViewController: UIViewController {
     @IBOutlet weak var userBarName: UILabel!
     @IBOutlet weak var userBarThumbnail: UIImageView!
     @IBOutlet weak var userBarFollowButton: UIButton!
-    @IBOutlet weak var webView: UIWebView!
+    @IBOutlet weak var webView: WKWebView!
     @IBOutlet weak var actionBar: UIView!
     
     //声明区
@@ -29,6 +32,7 @@ class DebateAnswerDetailViewController: UIViewController {
         super.viewDidLoad()
 
         setupUI()
+        bindRx()
     }
 
     override func didReceiveMemoryWarning() {
@@ -36,7 +40,15 @@ class DebateAnswerDetailViewController: UIViewController {
         // Dispose of any resources that can be recreated.
     }
     
+    deinit {
+        print("deinit: \(type(of: self))")
+    }
+    
     override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        
+        //隐藏导航栏
+        self.navigationController?.setNavigationBarHidden(true, animated: false)
         //UserBar 添加下边框
         let bottomBorderLayer = CALayer()
         bottomBorderLayer.frame = CGRect(x: 0, y: userBar.frame.height - 1, width: SW, height: 1)
@@ -55,6 +67,14 @@ class DebateAnswerDetailViewController: UIViewController {
     }
     
     //私有成员
+    fileprivate var viewModel: DebateAnswerDetailViewModel!
+    fileprivate var disposeBag = DisposeBag()
+    fileprivate lazy var emptyView: EmptyView = {
+        let emptyView = EmptyView(target: self.view)
+        emptyView.delegate = self
+       return emptyView
+    }()
+    //Action Bar
     fileprivate lazy var actionButtonSY: UIButton = { //声援按钮
         let w = SW/5
         let h = self.actionBar.frame.height
@@ -148,6 +168,9 @@ class DebateAnswerDetailViewController: UIViewController {
         label.textColor = GMColor.grey600Color()
         label.textAlignment = .center
         button.addSubview(label)
+        //Ges
+        let tapGes = UITapGestureRecognizer(target: self, action: #selector(self.commentButtonClicked))
+        button.addGestureRecognizer(tapGes)
         return button
     }()
 
@@ -156,11 +179,15 @@ class DebateAnswerDetailViewController: UIViewController {
 extension DebateAnswerDetailViewController {
     //初始化
     fileprivate func setupUI() {
+        //WebView
+        self.webView.scrollView.showsVerticalScrollIndicator = false
+        self.webView.navigationDelegate = self
         //DebateTitle
         self.debateTitle.text = section.title
         //UserBar
         self.userBarName.text = section.username
         self.userBarThumbnail.layer.cornerRadius = self.userBarThumbnail.frame.width/2
+        self.userBarThumbnail.layer.masksToBounds = true
         self.userBarThumbnail.kf.setImage(with: URL(string: section.thumbnail!))
         //Buttons
         self.userBarFollowButton.setImage(UIImage.init(icon: .fontAwesome(.plus), size: CGSize(width: 20, height: 20), textColor: ColorPrimary, backgroundColor: UIColor.clear), for: .normal)
@@ -180,6 +207,35 @@ extension DebateAnswerDetailViewController {
         self.actionBar.addSubview(self.actionButtonKeep)
         self.actionBar.addSubview(self.actionButtonComment)
     }
+    fileprivate func bindRx() {
+        //View Model
+        self.viewModel = DebateAnswerDetailViewModel(disposeBag: disposeBag, section: self.section)
+        //Rx
+        viewModel.outputs.section!
+            .subscribe(onNext: { data in
+                guard data.body != nil else {
+                    return
+                }
+                //AnswerDetail
+                self.webView.loadHTMLString(self.concatHTML(css: data.css!, body: data.body!), baseURL: nil)
+            })
+            .disposed(by: disposeBag)
+        viewModel.outputs.emptyStateObserver.asObservable()
+            .subscribe(onNext: { state in
+                switch state {
+                case .loading(let type):
+                    self.emptyView.show(type: .loading(type: type), frame: CGRect(x: self.webView.frame.origin.x, y: self.webView.frame.origin.y, width: SW, height: SH - self.webView.frame.origin.y - self.actionBar.frame.size.height))
+                    break
+                case .empty:
+                    self.emptyView.hide()
+                default:
+                    break
+                }
+            })
+            .disposed(by: disposeBag)
+        //首次加载
+        viewModel.inputs.refreshData.onNext(())
+    }
     //NavigationBarItem Action
     @objc fileprivate func goBack() {
         if (navigationController != nil) {
@@ -187,5 +243,53 @@ extension DebateAnswerDetailViewController {
         } else {
             dismiss(animated: true, completion: nil)
         }
+    }
+    //Deal With Html String
+    private func concatHTML(css: [String], body: String) -> String {
+        var html = "<html>"
+        html += "<head>"
+        css.forEach { html += "<link rel=\"stylesheet\" href=\"\($0)\">" }
+        //H5 模式
+        html += "<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no'>"
+        html += "<style>body{font-size: 30px}img{max-width:320px !important;}</style>"
+        html += "</head>"
+        html += "<body>"
+        html += body
+        html += "</body>"
+        html += "</html>"
+        return html
+    }
+    //ActionBar Event
+    @objc fileprivate func commentButtonClicked() {
+        let storyBoard = UIStoryboard.init(name: "Debate", bundle: nil)
+        let debateAnswerCommentVC = storyBoard.instantiateViewController(withIdentifier: "AnswerComment") as! DebateAnswerCommentViewController
+        debateAnswerCommentVC.section = self.section
+        self.navigationController?.pushViewController(debateAnswerCommentVC, animated: true)
+    }
+}
+
+extension DebateAnswerDetailViewController: WKNavigationDelegate, EmptyViewDelegate {
+    // WKNavigationDelegate
+    // --------------------
+    //页面开始加载
+    func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
+        
+    }
+    //内容开始返回
+    func webView(_ webView: WKWebView, didCommit navigation: WKNavigation!) {
+        
+    }
+    //页面加载完
+    func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
+        self.emptyView.hide()
+    }
+    //页面加载失败
+    func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
+        self.emptyView.show(type: .empty, frame: CGRect(x: self.webView.frame.origin.x, y: self.webView.frame.origin.y, width: SW, height: SH - self.webView.frame.origin.y - self.actionBar.frame.size.height))
+    }
+    //EmptyViewDelegate
+    func emptyViewClicked() {
+        //重新加载
+        viewModel.inputs.refreshData.onNext(())
     }
 }

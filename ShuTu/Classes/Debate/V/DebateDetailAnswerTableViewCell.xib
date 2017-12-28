@@ -55,9 +55,6 @@
                     </view>
                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="别说了，我去年在杭州武林银泰的HM买衣服，付款的时候我向收银员展示支付二维码。收银员很高冷的说，对不起，我们这里不接受支付宝付款，我们是外" textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="zL2-DU-tqm">
                         <rect key="frame" x="14" y="40" width="381" height="39.5"/>
-                        <constraints>
-                            <constraint firstAttribute="height" constant="39.5" id="w2i-fv-sIs"/>
-                        </constraints>
                         <fontDescription key="fontDescription" type="system" pointSize="11"/>
                         <color key="textColor" red="0.12941176469999999" green="0.12941176469999999" blue="0.12941176469999999" alpha="1" colorSpace="calibratedRGB"/>
                         <nil key="highlightedColor"/>
@@ -68,10 +65,10 @@
                     <constraint firstItem="zL2-DU-tqm" firstAttribute="top" secondItem="WXi-br-z85" secondAttribute="bottom" constant="8" id="EHc-hb-k1w"/>
                     <constraint firstAttribute="bottom" secondItem="ygr-Fb-Phl" secondAttribute="bottom" constant="11" id="FJm-uE-OUb"/>
                     <constraint firstAttribute="trailing" secondItem="zL2-DU-tqm" secondAttribute="trailing" constant="20" id="GZs-dR-tOS"/>
+                    <constraint firstItem="ygr-Fb-Phl" firstAttribute="top" secondItem="zL2-DU-tqm" secondAttribute="bottom" constant="8" id="Ink-nS-VDG"/>
                     <constraint firstItem="WXi-br-z85" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" constant="14" id="J7Y-tw-uzQ"/>
                     <constraint firstAttribute="trailing" secondItem="WXi-br-z85" secondAttribute="trailing" id="Vov-Fi-1ft"/>
                     <constraint firstItem="ygr-Fb-Phl" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="14" id="YJO-Nn-XSS"/>
-                    <constraint firstItem="ygr-Fb-Phl" firstAttribute="top" secondItem="zL2-DU-tqm" secondAttribute="bottom" constant="8" id="g1x-yl-6Bf"/>
                     <constraint firstItem="WXi-br-z85" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" id="wst-yg-1VV"/>
                     <constraint firstItem="zL2-DU-tqm" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="14" id="yKB-FH-xPn"/>
                 </constraints>
@@ -79,7 +76,6 @@
             <viewLayoutGuide key="safeArea" id="njF-e1-oar"/>
             <connections>
                 <outlet property="answer" destination="zL2-DU-tqm" id="0Ic-6g-W4w"/>
-                <outlet property="answerHeightConstraint" destination="w2i-fv-sIs" id="QfO-zR-H5T"/>
                 <outlet property="name" destination="f85-lM-yc9" id="3P7-A7-O82"/>
                 <outlet property="score" destination="ygr-Fb-Phl" id="izX-ms-xL2"/>
                 <outlet property="thumbnail" destination="1RB-Z5-q1e" id="nH9-LU-FiG"/>

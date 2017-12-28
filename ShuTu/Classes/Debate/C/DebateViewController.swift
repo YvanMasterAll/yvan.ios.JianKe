@@ -55,6 +55,10 @@ class DebateViewController: UIViewController {
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
     }
+    
+    deinit {
+        print("deinit: \(type(of: self))")
+    }
 
 }
 

@@ -59,6 +59,10 @@ class DebateDetailViewController: UIViewController {
         //隐藏导航栏
         self.navigationController?.setNavigationBarHidden(true, animated: false)
     }
+    
+    deinit {
+        print("deinit: \(type(of: self))")
+    }
 
 }
 

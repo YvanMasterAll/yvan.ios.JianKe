@@ -14,12 +14,12 @@ import RxDataSources
 public struct DebateDetailViewModelInput {
     var refreshNewData: PublishSubject<Bool>
 }
-public struct DebateDetailViewModelOuput {
+public struct DebateDetailViewModelOutput {
     var sections: Driver<[DebateDetailSectionModel]>?
     var emptyStateObserver: Variable<EmptyViewType>
 }
 class DebateDetailViewModel {
-    fileprivate struct DetailAnswer {
+    fileprivate struct DebateAnswerModel {
         var pageIndex: Int
         var models: Variable<[Answer]>
         var disposeBag: DisposeBag
@@ -28,29 +28,29 @@ class DebateDetailViewModel {
         var refreshStateObserver: Variable<RefreshStatus>
     }
     //私有成员
-    fileprivate var answerY:  DetailAnswer!
-    fileprivate var answerS: DetailAnswer!
+    fileprivate var answerY:  DebateAnswerModel!
+    fileprivate var answerS: DebateAnswerModel!
     fileprivate var service = DebateService.instance
     //inputs
     public var section: Debate!
     public var inputsY: DebateDetailViewModelInput!
     public var inputsS: DebateDetailViewModelInput!
     //outputs
-    public var outputsY: DebateDetailViewModelOuput!
-    public var outputsS: DebateDetailViewModelOuput!
+    public var outputsY: DebateDetailViewModelOutput!
+    public var outputsS: DebateDetailViewModelOutput!
     
     init(section: Debate) {
         //初始化
         self.section = section
         self.inputsY = DebateDetailViewModelInput(refreshNewData: PublishSubject<Bool>())
         self.inputsS = DebateDetailViewModelInput(refreshNewData: PublishSubject<Bool>())
-        self.outputsY = DebateDetailViewModelOuput(sections: nil, emptyStateObserver: Variable<EmptyViewType>(.none))
-        self.outputsS = DebateDetailViewModelOuput(sections: nil, emptyStateObserver: Variable<EmptyViewType>(.none))
+        self.outputsY = DebateDetailViewModelOutput(sections: nil, emptyStateObserver: Variable<EmptyViewType>(.none))
+        self.outputsS = DebateDetailViewModelOutput(sections: nil, emptyStateObserver: Variable<EmptyViewType>(.none))
     }
     
     //初始化
     public func initAnswerY(answer: (disposeBag: DisposeBag, tableView: UITableView, emptyView: EmptyView)) {
-        self.answerY = DetailAnswer(pageIndex: 0, models: Variable<[Answer]>([]), disposeBag: answer.disposeBag, tableView: answer.tableView, emptyView: answer.emptyView, refreshStateObserver: Variable<RefreshStatus>(.none))
+        self.answerY = DebateAnswerModel(pageIndex: 0, models: Variable<[Answer]>([]), disposeBag: answer.disposeBag, tableView: answer.tableView, emptyView: answer.emptyView, refreshStateObserver: Variable<RefreshStatus>(.none))
         //Rx
         self.outputsY.sections = self.answerY.models.asObservable()
             .map{ models -> [DebateDetailSectionModel] in
@@ -130,7 +130,7 @@ class DebateDetailViewModel {
             .disposed(by: self.answerY.disposeBag)
     }
     public func initAnswerS(answer: (disposeBag: DisposeBag, tableView: UITableView, emptyView: EmptyView)) {
-        self.answerS = DetailAnswer(pageIndex: 0, models: Variable<[Answer]>([]), disposeBag: answer.disposeBag, tableView: answer.tableView, emptyView: answer.emptyView, refreshStateObserver: Variable<RefreshStatus>(.none))
+        self.answerS = DebateAnswerModel(pageIndex: 0, models: Variable<[Answer]>([]), disposeBag: answer.disposeBag, tableView: answer.tableView, emptyView: answer.emptyView, refreshStateObserver: Variable<RefreshStatus>(.none))
         //Rx
         self.outputsS.sections = self.answerS.models.asObservable()
             .map{ models -> [DebateDetailSectionModel] in

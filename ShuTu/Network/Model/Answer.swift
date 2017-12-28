@@ -36,3 +36,18 @@ public struct Answer: Mappable {
     }
 }
 
+public struct AnswerDetail: Mappable {
+    
+    var answerId: Int?
+    var body: String?
+    var css: [String]?
+    
+    public init(){}
+    public init?(map: Map) {}
+    
+    public mutating func mapping(map: Map) {
+        answerId <- map["answerId"]
+        body <- map["body"]
+        css <- map["css"]
+    }
+}

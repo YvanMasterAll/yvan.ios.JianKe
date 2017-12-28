@@ -79,6 +79,18 @@ class DebateService {
             .catchErrorJustReturn(([], Error001))
     }
     
+    //拉取回答详情
+    func getAnswerDetail(id: Int) -> Observable<(AnswerDetail, Result)> {
+        return ShuTuProvider.rx.request(.answerDetail(id: id))
+            .mapObject(AnswerDetail.self)
+            .asObservable()
+            .observeOn(MainScheduler.instance)
+            .map{ data in
+                return (data, Ok001)
+            }
+            .catchErrorJustReturn((AnswerDetail(), Error001))
+    }
+    
     //拉取轮播图片
     func getDebateCarousel() -> Observable<[DebateImage]>{
         return ShuTuProvider.rx.request(.carousel)
