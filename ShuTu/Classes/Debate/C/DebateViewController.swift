@@ -14,6 +14,7 @@ import Kingfisher
 
 class DebateViewController: UIViewController {
 
+    @IBOutlet weak var addDebate: UILabel!
     @IBOutlet weak var tableView: UITableView!
     @IBOutlet weak var searchBar: UIView!
     @IBOutlet weak var pagerView: FSPagerView! {
@@ -78,6 +79,10 @@ extension DebateViewController {
         self.tableView.configRefreshFooter(with: FirstRefreshFooter(), action: {
             self.viewModel.inputs.refreshNewData.onNext(false)
         })
+        //Go To AddDebate
+        let tapGes = UITapGestureRecognizer.init(target: self, action: #selector(self.gotoAddDebate))
+        self.addDebate.addGestureRecognizer(tapGes)
+        self.addDebate.isUserInteractionEnabled = true
     }
     //绑定 Rx
     fileprivate func bindRx() {
@@ -117,6 +122,13 @@ extension DebateViewController {
             .disposed(by: disposeBag)
         //刷新
         self.tableView.switchRefreshHeader(to: .refreshing)
+    }
+    //跳转到添加辩题页
+    @objc fileprivate func gotoAddDebate() {
+        let debateStoryBoard = UIStoryboard(name: "Debate", bundle: nil)
+        let debateAddNewVC = debateStoryBoard.instantiateViewController(withIdentifier: "DebateAddNew") as! DebateAddNewViewController
+        
+        self.navigationController?.pushViewController(debateAddNewVC, animated: true)
     }
 }
 

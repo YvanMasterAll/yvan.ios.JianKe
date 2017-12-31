@@ -9,5 +9,5 @@ target 'ShuTu' do
 	pod 'Kingfisher' #缓存方案
 	pod 'SnapKit' #约束工具
 	pod 'PMSuperButton' #Ripple Button
-	pod 'XLPagerTabStrip' #Tab View
+	pod 'IQKeyboardManager' #键盘管理
 end

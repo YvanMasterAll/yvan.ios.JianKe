@@ -51,3 +51,28 @@ public struct AnswerDetail: Mappable {
         css <- map["css"]
     }
 }
+
+public struct AnswerComment: Mappable {
+    
+    var answerId: Int?
+    var username: String?
+    var thumbnail: String?
+    var commment: String?
+    var date: String?
+    var hasTalk: Bool? //是否有二层对话
+    var zan: Int?
+    
+    public init(){}
+    public init?(map: Map) {}
+    
+    public mutating func mapping(map: Map) {
+        answerId <- map["answerId"]
+        username <- map["username"]
+        thumbnail <- map["thumbnail"]
+        commment <- map["comment"]
+        date <- map["date"]
+        hasTalk <- map["hasTalk"]
+        zan <- map["zan"]
+    }
+    
+}

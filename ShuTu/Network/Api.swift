@@ -29,6 +29,7 @@ public enum ShuTuApi {
     case debate(pageIndex: Int)
     case answer(id: Int, pageIndex: Int, side: AnswerSide)
     case answerDetail(id: Int)
+    case answerComment(id: Int, pageIndex: Int)
 }
 public enum AnswerSide: String {
     case SY = "y"
@@ -52,11 +53,13 @@ extension ShuTuApi: TargetType {
             return "debate/answer/\(side.rawValue)/\(id)/\(pageIndex)"
         case .answerDetail(let id):
             return "debate/answer/detail/\(id)"
+        case .answerComment(let id, let pageIndex):
+            return "debate/answer/comment/\(id)/\(pageIndex)"
         }
     }
     //The HTTP method used in the request.
     public var method: Moya.Method {
-        print(self.path)
+        print("request(for: \(self.path))")
         return .get
     }
     //The headers to be incoded in the request.

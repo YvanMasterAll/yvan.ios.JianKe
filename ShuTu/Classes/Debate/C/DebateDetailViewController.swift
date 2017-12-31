@@ -82,6 +82,8 @@ extension DebateDetailViewController {
         //Buttons
         self.inviteButton.setImage(UIImage(icon: .fontAwesome(.userPlus), size: CGSize(width: 14, height: 14), textColor: GMColor.grey600Color(), backgroundColor: UIColor.clear), for: .normal)
         self.answerButton.setImage(UIImage(icon: .fontAwesome(.edit), size: CGSize(width: 14, height: 14), textColor: GMColor.grey600Color(), backgroundColor: UIColor.clear), for: .normal)
+        let answerTapGes = UITapGestureRecognizer.init(target: self, action: #selector(self.gotoAddAnswer))
+        self.answerButton.addGestureRecognizer(answerTapGes)
         self.descFolder.setIcon(prefixText: "展开问题详情", prefixTextColor: GMColor.grey500Color(), icon: .fontAwesome(.angleDown), iconColor: GMColor.grey500Color(), postfixText: "", postfixTextColor: UIColor.clear, size: 11, iconSize: 11)
         self.followButton.contentEdgeInsets.left = 8
         self.followButton.contentEdgeInsets.right = 8
@@ -130,6 +132,13 @@ extension DebateDetailViewController {
     //SegmengControl Changed
     @objc fileprivate func segmentControlChanged(sender: UISegmentedControl) {
         self.pagerView.scrollToItem(at: sender.selectedSegmentIndex, animated: true)
+    }
+    //跳转到添加回答页
+    @objc fileprivate func gotoAddAnswer() {
+        let debateStoryBoard = UIStoryboard(name: "Debate", bundle: nil)
+        let debateAnswerAddNewVC = debateStoryBoard.instantiateViewController(withIdentifier: "DebateAnswerAddNew") as! DebateAnswerAddNewViewController
+        
+        self.navigationController?.pushViewController(debateAnswerAddNewVC, animated: true)
     }
 }
 

@@ -67,12 +67,12 @@ class DebateAnswerDetailViewController: UIViewController {
     }
     
     //私有成员
-    fileprivate var viewModel: DebateAnswerDetailViewModel!
+    fileprivate weak var viewModel: DebateAnswerDetailViewModel!
     fileprivate var disposeBag = DisposeBag()
     fileprivate lazy var emptyView: EmptyView = {
         let emptyView = EmptyView(target: self.view)
         emptyView.delegate = self
-       return emptyView
+        return emptyView
     }()
     //Action Bar
     fileprivate lazy var actionButtonSY: UIButton = { //声援按钮
@@ -211,23 +211,24 @@ extension DebateAnswerDetailViewController {
         //View Model
         self.viewModel = DebateAnswerDetailViewModel(disposeBag: disposeBag, section: self.section)
         //Rx
+        weak var weakself = self
         viewModel.outputs.section!
             .subscribe(onNext: { data in
                 guard data.body != nil else {
                     return
                 }
                 //AnswerDetail
-                self.webView.loadHTMLString(self.concatHTML(css: data.css!, body: data.body!), baseURL: nil)
+                weakself?.webViewLoad(data: data)
             })
             .disposed(by: disposeBag)
         viewModel.outputs.emptyStateObserver.asObservable()
             .subscribe(onNext: { state in
                 switch state {
                 case .loading(let type):
-                    self.emptyView.show(type: .loading(type: type), frame: CGRect(x: self.webView.frame.origin.x, y: self.webView.frame.origin.y, width: SW, height: SH - self.webView.frame.origin.y - self.actionBar.frame.size.height))
+                    weakself?.emptyView.show(type: .loading(type: type), frame: CGRect(x: weakself!.webView.frame.origin.x, y: weakself!.webView.frame.origin.y, width: SW, height: SH - weakself!.webView.frame.origin.y - weakself!.actionBar.frame.size.height))
                     break
                 case .empty:
-                    self.emptyView.hide()
+                    weakself?.emptyView.hide()
                 default:
                     break
                 }
@@ -235,6 +236,10 @@ extension DebateAnswerDetailViewController {
             .disposed(by: disposeBag)
         //首次加载
         viewModel.inputs.refreshData.onNext(())
+    }
+    //WebView Load Data
+    fileprivate func webViewLoad(data: AnswerDetail){
+        webView.loadHTMLString(self.concatHTML(css: data.css!, body: data.body!), baseURL: nil)
     }
     //NavigationBarItem Action
     @objc fileprivate func goBack() {

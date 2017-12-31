@@ -11,7 +11,7 @@ import RxDataSources
 import RxCocoa
 import RxSwift
 
-protocol DebateDetailCollectionViewCellDelegate {
+@objc protocol DebateDetailCollectionViewCellDelegate {
     func scrollViewDidScroll(_ scrollView: UIScrollView, _ offset: CGPoint)
 }
 
@@ -32,7 +32,7 @@ class DebateDetailCollectionViewCell: FSPagerViewCell {
         }
     }
     public var section: Debate!
-    public var delegate: DebateDetailCollectionViewCellDelegate?
+    public weak var delegate: DebateDetailCollectionViewCellDelegate?
     public var navigationController: UINavigationController!
     //私有成员
     fileprivate var disposeBag = DisposeBag()
