@@ -79,6 +79,7 @@ extension DebateDetailViewController {
         self.navigationBarLeftImage.isUserInteractionEnabled = true
         let goBackTapGes = UITapGestureRecognizer(target: self, action: #selector(self.goBack))
         self.navigationBarLeftImage.addGestureRecognizer(goBackTapGes)
+        self.view.bringSubview(toFront: self.navigationBar)
         //Buttons
         self.inviteButton.setImage(UIImage(icon: .fontAwesome(.userPlus), size: CGSize(width: 14, height: 14), textColor: GMColor.grey600Color(), backgroundColor: UIColor.clear), for: .normal)
         self.answerButton.setImage(UIImage(icon: .fontAwesome(.edit), size: CGSize(width: 14, height: 14), textColor: GMColor.grey600Color(), backgroundColor: UIColor.clear), for: .normal)
@@ -100,7 +101,7 @@ extension DebateDetailViewController {
         let desc = self.section.desc!
         debateDesc.text = desc
         let descHeightMax = self.debateDesc.heightOfLines(by: 2)
-        let descHeight = self.debateDesc.height
+        let descHeight = self.debateDesc.heightOfLine
         if descHeight > descHeightMax {
             self.descLabelHeightConstraint.constant = descHeightMax
             self.descFolder.isHidden = false

@@ -128,7 +128,10 @@ extension DebateViewController {
         let debateStoryBoard = UIStoryboard(name: "Debate", bundle: nil)
         let debateAddNewVC = debateStoryBoard.instantiateViewController(withIdentifier: "DebateAddNew") as! DebateAddNewViewController
         
+        //隐藏 Tabbar
+        self.hidesBottomBarWhenPushed = true
         self.navigationController?.pushViewController(debateAddNewVC, animated: true)
+        self.hidesBottomBarWhenPushed = false
     }
 }
 

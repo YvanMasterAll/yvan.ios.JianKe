@@ -12,6 +12,42 @@
 		C61B9F6E1FDE9ECE00471B72 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C61B9F6D1FDE9ECE00471B72 /* Assets.xcassets */; };
 		C61B9F7C1FDE9ECF00471B72 /* ShuTuTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C61B9F7B1FDE9ECF00471B72 /* ShuTuTests.swift */; };
 		C61B9F871FDE9ECF00471B72 /* ShuTuUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C61B9F861FDE9ECF00471B72 /* ShuTuUITests.swift */; };
+		C621031E1FFB3E3300BE43F8 /* YoshikoTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = C62103131FFB3E3300BE43F8 /* YoshikoTextField.swift */; };
+		C621031F1FFB3E3300BE43F8 /* HoshiTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = C62103151FFB3E3300BE43F8 /* HoshiTextField.swift */; };
+		C62103201FFB3E3300BE43F8 /* MinoruTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = C62103161FFB3E3300BE43F8 /* MinoruTextField.swift */; };
+		C62103211FFB3E3300BE43F8 /* YokoTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = C62103171FFB3E3300BE43F8 /* YokoTextField.swift */; };
+		C62103221FFB3E3300BE43F8 /* TextFieldEffects.swift in Sources */ = {isa = PBXBuildFile; fileRef = C62103181FFB3E3300BE43F8 /* TextFieldEffects.swift */; };
+		C62103231FFB3E3300BE43F8 /* JiroTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = C62103191FFB3E3300BE43F8 /* JiroTextField.swift */; };
+		C62103241FFB3E3300BE43F8 /* MadokaTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = C621031A1FFB3E3300BE43F8 /* MadokaTextField.swift */; };
+		C62103251FFB3E3300BE43F8 /* KaedeTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = C621031B1FFB3E3300BE43F8 /* KaedeTextField.swift */; };
+		C62103261FFB3E3300BE43F8 /* AkiraTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = C621031C1FFB3E3300BE43F8 /* AkiraTextField.swift */; };
+		C62103271FFB3E3300BE43F8 /* IsaoTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = C621031D1FFB3E3300BE43F8 /* IsaoTextField.swift */; };
+		C621033E1FFB8C6B00BE43F8 /* RichTextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C621033D1FFB8C6B00BE43F8 /* RichTextView.swift */; };
+		C62103B21FFBADDE00BE43F8 /* StringScanner.swift in Sources */ = {isa = PBXBuildFile; fileRef = C62103A91FFBADDD00BE43F8 /* StringScanner.swift */; };
+		C62103B31FFBADDE00BE43F8 /* MarkupString.swift in Sources */ = {isa = PBXBuildFile; fileRef = C62103AA1FFBADDD00BE43F8 /* MarkupString.swift */; };
+		C62103B41FFBADDE00BE43F8 /* AttributedString+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = C62103AB1FFBADDD00BE43F8 /* AttributedString+Extension.swift */; };
+		C62103B51FFBADDE00BE43F8 /* Imports.swift in Sources */ = {isa = PBXBuildFile; fileRef = C62103AC1FFBADDD00BE43F8 /* Imports.swift */; };
+		C62103B61FFBADDE00BE43F8 /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = C62103AD1FFBADDD00BE43F8 /* Extensions.swift */; };
+		C62103B71FFBADDE00BE43F8 /* String+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = C62103AE1FFBADDD00BE43F8 /* String+Extension.swift */; };
+		C62103B81FFBADDE00BE43F8 /* FontNames.swift in Sources */ = {isa = PBXBuildFile; fileRef = C62103AF1FFBADDD00BE43F8 /* FontNames.swift */; };
+		C62103B91FFBADDE00BE43F8 /* Style.swift in Sources */ = {isa = PBXBuildFile; fileRef = C62103B01FFBADDD00BE43F8 /* Style.swift */; };
+		C62103BA1FFBADDE00BE43F8 /* Colors.swift in Sources */ = {isa = PBXBuildFile; fileRef = C62103B11FFBADDD00BE43F8 /* Colors.swift */; };
+		C62103F51FFBBFEC00BE43F8 /* .gitkeep in Resources */ = {isa = PBXBuildFile; fileRef = C62103E91FFBBFEB00BE43F8 /* .gitkeep */; };
+		C62103F61FFBBFEC00BE43F8 /* TLPhotoLibrary.swift in Sources */ = {isa = PBXBuildFile; fileRef = C62103EA1FFBBFEB00BE43F8 /* TLPhotoLibrary.swift */; };
+		C62103F71FFBBFEC00BE43F8 /* TLCollectionTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = C62103EB1FFBBFEB00BE43F8 /* TLCollectionTableViewCell.swift */; };
+		C62103F81FFBBFEC00BE43F8 /* TLCollectionTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = C62103EC1FFBBFEB00BE43F8 /* TLCollectionTableViewCell.xib */; };
+		C62103F91FFBBFEC00BE43F8 /* TLBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = C62103ED1FFBBFEB00BE43F8 /* TLBundle.swift */; };
+		C62103FA1FFBBFEC00BE43F8 /* TLAlbumPopView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C62103EE1FFBBFEB00BE43F8 /* TLAlbumPopView.swift */; };
+		C62103FB1FFBBFEC00BE43F8 /* TLPhotoCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = C62103EF1FFBBFEB00BE43F8 /* TLPhotoCollectionViewCell.swift */; };
+		C62103FC1FFBBFEC00BE43F8 /* TLPhotoCollectionViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = C62103F01FFBBFEB00BE43F8 /* TLPhotoCollectionViewCell.xib */; };
+		C62103FD1FFBBFEC00BE43F8 /* TLPhotosPickerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C62103F11FFBBFEB00BE43F8 /* TLPhotosPickerViewController.swift */; };
+		C62103FE1FFBBFEC00BE43F8 /* TLAssetsCollection.swift in Sources */ = {isa = PBXBuildFile; fileRef = C62103F21FFBBFEB00BE43F8 /* TLAssetsCollection.swift */; };
+		C62103FF1FFBBFEC00BE43F8 /* TLPhotosPickerViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = C62103F31FFBBFEB00BE43F8 /* TLPhotosPickerViewController.xib */; };
+		C62104001FFBBFEC00BE43F8 /* TLPhotoPickerController.bundle in Resources */ = {isa = PBXBuildFile; fileRef = C62103F41FFBBFEB00BE43F8 /* TLPhotoPickerController.bundle */; };
+		C62104021FFBCA9F00BE43F8 /* PhotoPickerWithNavigationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C62104011FFBCA9F00BE43F8 /* PhotoPickerWithNavigationViewController.swift */; };
+		C62104041FFBCB3B00BE43F8 /* TLPhotosPicker+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = C62104031FFBCB3B00BE43F8 /* TLPhotosPicker+Extension.swift */; };
+		C62104071FFBCBAA00BE43F8 /* ImagePreviewViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = C62104051FFBCBA900BE43F8 /* ImagePreviewViewController.xib */; };
+		C62104081FFBCBAA00BE43F8 /* ImagePreviewViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C62104061FFBCBAA00BE43F8 /* ImagePreviewViewController.swift */; };
 		C625605C1FE220240073564A /* Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = C625605B1FE220240073564A /* Extension.swift */; };
 		C633BDB61FEF72A7009CD1DC /* Answer.swift in Sources */ = {isa = PBXBuildFile; fileRef = C633BDB51FEF72A7009CD1DC /* Answer.swift */; };
 		C633BDB81FEF745C009CD1DC /* DebateDetailViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C633BDB71FEF745C009CD1DC /* DebateDetailViewModel.swift */; };
@@ -136,6 +172,43 @@
 		C61B9F821FDE9ECF00471B72 /* ShuTuUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ShuTuUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		C61B9F861FDE9ECF00471B72 /* ShuTuUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShuTuUITests.swift; sourceTree = "<group>"; };
 		C61B9F881FDE9ECF00471B72 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		C62103131FFB3E3300BE43F8 /* YoshikoTextField.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = YoshikoTextField.swift; sourceTree = "<group>"; };
+		C62103141FFB3E3300BE43F8 /* TextFieldEffects.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TextFieldEffects.h; sourceTree = "<group>"; };
+		C62103151FFB3E3300BE43F8 /* HoshiTextField.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HoshiTextField.swift; sourceTree = "<group>"; };
+		C62103161FFB3E3300BE43F8 /* MinoruTextField.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MinoruTextField.swift; sourceTree = "<group>"; };
+		C62103171FFB3E3300BE43F8 /* YokoTextField.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = YokoTextField.swift; sourceTree = "<group>"; };
+		C62103181FFB3E3300BE43F8 /* TextFieldEffects.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TextFieldEffects.swift; sourceTree = "<group>"; };
+		C62103191FFB3E3300BE43F8 /* JiroTextField.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = JiroTextField.swift; sourceTree = "<group>"; };
+		C621031A1FFB3E3300BE43F8 /* MadokaTextField.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MadokaTextField.swift; sourceTree = "<group>"; };
+		C621031B1FFB3E3300BE43F8 /* KaedeTextField.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KaedeTextField.swift; sourceTree = "<group>"; };
+		C621031C1FFB3E3300BE43F8 /* AkiraTextField.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AkiraTextField.swift; sourceTree = "<group>"; };
+		C621031D1FFB3E3300BE43F8 /* IsaoTextField.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = IsaoTextField.swift; sourceTree = "<group>"; };
+		C621033D1FFB8C6B00BE43F8 /* RichTextView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RichTextView.swift; sourceTree = "<group>"; };
+		C62103A91FFBADDD00BE43F8 /* StringScanner.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StringScanner.swift; sourceTree = "<group>"; };
+		C62103AA1FFBADDD00BE43F8 /* MarkupString.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MarkupString.swift; sourceTree = "<group>"; };
+		C62103AB1FFBADDD00BE43F8 /* AttributedString+Extension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "AttributedString+Extension.swift"; sourceTree = "<group>"; };
+		C62103AC1FFBADDD00BE43F8 /* Imports.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Imports.swift; sourceTree = "<group>"; };
+		C62103AD1FFBADDD00BE43F8 /* Extensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
+		C62103AE1FFBADDD00BE43F8 /* String+Extension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "String+Extension.swift"; sourceTree = "<group>"; };
+		C62103AF1FFBADDD00BE43F8 /* FontNames.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FontNames.swift; sourceTree = "<group>"; };
+		C62103B01FFBADDD00BE43F8 /* Style.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Style.swift; sourceTree = "<group>"; };
+		C62103B11FFBADDD00BE43F8 /* Colors.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Colors.swift; sourceTree = "<group>"; };
+		C62103E91FFBBFEB00BE43F8 /* .gitkeep */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = .gitkeep; sourceTree = "<group>"; };
+		C62103EA1FFBBFEB00BE43F8 /* TLPhotoLibrary.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TLPhotoLibrary.swift; sourceTree = "<group>"; };
+		C62103EB1FFBBFEB00BE43F8 /* TLCollectionTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TLCollectionTableViewCell.swift; sourceTree = "<group>"; };
+		C62103EC1FFBBFEB00BE43F8 /* TLCollectionTableViewCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = TLCollectionTableViewCell.xib; sourceTree = "<group>"; };
+		C62103ED1FFBBFEB00BE43F8 /* TLBundle.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TLBundle.swift; sourceTree = "<group>"; };
+		C62103EE1FFBBFEB00BE43F8 /* TLAlbumPopView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TLAlbumPopView.swift; sourceTree = "<group>"; };
+		C62103EF1FFBBFEB00BE43F8 /* TLPhotoCollectionViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TLPhotoCollectionViewCell.swift; sourceTree = "<group>"; };
+		C62103F01FFBBFEB00BE43F8 /* TLPhotoCollectionViewCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = TLPhotoCollectionViewCell.xib; sourceTree = "<group>"; };
+		C62103F11FFBBFEB00BE43F8 /* TLPhotosPickerViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TLPhotosPickerViewController.swift; sourceTree = "<group>"; };
+		C62103F21FFBBFEB00BE43F8 /* TLAssetsCollection.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TLAssetsCollection.swift; sourceTree = "<group>"; };
+		C62103F31FFBBFEB00BE43F8 /* TLPhotosPickerViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = TLPhotosPickerViewController.xib; sourceTree = "<group>"; };
+		C62103F41FFBBFEB00BE43F8 /* TLPhotoPickerController.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = TLPhotoPickerController.bundle; sourceTree = "<group>"; };
+		C62104011FFBCA9F00BE43F8 /* PhotoPickerWithNavigationViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PhotoPickerWithNavigationViewController.swift; sourceTree = "<group>"; };
+		C62104031FFBCB3B00BE43F8 /* TLPhotosPicker+Extension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "TLPhotosPicker+Extension.swift"; sourceTree = "<group>"; };
+		C62104051FFBCBA900BE43F8 /* ImagePreviewViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = ImagePreviewViewController.xib; sourceTree = "<group>"; };
+		C62104061FFBCBAA00BE43F8 /* ImagePreviewViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ImagePreviewViewController.swift; sourceTree = "<group>"; };
 		C625605B1FE220240073564A /* Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Extension.swift; sourceTree = "<group>"; };
 		C633BDB51FEF72A7009CD1DC /* Answer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Answer.swift; sourceTree = "<group>"; };
 		C633BDB71FEF745C009CD1DC /* DebateDetailViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebateDetailViewModel.swift; sourceTree = "<group>"; };
@@ -354,6 +427,72 @@
 			path = Login;
 			sourceTree = "<group>";
 		};
+		C62103121FFB3E3300BE43F8 /* TextFieldEffects */ = {
+			isa = PBXGroup;
+			children = (
+				C62103131FFB3E3300BE43F8 /* YoshikoTextField.swift */,
+				C62103141FFB3E3300BE43F8 /* TextFieldEffects.h */,
+				C62103151FFB3E3300BE43F8 /* HoshiTextField.swift */,
+				C62103161FFB3E3300BE43F8 /* MinoruTextField.swift */,
+				C62103171FFB3E3300BE43F8 /* YokoTextField.swift */,
+				C62103181FFB3E3300BE43F8 /* TextFieldEffects.swift */,
+				C62103191FFB3E3300BE43F8 /* JiroTextField.swift */,
+				C621031A1FFB3E3300BE43F8 /* MadokaTextField.swift */,
+				C621031B1FFB3E3300BE43F8 /* KaedeTextField.swift */,
+				C621031C1FFB3E3300BE43F8 /* AkiraTextField.swift */,
+				C621031D1FFB3E3300BE43F8 /* IsaoTextField.swift */,
+			);
+			path = TextFieldEffects;
+			sourceTree = "<group>";
+		};
+		C62103A81FFBADDD00BE43F8 /* SwiftRichString */ = {
+			isa = PBXGroup;
+			children = (
+				C62103A91FFBADDD00BE43F8 /* StringScanner.swift */,
+				C62103AA1FFBADDD00BE43F8 /* MarkupString.swift */,
+				C62103AB1FFBADDD00BE43F8 /* AttributedString+Extension.swift */,
+				C62103AC1FFBADDD00BE43F8 /* Imports.swift */,
+				C62103AD1FFBADDD00BE43F8 /* Extensions.swift */,
+				C62103AE1FFBADDD00BE43F8 /* String+Extension.swift */,
+				C62103AF1FFBADDD00BE43F8 /* FontNames.swift */,
+				C62103B01FFBADDD00BE43F8 /* Style.swift */,
+				C62103B11FFBADDD00BE43F8 /* Colors.swift */,
+			);
+			name = SwiftRichString;
+			path = "../../../../../../Downloads/SwiftRichString-master/Sources/SwiftRichString";
+			sourceTree = "<group>";
+		};
+		C62103E71FFBBFEB00BE43F8 /* TLPhotoPicker */ = {
+			isa = PBXGroup;
+			children = (
+				C62103E81FFBBFEB00BE43F8 /* Classes */,
+				C62103F41FFBBFEB00BE43F8 /* TLPhotoPickerController.bundle */,
+			);
+			path = TLPhotoPicker;
+			sourceTree = "<group>";
+		};
+		C62103E81FFBBFEB00BE43F8 /* Classes */ = {
+			isa = PBXGroup;
+			children = (
+				C62103E91FFBBFEB00BE43F8 /* .gitkeep */,
+				C62103EA1FFBBFEB00BE43F8 /* TLPhotoLibrary.swift */,
+				C62104031FFBCB3B00BE43F8 /* TLPhotosPicker+Extension.swift */,
+				C62103EB1FFBBFEB00BE43F8 /* TLCollectionTableViewCell.swift */,
+				C62103EC1FFBBFEB00BE43F8 /* TLCollectionTableViewCell.xib */,
+				C62103ED1FFBBFEB00BE43F8 /* TLBundle.swift */,
+				C62103EE1FFBBFEB00BE43F8 /* TLAlbumPopView.swift */,
+				C62103EF1FFBBFEB00BE43F8 /* TLPhotoCollectionViewCell.swift */,
+				C62103F01FFBBFEB00BE43F8 /* TLPhotoCollectionViewCell.xib */,
+				C62103F11FFBBFEB00BE43F8 /* TLPhotosPickerViewController.swift */,
+				C62103F21FFBBFEB00BE43F8 /* TLAssetsCollection.swift */,
+				C62103F31FFBBFEB00BE43F8 /* TLPhotosPickerViewController.xib */,
+				C62104011FFBCA9F00BE43F8 /* PhotoPickerWithNavigationViewController.swift */,
+				C62104061FFBCBAA00BE43F8 /* ImagePreviewViewController.swift */,
+				C62104051FFBCBA900BE43F8 /* ImagePreviewViewController.xib */,
+			);
+			path = Classes;
+			sourceTree = "<group>";
+		};
 		C666EAE01FDEB4A500ABADFB /* App */ = {
 			isa = PBXGroup;
 			children = (
@@ -395,6 +534,9 @@
 		C68983971FDF6CC900C53E95 /* Libraries */ = {
 			isa = PBXGroup;
 			children = (
+				C62103E71FFBBFEB00BE43F8 /* TLPhotoPicker */,
+				C62103A81FFBADDD00BE43F8 /* SwiftRichString */,
+				C62103121FFB3E3300BE43F8 /* TextFieldEffects */,
 				C6929C031FEA9F8A00D74A0C /* PullToRefreshKit */,
 				C6E2736C1FEA5E2600D78520 /* FSPagerView */,
 				C68E275C1FE94B89003144AB /* Component */,
@@ -472,6 +614,7 @@
 				C68E275D1FE94BD9003144AB /* EmptyView.swift */,
 				C63EAC761FF6176E00A69EAA /* SlackTextView.swift */,
 				C63EAC801FF66E4100A69EAA /* GrowingTextView.swift */,
+				C621033D1FFB8C6B00BE43F8 /* RichTextView.swift */,
 			);
 			path = Component;
 			sourceTree = "<group>";
@@ -714,6 +857,7 @@
 				C68983C31FDF78A400C53E95 /* MaterialIcons.ttf in Resources */,
 				C68983C71FDF78A400C53E95 /* WeatherIcons.ttf in Resources */,
 				C6929C251FEA9F9F00D74A0C /* arrow_right@3x.png in Resources */,
+				C62104071FFBCBAA00BE43F8 /* ImagePreviewViewController.xib in Resources */,
 				C6929C231FEA9F9F00D74A0C /* arrow_left@3x.png in Resources */,
 				C6C130891FE3A2CA00E2B21D /* Debate.storyboard in Resources */,
 				C68983C91FDF78A400C53E95 /* Icofont.ttf in Resources */,
@@ -726,11 +870,16 @@
 				C66B37F01FE2C3EE004117A8 /* Info.plist in Resources */,
 				C68983C01FDF78A400C53E95 /* Ionicons.ttf in Resources */,
 				C6929C211FEA9F9F00D74A0C /* arrow_down@3x.png in Resources */,
+				C62103FF1FFBBFEC00BE43F8 /* TLPhotosPickerViewController.xib in Resources */,
 				C6929C241FEA9F9F00D74A0C /* success@3x.png in Resources */,
+				C62104001FFBBFEC00BE43F8 /* TLPhotoPickerController.bundle in Resources */,
+				C62103FC1FFBBFEC00BE43F8 /* TLPhotoCollectionViewCell.xib in Resources */,
 				C67ED6801FEE367B008E4853 /* DebateDetailCollectionViewCell.xib in Resources */,
 				C666EAE81FDEC6C200ABADFB /* LaunchScreen.storyboard in Resources */,
+				C62103F51FFBBFEC00BE43F8 /* .gitkeep in Resources */,
 				C68983BF1FDF78A400C53E95 /* Emoji.ttf in Resources */,
 				C61B9F6E1FDE9ECE00471B72 /* Assets.xcassets in Resources */,
+				C62103F81FFBBFEC00BE43F8 /* TLCollectionTableViewCell.xib in Resources */,
 				C6929C221FEA9F9F00D74A0C /* Localize.strings in Resources */,
 				C68983C61FDF78A400C53E95 /* Stateface.ttf in Resources */,
 			);
@@ -834,52 +983,75 @@
 			buildActionMask = 2147483647;
 			files = (
 				C6929C1C1FEA9F9F00D74A0C /* Right.swift in Sources */,
+				C62103BA1FFBADDE00BE43F8 /* Colors.swift in Sources */,
+				C62104081FFBCBAA00BE43F8 /* ImagePreviewViewController.swift in Sources */,
 				C68983CF1FDF82D800C53E95 /* LoginViewController.swift in Sources */,
+				C62103221FFB3E3300BE43F8 /* TextFieldEffects.swift in Sources */,
 				C6929C1E1FEA9F9F00D74A0C /* ElasticRefreshHeader.swift in Sources */,
+				C62104041FFBCB3B00BE43F8 /* TLPhotosPicker+Extension.swift in Sources */,
 				C6929C181FEA9F9F00D74A0C /* PullToRefresh.swift in Sources */,
 				C66B37EA1FE2C3EE004117A8 /* Window.swift in Sources */,
+				C62103251FFB3E3300BE43F8 /* KaedeTextField.swift in Sources */,
 				C6FF409C1FEAA9F800AA1542 /* FirstRefreshHeader.swift in Sources */,
+				C62103B71FFBADDE00BE43F8 /* String+Extension.swift in Sources */,
 				C66B37E01FE2C3EE004117A8 /* PKHUDAnimation.swift in Sources */,
 				C66B37EE1FE2C3EE004117A8 /* PKHUDSquareBaseView.swift in Sources */,
+				C62103FE1FFBBFEC00BE43F8 /* TLAssetsCollection.swift in Sources */,
 				C6E273931FEA77FE00D78520 /* FSPagerViewLayout.swift in Sources */,
 				C66B37E71FE2C3EE004117A8 /* PKHUDTextView.swift in Sources */,
+				C62103B31FFBADDE00BE43F8 /* MarkupString.swift in Sources */,
 				C68E275B1FE94931003144AB /* GeneralFactory.swift in Sources */,
 				C6929C201FEA9F9F00D74A0C /* Left.swift in Sources */,
 				C637764B1FF8DEE6004EE194 /* DebateAnswerAddNewViewController.swift in Sources */,
+				C62103B81FFBADDE00BE43F8 /* FontNames.swift in Sources */,
 				C6929C1A1FEA9F9F00D74A0C /* Availability.swift in Sources */,
 				C63EAC811FF66E4100A69EAA /* GrowingTextView.swift in Sources */,
 				C6816E911FF4B4F600219420 /* DebateAnswerDetailViewModel.swift in Sources */,
 				C67ED67F1FEE367B008E4853 /* DebateDetailCollectionViewCell.swift in Sources */,
+				C62103B91FFBADDE00BE43F8 /* Style.swift in Sources */,
 				C66B37EB1FE2C3EE004117A8 /* WindowRootViewController.swift in Sources */,
 				C6929C1B1FEA9F9F00D74A0C /* Header.swift in Sources */,
+				C62104021FFBCA9F00BE43F8 /* PhotoPickerWithNavigationViewController.swift in Sources */,
+				C62103271FFB3E3300BE43F8 /* IsaoTextField.swift in Sources */,
 				C66B37E51FE2C3EE004117A8 /* PKHUDAssets.swift in Sources */,
 				C66B37E41FE2C3EE004117A8 /* PKHUDSuccessView.swift in Sources */,
 				C6B84B2E1FEA8178000B74A4 /* DebateSearchView.swift in Sources */,
 				C66B37E11FE2C3EE004117A8 /* PKHUDAnimating.swift in Sources */,
+				C62103F91FFBBFEC00BE43F8 /* TLBundle.swift in Sources */,
 				C63EAC771FF6176E00A69EAA /* SlackTextView.swift in Sources */,
 				C666EAE41FDEB4FC00ABADFB /* Const.swift in Sources */,
 				C6E273961FEA77FE00D78520 /* FSPagerViewLayoutAttributes.swift in Sources */,
 				C66B37DF1FE2C3EE004117A8 /* PKHUDSystemActivityIndicatorView.swift in Sources */,
 				C68983D51FDF8DB200C53E95 /* Protocol.swift in Sources */,
+				C62103B41FFBADDE00BE43F8 /* AttributedString+Extension.swift in Sources */,
 				C66B37E61FE2C3EE004117A8 /* PKHUDWideBaseView.swift in Sources */,
+				C621031F1FFB3E3300BE43F8 /* HoshiTextField.swift in Sources */,
 				C6C130911FE3ABCD00E2B21D /* DebateViewModel.swift in Sources */,
+				C62103B51FFBADDE00BE43F8 /* Imports.swift in Sources */,
+				C62103FA1FFBBFEC00BE43F8 /* TLAlbumPopView.swift in Sources */,
+				C621033E1FFB8C6B00BE43F8 /* RichTextView.swift in Sources */,
 				C6CD27401FEBC27500CF87A8 /* DebateTableViewCell.swift in Sources */,
+				C62103201FFB3E3300BE43F8 /* MinoruTextField.swift in Sources */,
 				C68983D91FDF8DED00C53E95 /* Api.swift in Sources */,
 				C63BE3B21FF24EE6006080FA /* DebateAnswerDetailViewController.swift in Sources */,
 				C68983B21FDF784D00C53E95 /* SwiftIcons.swift in Sources */,
+				C621031E1FFB3E3300BE43F8 /* YoshikoTextField.swift in Sources */,
 				C68983D71FDF8DD300C53E95 /* Service.swift in Sources */,
 				C68E275E1FE94BD9003144AB /* EmptyView.swift in Sources */,
 				C6E25C711FECDF5200E730DA /* DebateDetailViewController.swift in Sources */,
 				C6E273901FEA77FE00D78520 /* FSPagerViewCell.swift in Sources */,
+				C62103211FFB3E3300BE43F8 /* YokoTextField.swift in Sources */,
 				C6929C191FEA9F9F00D74A0C /* Footer.swift in Sources */,
 				C66B37E81FE2C3EE004117A8 /* HUD.swift in Sources */,
 				C66B37E31FE2C3EE004117A8 /* PKHUD.swift in Sources */,
 				C6E273911FEA77FE00D78520 /* FSPagerViewTransformer.swift in Sources */,
 				C66B37EF1FE2C3EE004117A8 /* PKHUDErrorView.swift in Sources */,
 				C6C1308F1FE3ABB500E2B21D /* DebateViewController.swift in Sources */,
+				C62103B61FFBADDE00BE43F8 /* Extensions.swift in Sources */,
 				C6E273921FEA77FE00D78520 /* FSPagerCollectionView.swift in Sources */,
 				C680B26E1FF7A26A002B9B16 /* DebateAnswerCommentViewModel.swift in Sources */,
 				C6C130941FE3CDD500E2B21D /* Debate.swift in Sources */,
+				C62103F71FFBBFEC00BE43F8 /* TLCollectionTableViewCell.swift in Sources */,
 				C625605C1FE220240073564A /* Extension.swift in Sources */,
 				C63BD0681FF0C3CC00272A55 /* SecondRefreshHeader.swift in Sources */,
 				C63776471FF8C096004EE194 /* DebateAnswerCommentTableViewCell.swift in Sources */,
@@ -888,15 +1060,22 @@
 				C6A1B9F41FF51387008AAFD8 /* DebateAnswerCommentViewController.swift in Sources */,
 				C61B9F671FDE9ECE00471B72 /* AppDelegate.swift in Sources */,
 				C66B37E21FE2C3EE004117A8 /* FrameView.swift in Sources */,
+				C62103B21FFBADDE00BE43F8 /* StringScanner.swift in Sources */,
+				C62103FD1FFBBFEC00BE43F8 /* TLPhotosPickerViewController.swift in Sources */,
+				C62103241FFB3E3300BE43F8 /* MadokaTextField.swift in Sources */,
 				C68983DD1FDF983000C53E95 /* LoginViewModel.swift in Sources */,
+				C62103231FFB3E3300BE43F8 /* JiroTextField.swift in Sources */,
 				C66B37EC1FE2C3EE004117A8 /* PKHUDProgressView.swift in Sources */,
+				C62103261FFB3E3300BE43F8 /* AkiraTextField.swift in Sources */,
 				C633BDB81FEF745C009CD1DC /* DebateDetailViewModel.swift in Sources */,
 				C63776491FF8DE3D004EE194 /* DebateAddNewViewController.swift in Sources */,
 				C6929C1D1FEA9F9F00D74A0C /* Utils.swift in Sources */,
 				C666EAE21FDEB4D000ABADFB /* GMColor.swift in Sources */,
 				C6E273941FEA77FE00D78520 /* FSPageControl.swift in Sources */,
+				C62103FB1FFBBFEC00BE43F8 /* TLPhotoCollectionViewCell.swift in Sources */,
 				C666EAE61FDEC67A00ABADFB /* Environment.swift in Sources */,
 				C6FF409E1FEAB07000AA1542 /* FirstRefreshFooter.swift in Sources */,
+				C62103F61FFBBFEC00BE43F8 /* TLPhotoLibrary.swift in Sources */,
 				C68983DB1FDF97A100C53E95 /* Auth.swift in Sources */,
 				C6929C1F1FEA9F9F00D74A0C /* ElasticRefreshControl.swift in Sources */,
 				C633BDB61FEF72A7009CD1DC /* Answer.swift in Sources */,

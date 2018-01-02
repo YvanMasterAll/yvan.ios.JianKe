@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import IQKeyboardManager
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -16,6 +17,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
         //创建窗口
         self.window = UIWindow(frame: UIScreen.main.bounds)
+        
+        //启动键盘管理
+        IQKeyboardManager.shared().isEnabled = true
+        IQKeyboardManager.shared().shouldResignOnTouchOutside = true //点击背景隐藏键盘
+        IQKeyboardManager.shared().isEnableAutoToolbar = false //隐藏工具栏
         
         //测试 - 清空存储信息
         //Environment.clear()

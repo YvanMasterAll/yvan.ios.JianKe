@@ -71,6 +71,7 @@ extension DebateAnswerCommentViewController {
         self.navigationBarLeftImage.isUserInteractionEnabled = true
         let goBackTapGes = UITapGestureRecognizer(target: self, action: #selector(self.goBack))
         self.navigationBarLeftImage.addGestureRecognizer(goBackTapGes)
+        self.view.bringSubview(toFront: self.navigationBar)
         //SlackTextView
         self.textView.layer.cornerRadius = 4
         self.textView.delegate = self

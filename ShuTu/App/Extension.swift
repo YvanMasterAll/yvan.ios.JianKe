@@ -181,12 +181,12 @@ extension Date {
 
 //UILabel 扩展
 extension UILabel {
-    var height: CGFloat {
+    var heightOfLine: CGFloat {
         get {
             return (self.text! as NSString).boundingRect(with: CGSize(width: self.frame.width, height:CGFloat(MAXFLOAT)), options: .usesLineFragmentOrigin, attributes: [NSAttributedStringKey.font : self.font], context: nil).height
         }
     }
-    var width: CGFloat {
+    var widthOfString: CGFloat {
         get {
             return (self.text! as NSString).boundingRect(with: CGSize(width: CGFloat(MAXFLOAT), height: 0), options: .usesLineFragmentOrigin, attributes: [NSAttributedStringKey.font : self.font], context: nil).width
         }

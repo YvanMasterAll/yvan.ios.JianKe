@@ -88,7 +88,7 @@ class DebateAnswerDetailViewController: UIViewController {
         let label = UILabel(frame: CGRect(x: 0, y: labelTop, width: w, height: 0))
         label.text = "声援"
         label.font = UIFont.systemFont(ofSize: 11)
-        label.frame.size.height = label.height
+        label.frame.size.height = label.heightOfLine
         label.textColor = GMColor.grey600Color()
         label.textAlignment = .center
         button.addSubview(label)
@@ -107,7 +107,7 @@ class DebateAnswerDetailViewController: UIViewController {
         let label = UILabel(frame: CGRect(x: 0, y: labelTop, width: w, height: 0))
         label.text = "殊途"
         label.font = UIFont.systemFont(ofSize: 11)
-        label.frame.size.height = label.height
+        label.frame.size.height = label.heightOfLine
         label.textColor = GMColor.grey600Color()
         label.textAlignment = .center
         button.addSubview(label)
@@ -126,7 +126,7 @@ class DebateAnswerDetailViewController: UIViewController {
         let label = UILabel(frame: CGRect(x: 0, y: labelTop, width: w, height: 0))
         label.text = "同归"
         label.font = UIFont.systemFont(ofSize: 11)
-        label.frame.size.height = label.height
+        label.frame.size.height = label.heightOfLine
         label.textColor = GMColor.grey600Color()
         label.textAlignment = .center
         button.addSubview(label)
@@ -145,7 +145,7 @@ class DebateAnswerDetailViewController: UIViewController {
         let label = UILabel(frame: CGRect(x: 0, y: labelTop, width: w, height: 0))
         label.text = "收藏"
         label.font = UIFont.systemFont(ofSize: 11)
-        label.frame.size.height = label.height
+        label.frame.size.height = label.heightOfLine
         label.textColor = GMColor.grey600Color()
         label.textAlignment = .center
         button.addSubview(label)
@@ -164,7 +164,7 @@ class DebateAnswerDetailViewController: UIViewController {
         let label = UILabel(frame: CGRect(x: 0, y: labelTop, width: w, height: 0))
         label.text = "179"
         label.font = UIFont.systemFont(ofSize: 11)
-        label.frame.size.height = label.height
+        label.frame.size.height = label.heightOfLine
         label.textColor = GMColor.grey600Color()
         label.textAlignment = .center
         button.addSubview(label)
@@ -199,6 +199,7 @@ extension DebateAnswerDetailViewController {
         self.navigationBarLeftImage.isUserInteractionEnabled = true
         let goBackTapGes = UITapGestureRecognizer(target: self, action: #selector(self.goBack))
         self.navigationBarLeftImage.addGestureRecognizer(goBackTapGes)
+        self.view.bringSubview(toFront: self.navigationBar)
         //ActionBar
         self.actionBar.backgroundColor = GMColor.grey50Color()
         self.actionBar.addSubview(self.actionButtonSY)

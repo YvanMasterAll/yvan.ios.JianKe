@@ -42,7 +42,7 @@ extension DebateDetailAnswerTableViewCell {
         }
         self.isInit = true //防止重复添加约束
         
-        let height = self.answer.height
+        let height = self.answer.heightOfLine
         let heightMax = self.answer.heightOfLines(by: 3)
         if height > heightMax {
             self.answer.snp.makeConstraints{ make in

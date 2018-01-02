@@ -19,11 +19,14 @@ open class GrowingTextView: UITextView {
     }
     private weak var heightConstraint: NSLayoutConstraint?
     
+    // Growing or not.
+    @IBInspectable open var isGrowing: Bool = true
+    
     // Maximum length of text. 0 means no limit.
     @IBInspectable open var maxLength: Int = 0
     
-    // Trim white space and newline characters when end editing. Default is true
-    @IBInspectable open var trimWhiteSpaceWhenEndEditing: Bool = true
+    // Trim white space and newline characters when end editing. Default is false
+    @IBInspectable open var trimWhiteSpaceWhenEndEditing: Bool = false
     
     // Customization
     @IBInspectable open var minHeight: CGFloat = 0 {
@@ -94,35 +97,37 @@ open class GrowingTextView: UITextView {
     override open func layoutSubviews() {
         super.layoutSubviews()
         
-        if text == oldText && bounds.size == oldSize { return }
-        oldText = text
-        oldSize = bounds.size
-        
-        let size = sizeThatFits(CGSize(width: bounds.size.width, height: CGFloat.greatestFiniteMagnitude))
-        var height = size.height
-        
-        // Constrain minimum height
-        height = minHeight > 0 ? max(height, minHeight) : height
-        
-        // Constrain maximum height
-        height = maxHeight > 0 ? min(height, maxHeight) : height
-        
-        // Add height constraint if it is not found
-        if (heightConstraint == nil) {
-            heightConstraint = NSLayoutConstraint(item: self, attribute: .height, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 1.0, constant: height)
-            addConstraint(heightConstraint!)
-        }
-        
-        // Update height constraint if needed
-        if height != heightConstraint!.constant {
-            shouldScrollAfterHeightChanged = true
-            heightConstraint!.constant = height
-            if let delegate = delegate as? GrowingTextViewDelegate {
-                delegate.textViewDidChangeHeight?(self, height: height)
+        if self.isGrowing {
+            if text == oldText && bounds.size == oldSize { return }
+            oldText = text
+            oldSize = bounds.size
+            
+            let size = sizeThatFits(CGSize(width: bounds.size.width, height: CGFloat.greatestFiniteMagnitude))
+            var height = size.height
+            
+            // Constrain minimum height
+            height = minHeight > 0 ? max(height, minHeight) : height
+            
+            // Constrain maximum height
+            height = maxHeight > 0 ? min(height, maxHeight) : height
+            
+            // Add height constraint if it is not found
+            if (heightConstraint == nil) {
+                heightConstraint = NSLayoutConstraint(item: self, attribute: .height, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 1.0, constant: height)
+                addConstraint(heightConstraint!)
             }
-        } else if shouldScrollAfterHeightChanged {
-            shouldScrollAfterHeightChanged = false
-            scrollToCorrectPosition()
+            
+            // Update height constraint if needed
+            if height != heightConstraint!.constant {
+                shouldScrollAfterHeightChanged = true
+                heightConstraint!.constant = height
+                if let delegate = delegate as? GrowingTextViewDelegate {
+                    delegate.textViewDidChangeHeight?(self, height: height)
+                }
+            } else if shouldScrollAfterHeightChanged {
+                shouldScrollAfterHeightChanged = false
+                scrollToCorrectPosition()
+            }
         }
     }
     
@@ -180,14 +185,14 @@ open class GrowingTextView: UITextView {
     
     // Limit the length of text
     @objc func textDidChange(notification: Notification) {
-        if let sender = notification.object as? GrowingTextView, sender == self {
+        if let sender = notification.object as? GrowingTextView, sender == self && self.isGrowing {
             if maxLength > 0 && text.count > maxLength {
                 let endIndex = text.index(text.startIndex, offsetBy: maxLength)
                 text = String(text[..<endIndex])
                 undoManager?.removeAllActions()
             }
-            setNeedsDisplay()
         }
+        setNeedsDisplay()
     }
 }
 

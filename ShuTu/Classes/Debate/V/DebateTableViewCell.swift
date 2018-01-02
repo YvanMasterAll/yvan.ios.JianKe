@@ -54,7 +54,7 @@ extension DebateTableViewCell {
         }
         self.isInit = true //防止重复添加约束
         
-        let height = self.desc.height
+        let height = self.desc.heightOfLine
         let heightMax = self.desc.heightOfLines(by: 3)
         if height > heightMax {
             self.descHeightConstraint.constant = heightMax
@@ -63,7 +63,7 @@ extension DebateTableViewCell {
         }
         self.desc.setNeedsUpdateConstraints()
         
-        self.score.frame.size.width = self.score.width
+        self.score.frame.size.width = self.score.widthOfString
     }
 }
 
