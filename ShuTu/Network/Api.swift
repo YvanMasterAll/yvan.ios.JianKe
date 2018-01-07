@@ -30,6 +30,8 @@ public enum ShuTuApi {
     case answer(id: Int, pageIndex: Int, side: AnswerSide)
     case answerDetail(id: Int)
     case answerComment(id: Int, pageIndex: Int)
+    case friend(id: Int, pageIndex: Int)
+    case friendDynamic(id: Int, pageIndex: Int)
 }
 public enum AnswerSide: String {
     case SY = "y"
@@ -55,6 +57,10 @@ extension ShuTuApi: TargetType {
             return "debate/answer/detail/\(id)"
         case .answerComment(let id, let pageIndex):
             return "debate/answer/comment/\(id)/\(pageIndex)"
+        case .friend(let id, let pageIndex):
+            return "debate/friend/\(id)/\(pageIndex)"
+        case .friendDynamic(let id, let pageIndex):
+            return "debate/friend/dynamic/\(id)/\(pageIndex)"
         }
     }
     //The HTTP method used in the request.

@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="13529" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="retina4_7" orientation="portrait">
+        <adaptation id="fullscreen"/>
+    </device>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="13527"/>
+        <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <tableViewCell contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" rowHeight="64" id="KGk-i7-Jjw" customClass="FriendTableViewCell" customModule="ShuTu" customModuleProvider="target">
+            <rect key="frame" x="0.0" y="0.0" width="489" height="64"/>
+            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+            <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="KGk-i7-Jjw" id="H2p-sc-9uM">
+                <rect key="frame" x="0.0" y="0.0" width="489" height="63.5"/>
+                <autoresizingMask key="autoresizingMask"/>
+                <subviews>
+                    <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="thumbnail" translatesAutoresizingMaskIntoConstraints="NO" id="5mz-VE-E9t">
+                        <rect key="frame" x="10" y="12" width="38" height="38"/>
+                        <constraints>
+                            <constraint firstAttribute="height" constant="38" id="aeF-RK-aCS"/>
+                            <constraint firstAttribute="width" constant="38" id="kXl-fA-4Sg"/>
+                        </constraints>
+                    </imageView>
+                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="好友1" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="5Gu-Fg-tSc">
+                        <rect key="frame" x="58" y="15" width="33" height="16"/>
+                        <fontDescription key="fontDescription" type="system" pointSize="13"/>
+                        <color key="textColor" red="0.12941176469999999" green="0.12941176469999999" blue="0.12941176469999999" alpha="1" colorSpace="calibratedRGB"/>
+                        <nil key="highlightedColor"/>
+                    </label>
+                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="个性签名：山有树兮树有枝，心悦军兮军不知" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="bez-78-L9V">
+                        <rect key="frame" x="58" y="39" width="399" height="13.5"/>
+                        <fontDescription key="fontDescription" type="system" pointSize="11"/>
+                        <color key="textColor" red="0.61960784310000006" green="0.61960784310000006" blue="0.61960784310000006" alpha="1" colorSpace="calibratedRGB"/>
+                        <nil key="highlightedColor"/>
+                    </label>
+                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="YWO-3x-aLR">
+                        <rect key="frame" x="58" y="62.5" width="411" height="0.5"/>
+                        <color key="backgroundColor" red="0.87843137250000003" green="0.87843137250000003" blue="0.87843137250000003" alpha="1" colorSpace="calibratedRGB"/>
+                        <constraints>
+                            <constraint firstAttribute="height" constant="0.5" id="dG9-0t-jc1"/>
+                        </constraints>
+                    </view>
+                </subviews>
+                <constraints>
+                    <constraint firstItem="5Gu-Fg-tSc" firstAttribute="leading" secondItem="5mz-VE-E9t" secondAttribute="trailing" constant="10" id="6tx-oL-Esm"/>
+                    <constraint firstAttribute="trailingMargin" secondItem="YWO-3x-aLR" secondAttribute="trailing" id="Au1-WZ-9xo"/>
+                    <constraint firstAttribute="bottom" secondItem="YWO-3x-aLR" secondAttribute="bottom" constant="0.5" id="IFm-mh-tZX"/>
+                    <constraint firstItem="bez-78-L9V" firstAttribute="leading" secondItem="5mz-VE-E9t" secondAttribute="trailing" constant="10" id="NbU-Of-NGL"/>
+                    <constraint firstItem="YWO-3x-aLR" firstAttribute="top" secondItem="bez-78-L9V" secondAttribute="bottom" constant="10" id="NrO-15-Csc"/>
+                    <constraint firstAttribute="trailingMargin" secondItem="bez-78-L9V" secondAttribute="trailing" constant="12" id="SYb-z5-vz3"/>
+                    <constraint firstItem="5mz-VE-E9t" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="10" id="VF9-SM-UJW"/>
+                    <constraint firstItem="5Gu-Fg-tSc" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="topMargin" constant="4" id="hPD-RL-9UK"/>
+                    <constraint firstItem="5mz-VE-E9t" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" constant="12" id="l6Q-vZ-74c"/>
+                    <constraint firstItem="bez-78-L9V" firstAttribute="top" secondItem="5Gu-Fg-tSc" secondAttribute="bottom" constant="8" id="lPb-eP-iTg"/>
+                    <constraint firstItem="YWO-3x-aLR" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leadingMargin" constant="38" id="vGY-DB-BRl"/>
+                </constraints>
+            </tableViewCellContentView>
+            <viewLayoutGuide key="safeArea" id="njF-e1-oar"/>
+            <connections>
+                <outlet property="name" destination="5Gu-Fg-tSc" id="SiW-0g-hds"/>
+                <outlet property="sign" destination="bez-78-L9V" id="iCP-e5-Deu"/>
+                <outlet property="thumbnail" destination="5mz-VE-E9t" id="aFU-OW-kaK"/>
+            </connections>
+            <point key="canvasLocation" x="-41.5" y="57"/>
+        </tableViewCell>
+    </objects>
+    <resources>
+        <image name="thumbnail" width="300" height="300"/>
+    </resources>
+</document>

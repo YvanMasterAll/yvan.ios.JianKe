@@ -17,6 +17,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
         //创建窗口
         self.window = UIWindow(frame: UIScreen.main.bounds)
+        self.window?.backgroundColor = UIColor.white
         
         //启动键盘管理
         IQKeyboardManager.shared().isEnabled = true
@@ -53,20 +54,37 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     //初始化 TabBar
     func setupTabBar() {
         let tabBarController = UITabBarController()
-        tabBarController.tabBar.backgroundColor = UIColor.white
+        tabBarController.tabBar.tintColor = ColorPrimary
+        tabBarController.tabBar.barTintColor = UIColor.white
         //ViewControllers
         let debateStoryBoard = UIStoryboard(name: "Debate", bundle: nil)
+        let friendStoryBoard = UIStoryboard(name: "Friend", bundle: nil)
+        let dailyDebateStoryBoard = UIStoryboard(name: "DailyDebate", bundle: nil)
+        let findStoryBoard = UIStoryboard(name: "Find", bundle: nil)
         let debateNavigationController = debateStoryBoard.instantiateViewController(withIdentifier: "Debate") as! UINavigationController
-        tabBarController.viewControllers = [debateNavigationController]
+        let friendNavigationController = friendStoryBoard.instantiateViewController(withIdentifier: "Friend") as! UINavigationController
+        let dailyDebateNavigationController = dailyDebateStoryBoard.instantiateViewController(withIdentifier: "DailyDebate") as! UINavigationController
+        let findNavigationController = findStoryBoard.instantiateViewController(withIdentifier: "Find") as! UINavigationController
+        tabBarController.viewControllers = [dailyDebateNavigationController, debateNavigationController, friendNavigationController, findNavigationController]
         //TabBars
-        debateNavigationController.tabBarItem = UITabBarItem(title: "首页", image: UIImage(named: "icon_home_grey600"), selectedImage: UIImage(named: "icon_home_primary"))
-        debateNavigationController.tabBarItem.imageInsets.top = -4
-        debateNavigationController.tabBarItem.titlePositionAdjustment.vertical = -2
+        debateNavigationController.tabBarItem = UITabBarItem(title: "首页", image: UIImage(named: "icon_home_grey500"), selectedImage: UIImage(named: "icon_home_primary"))
+//        debateNavigationController.tabBarItem.imageInsets.top = -4
+//        debateNavigationController.tabBarItem.titlePositionAdjustment.vertical = -2
         debateNavigationController.tabBarItem.setTitleTextAttributes([NSAttributedStringKey.font: UIFont.systemFont(ofSize: 11)], for: .normal)
+        friendNavigationController.tabBarItem = UITabBarItem(title: "消息", image: UIImage(named: "icon_friend_grey500"), selectedImage: UIImage(named: "icon_friend_primary"))
+//        friendNavigationController.tabBarItem.imageInsets.top = -4
+//        friendNavigationController.tabBarItem.titlePositionAdjustment.vertical = -2
+        friendNavigationController.tabBarItem.setTitleTextAttributes([NSAttributedStringKey.font: UIFont.systemFont(ofSize: 11)], for: .normal)
+        dailyDebateNavigationController.tabBarItem = UITabBarItem(title: "今日", image: UIImage(named: "icon_daily_grey500"), selectedImage: UIImage(named: "icon_daily_primary"))
+//        dailyDebateNavigationController.tabBarItem.imageInsets.top = -4
+//        dailyDebateNavigationController.tabBarItem.titlePositionAdjustment.vertical = -2
+        dailyDebateNavigationController.tabBarItem.setTitleTextAttributes([NSAttributedStringKey.font: UIFont.systemFont(ofSize: 11)], for: .normal)
+        findNavigationController.tabBarItem = UITabBarItem(title: "发现", image: UIImage(named: "icon_find_grey500"), selectedImage: UIImage(named: "icon_find_primary"))
+        findNavigationController.tabBarItem.setTitleTextAttributes([NSAttributedStringKey.font: UIFont.systemFont(ofSize: 11)], for: .normal)
         tabBarController.tabBar.frame.size = CGSize(width: SW, height: TarBarHeight)
         //TabBar Top Shadow
         tabBarController.tabBar.layer.shadowOffset = CGSize(width: 0, height: 0)
-        tabBarController.tabBar.layer.shadowColor = GMColor.grey600Color().cgColor
+        tabBarController.tabBar.layer.shadowColor = GMColor.grey500Color().cgColor
         tabBarController.tabBar.layer.shadowOpacity = 0.5
         tabBarController.tabBar.layer.shadowRadius = 2
         let path = UIBezierPath(roundedRect: CGRect(x: 0, y: -1, width: SW, height: 1), cornerRadius: 0)

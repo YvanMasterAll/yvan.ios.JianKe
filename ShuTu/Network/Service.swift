@@ -114,6 +114,35 @@ class DebateService {
    
 }
 
+class FriendService {
+    //单例
+    static let instance = FriendService()
+    private init() {}
+    
+    //拉取好友列表
+    func getFriend(id: Int, pageIndex: Int) -> Observable<([Friend], Result)> {
+        return ShuTuProvider.rx.request(.friend(id: id, pageIndex: pageIndex))
+            .mapArray(Friend.self)
+            .asObservable()
+            .observeOn(MainScheduler.instance)
+            .map { data in
+                return (data, Ok001)
+            }
+            .catchErrorJustReturn(([], Error001))
+    }
+    //拉取动态
+    func getDynamic(id: Int, pageIndex: Int) -> Observable<([Dynamic], Result)> {
+        return ShuTuProvider.rx.request(.friendDynamic(id: id, pageIndex: pageIndex))
+            .mapArray(Dynamic.self)
+            .asObservable()
+            .observeOn(MainScheduler.instance)
+            .map { data in
+                return (data, Ok001)
+            }
+            .catchErrorJustReturn(([], Error001))
+    }
+}
+
 class TestService {
     //单例
     static let instance = TestService()

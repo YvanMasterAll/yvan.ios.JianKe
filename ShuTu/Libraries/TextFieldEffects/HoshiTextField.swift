@@ -50,7 +50,7 @@ import UIKit
      
      This property determines the size of the placeholder label relative to the font size of the text field.
     */
-    @IBInspectable dynamic open var placeholderFontScale: CGFloat = 0.65 {
+    @IBInspectable dynamic open var placeholderFontScale: CGFloat = 0.8 {
         didSet {
             updatePlaceholder()
         }
@@ -95,6 +95,7 @@ import UIKit
     override open func animateViewsForTextEntry() {
         if text!.isEmpty {
             UIView.animate(withDuration: 0.3, delay: 0.0, usingSpringWithDamping: 0.8, initialSpringVelocity: 1.0, options: .beginFromCurrentState, animations: ({
+                self.placeholderLabel.font = self.placeholderFontFromFont(self.font!)
                 self.placeholderLabel.frame.origin = CGPoint(x: 10, y: self.placeholderLabel.frame.origin.y)
                 self.placeholderLabel.alpha = 0
             }), completion: { _ in
@@ -115,8 +116,10 @@ import UIKit
     override open func animateViewsForTextDisplay() {
         if text!.isEmpty {
             UIView.animate(withDuration: 0.35, delay: 0.0, usingSpringWithDamping: 0.8, initialSpringVelocity: 2.0, options: UIViewAnimationOptions.beginFromCurrentState, animations: ({
+                self.placeholderLabel.font = self.placeholderFontFromFont(self.font!)
                 self.layoutPlaceholderInTextRect()
                 self.placeholderLabel.alpha = 1
+                self.layoutIfNeeded()
             }), completion: { _ in
                 self.animationCompletionHandler?(.textDisplay)
             })
@@ -147,8 +150,12 @@ import UIKit
     }
     
     private func placeholderFontFromFont(_ font: UIFont) -> UIFont! {
-        let smallerFont = UIFont(name: font.fontName, size: font.pointSize * placeholderFontScale)
-        return smallerFont
+        if isFirstResponder {
+            let smallerFont = UIFont(name: font.fontName, size: font.pointSize * placeholderFontScale)
+            return smallerFont
+        } else {
+            return UIFont(name: font.fontName, size: font.pointSize)
+        }
     }
     
     private func rectForBorder(_ thickness: CGFloat, isFilled: Bool) -> CGRect {
