@@ -60,6 +60,9 @@
 		C63BE3B21FF24EE6006080FA /* DebateAnswerDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C63BE3B11FF24EE6006080FA /* DebateAnswerDetailViewController.swift */; };
 		C63EAC771FF6176E00A69EAA /* SlackTextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C63EAC761FF6176E00A69EAA /* SlackTextView.swift */; };
 		C63EAC811FF66E4100A69EAA /* GrowingTextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C63EAC801FF66E4100A69EAA /* GrowingTextView.swift */; };
+		C641DC1E20037D8E00D7D8FC /* SlideMenuController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C641DC1D20037D8E00D7D8FC /* SlideMenuController.swift */; };
+		C641DC2120037DC300D7D8FC /* Me.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C641DC2020037DC300D7D8FC /* Me.storyboard */; };
+		C641DC242003809A00D7D8FC /* MeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C641DC232003809A00D7D8FC /* MeViewController.swift */; };
 		C666EAE21FDEB4D000ABADFB /* GMColor.swift in Sources */ = {isa = PBXBuildFile; fileRef = C666EAE11FDEB4D000ABADFB /* GMColor.swift */; };
 		C666EAE41FDEB4FC00ABADFB /* Const.swift in Sources */ = {isa = PBXBuildFile; fileRef = C666EAE31FDEB4FC00ABADFB /* Const.swift */; };
 		C666EAE61FDEC67A00ABADFB /* Environment.swift in Sources */ = {isa = PBXBuildFile; fileRef = C666EAE51FDEC67A00ABADFB /* Environment.swift */; };
@@ -82,6 +85,10 @@
 		C66B37EE1FE2C3EE004117A8 /* PKHUDSquareBaseView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C66B37DB1FE2C3EE004117A8 /* PKHUDSquareBaseView.swift */; };
 		C66B37EF1FE2C3EE004117A8 /* PKHUDErrorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C66B37DC1FE2C3EE004117A8 /* PKHUDErrorView.swift */; };
 		C66B37F01FE2C3EE004117A8 /* Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = C66B37DE1FE2C3EE004117A8 /* Info.plist */; };
+		C66C4582200315E300021BDD /* FindYetCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = C66C4580200315E300021BDD /* FindYetCollectionViewCell.swift */; };
+		C66C4583200315E300021BDD /* FindYetCollectionViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = C66C4581200315E300021BDD /* FindYetCollectionViewCell.xib */; };
+		C66C4588200352D200021BDD /* FindGayCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = C66C4586200352D200021BDD /* FindGayCollectionViewCell.swift */; };
+		C66C4589200352D200021BDD /* FindGayCollectionViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = C66C4587200352D200021BDD /* FindGayCollectionViewCell.xib */; };
 		C66D21F81FFDF64B006AA0AE /* Friend.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C66D21F71FFDF64B006AA0AE /* Friend.storyboard */; };
 		C66D21FA1FFE005D006AA0AE /* FriendViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C66D21F91FFE005D006AA0AE /* FriendViewController.swift */; };
 		C66D21FE1FFE083F006AA0AE /* FriendCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = C66D21FC1FFE083F006AA0AE /* FriendCollectionViewCell.swift */; };
@@ -245,6 +252,9 @@
 		C63BE3B11FF24EE6006080FA /* DebateAnswerDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebateAnswerDetailViewController.swift; sourceTree = "<group>"; };
 		C63EAC761FF6176E00A69EAA /* SlackTextView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SlackTextView.swift; sourceTree = "<group>"; };
 		C63EAC801FF66E4100A69EAA /* GrowingTextView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GrowingTextView.swift; sourceTree = "<group>"; };
+		C641DC1D20037D8E00D7D8FC /* SlideMenuController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SlideMenuController.swift; sourceTree = "<group>"; };
+		C641DC2020037DC300D7D8FC /* Me.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = Me.storyboard; sourceTree = "<group>"; };
+		C641DC232003809A00D7D8FC /* MeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeViewController.swift; sourceTree = "<group>"; };
 		C666EAE11FDEB4D000ABADFB /* GMColor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GMColor.swift; sourceTree = "<group>"; };
 		C666EAE31FDEB4FC00ABADFB /* Const.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Const.swift; sourceTree = "<group>"; };
 		C666EAE51FDEC67A00ABADFB /* Environment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Environment.swift; sourceTree = "<group>"; };
@@ -268,6 +278,10 @@
 		C66B37DC1FE2C3EE004117A8 /* PKHUDErrorView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PKHUDErrorView.swift; sourceTree = "<group>"; };
 		C66B37DD1FE2C3EE004117A8 /* PKHUD.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PKHUD.h; sourceTree = "<group>"; };
 		C66B37DE1FE2C3EE004117A8 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		C66C4580200315E300021BDD /* FindYetCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FindYetCollectionViewCell.swift; sourceTree = "<group>"; };
+		C66C4581200315E300021BDD /* FindYetCollectionViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = FindYetCollectionViewCell.xib; sourceTree = "<group>"; };
+		C66C4586200352D200021BDD /* FindGayCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FindGayCollectionViewCell.swift; sourceTree = "<group>"; };
+		C66C4587200352D200021BDD /* FindGayCollectionViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = FindGayCollectionViewCell.xib; sourceTree = "<group>"; };
 		C66D21F71FFDF64B006AA0AE /* Friend.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = Friend.storyboard; sourceTree = "<group>"; };
 		C66D21F91FFE005D006AA0AE /* FriendViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FriendViewController.swift; sourceTree = "<group>"; };
 		C66D21FC1FFE083F006AA0AE /* FriendCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FriendCollectionViewCell.swift; sourceTree = "<group>"; };
@@ -541,6 +555,23 @@
 			path = Classes;
 			sourceTree = "<group>";
 		};
+		C641DC1F20037DB400D7D8FC /* Menu */ = {
+			isa = PBXGroup;
+			children = (
+				C641DC2220037DD400D7D8FC /* C */,
+				C641DC2020037DC300D7D8FC /* Me.storyboard */,
+			);
+			path = Menu;
+			sourceTree = "<group>";
+		};
+		C641DC2220037DD400D7D8FC /* C */ = {
+			isa = PBXGroup;
+			children = (
+				C641DC232003809A00D7D8FC /* MeViewController.swift */,
+			);
+			path = C;
+			sourceTree = "<group>";
+		};
 		C666EAE01FDEB4A500ABADFB /* App */ = {
 			isa = PBXGroup;
 			children = (
@@ -710,6 +741,7 @@
 				C63EAC761FF6176E00A69EAA /* SlackTextView.swift */,
 				C63EAC801FF66E4100A69EAA /* GrowingTextView.swift */,
 				C621033D1FFB8C6B00BE43F8 /* RichTextView.swift */,
+				C641DC1D20037D8E00D7D8FC /* SlideMenuController.swift */,
 			);
 			path = Component;
 			sourceTree = "<group>";
@@ -790,6 +822,7 @@
 		C6C130861FE3A27500E2B21D /* Classes */ = {
 			isa = PBXGroup;
 			children = (
+				C641DC1F20037DB400D7D8FC /* Menu */,
 				C6E52DB6200215D800EEBA28 /* Find */,
 				C6A054532000C3AE00BBFE2C /* DailyDebate */,
 				C66D21F41FFDF608006AA0AE /* Friend */,
@@ -879,6 +912,10 @@
 			children = (
 				C6E52DBE20021A8300EEBA28 /* FindHotCollectionViewCell.swift */,
 				C6E52DBF20021A8300EEBA28 /* FindHotCollectionViewCell.xib */,
+				C66C4580200315E300021BDD /* FindYetCollectionViewCell.swift */,
+				C66C4581200315E300021BDD /* FindYetCollectionViewCell.xib */,
+				C66C4586200352D200021BDD /* FindGayCollectionViewCell.swift */,
+				C66C4587200352D200021BDD /* FindGayCollectionViewCell.xib */,
 			);
 			path = V;
 			sourceTree = "<group>";
@@ -1024,6 +1061,7 @@
 				C67ED6841FEE3C88008E4853 /* DebateDetailAnswerTableViewCell.xib in Resources */,
 				C68983C41FDF78A400C53E95 /* OpenIconic.ttf in Resources */,
 				C66B37ED1FE2C3EE004117A8 /* Images.xcassets in Resources */,
+				C66C4589200352D200021BDD /* FindGayCollectionViewCell.xib in Resources */,
 				C68983C31FDF78A400C53E95 /* MaterialIcons.ttf in Resources */,
 				C68983C71FDF78A400C53E95 /* WeatherIcons.ttf in Resources */,
 				C6929C251FEA9F9F00D74A0C /* arrow_right@3x.png in Resources */,
@@ -1039,6 +1077,7 @@
 				C68983C81FDF78A400C53E95 /* Dripicons.ttf in Resources */,
 				C68983CA1FDF78A400C53E95 /* Linearicons.ttf in Resources */,
 				C68983C21FDF78A400C53E95 /* FontAwesome.ttf in Resources */,
+				C641DC2120037DC300D7D8FC /* Me.storyboard in Resources */,
 				C68983CC1FDF81ED00C53E95 /* Login.storyboard in Resources */,
 				C66D22031FFE097C006AA0AE /* FriendDynamicCollectionViewCell.xib in Resources */,
 				C66B37F01FE2C3EE004117A8 /* Info.plist in Resources */,
@@ -1051,6 +1090,7 @@
 				C62103FC1FFBBFEC00BE43F8 /* TLPhotoCollectionViewCell.xib in Resources */,
 				C67ED6801FEE367B008E4853 /* DebateDetailCollectionViewCell.xib in Resources */,
 				C666EAE81FDEC6C200ABADFB /* LaunchScreen.storyboard in Resources */,
+				C66C4583200315E300021BDD /* FindYetCollectionViewCell.xib in Resources */,
 				C6E52DC120021A8300EEBA28 /* FindHotCollectionViewCell.xib in Resources */,
 				C62103F51FFBBFEC00BE43F8 /* .gitkeep in Resources */,
 				C68983BF1FDF78A400C53E95 /* Emoji.ttf in Resources */,
@@ -1195,6 +1235,7 @@
 				C62103B91FFBADDE00BE43F8 /* Style.swift in Sources */,
 				C66B37EB1FE2C3EE004117A8 /* WindowRootViewController.swift in Sources */,
 				C6929C1B1FEA9F9F00D74A0C /* Header.swift in Sources */,
+				C641DC242003809A00D7D8FC /* MeViewController.swift in Sources */,
 				C62104021FFBCA9F00BE43F8 /* PhotoPickerWithNavigationViewController.swift in Sources */,
 				C62103271FFB3E3300BE43F8 /* IsaoTextField.swift in Sources */,
 				C66B37E51FE2C3EE004117A8 /* PKHUDAssets.swift in Sources */,
@@ -1213,6 +1254,7 @@
 				C6C130911FE3ABCD00E2B21D /* DebateViewModel.swift in Sources */,
 				C62103B51FFBADDE00BE43F8 /* Imports.swift in Sources */,
 				C62103FA1FFBBFEC00BE43F8 /* TLAlbumPopView.swift in Sources */,
+				C66C4588200352D200021BDD /* FindGayCollectionViewCell.swift in Sources */,
 				C621033E1FFB8C6B00BE43F8 /* RichTextView.swift in Sources */,
 				C6CD27401FEBC27500CF87A8 /* DebateTableViewCell.swift in Sources */,
 				C62103201FFB3E3300BE43F8 /* MinoruTextField.swift in Sources */,
@@ -1251,6 +1293,7 @@
 				C62103B21FFBADDE00BE43F8 /* StringScanner.swift in Sources */,
 				C62103FD1FFBBFEC00BE43F8 /* TLPhotosPickerViewController.swift in Sources */,
 				C62103241FFB3E3300BE43F8 /* MadokaTextField.swift in Sources */,
+				C641DC1E20037D8E00D7D8FC /* SlideMenuController.swift in Sources */,
 				C66D21FE1FFE083F006AA0AE /* FriendCollectionViewCell.swift in Sources */,
 				C6E52DC620024C4500EEBA28 /* SwiftyInnerShadowView.swift in Sources */,
 				C68983DD1FDF983000C53E95 /* LoginViewModel.swift in Sources */,
@@ -1263,6 +1306,7 @@
 				C63776491FF8DE3D004EE194 /* DebateAddNewViewController.swift in Sources */,
 				C6929C1D1FEA9F9F00D74A0C /* Utils.swift in Sources */,
 				C666EAE21FDEB4D000ABADFB /* GMColor.swift in Sources */,
+				C66C4582200315E300021BDD /* FindYetCollectionViewCell.swift in Sources */,
 				C6E273941FEA77FE00D78520 /* FSPageControl.swift in Sources */,
 				C62103FB1FFBBFEC00BE43F8 /* TLPhotoCollectionViewCell.swift in Sources */,
 				C666EAE61FDEC67A00ABADFB /* Environment.swift in Sources */,

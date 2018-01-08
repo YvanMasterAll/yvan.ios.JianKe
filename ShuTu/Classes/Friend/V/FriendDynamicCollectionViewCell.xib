@@ -165,6 +165,7 @@
             <connections>
                 <outlet property="filterView" destination="MZO-JP-591" id="rL6-10-qWk"/>
                 <outlet property="sixinImageView" destination="jF4-yW-m1A" id="wXX-MM-2Yf"/>
+                <outlet property="sixinView" destination="TzA-Lq-suM" id="44F-ue-LDW"/>
                 <outlet property="tableView" destination="E3B-Y6-cY1" id="gGp-EA-W9j"/>
             </connections>
             <point key="canvasLocation" x="158" y="211.5"/>

@@ -277,3 +277,34 @@ extension UIView {
     }
     
 }
+
+//扩展 UIImage
+extension UIImage {
+    /// 重设图片尺寸
+    func reSizeImage(_ reSize: CGSize)->UIImage {
+        UIGraphicsBeginImageContextWithOptions(reSize,false,UIScreen.main.scale)
+        self.draw(in: CGRect.init(x: 0, y: 0, width: reSize.width, height: reSize.height))
+        let reSizeImage: UIImage = UIGraphicsGetImageFromCurrentImageContext()!
+        UIGraphicsEndImageContext()
+        
+        return reSizeImage
+    }
+    /// 等比例缩放
+    func scaleImage(scaleSize:CGFloat)->UIImage {
+        let reSize = CGSize(width: self.size.width * scaleSize, height: self.size.height * scaleSize)
+        
+        return reSizeImage(reSize)
+    }
+    /// 更改图片颜色
+    public func imageWithTintColor(_ color : UIColor) -> UIImage{
+        UIGraphicsBeginImageContext(self.size)
+        color.setFill()
+        let bounds = CGRect.init(x: 0, y: 0, width: self.size.width, height: self.size.height)
+        UIRectFill(bounds)
+        self.draw(in: bounds, blendMode: CGBlendMode.destinationIn, alpha: 1.0)
+        let tintedImage = UIGraphicsGetImageFromCurrentImageContext()
+        UIGraphicsEndImageContext()
+        
+        return tintedImage!
+    }
+}

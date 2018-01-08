@@ -53,9 +53,15 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
     //初始化 TabBar
     func setupTabBar() {
+        //MenuViewController
+        let menuStoryboard = UIStoryboard.init(name: "Me", bundle: nil)
+        let menuViewController = menuStoryboard.instantiateViewController(withIdentifier: "Me")
+        //Tabbar Controller
         let tabBarController = UITabBarController()
         tabBarController.tabBar.tintColor = ColorPrimary
         tabBarController.tabBar.barTintColor = UIColor.white
+        tabBarController.tabBar.backgroundImage = GeneralFactory.createImageWithColor(UIColor.clear)
+        tabBarController.tabBar.shadowImage = GeneralFactory.createImageWithColor(UIColor.clear)
         //ViewControllers
         let debateStoryBoard = UIStoryboard(name: "Debate", bundle: nil)
         let friendStoryBoard = UIStoryboard(name: "Friend", bundle: nil)
@@ -90,7 +96,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         let path = UIBezierPath(roundedRect: CGRect(x: 0, y: -1, width: SW, height: 1), cornerRadius: 0)
         tabBarController.tabBar.layer.shadowPath = path.cgPath
         
-        self.window?.rootViewController = tabBarController
+        self.window?.rootViewController = SlideMenuController.init(mainViewController: tabBarController, leftMenuViewController: menuViewController)
         self.window?.makeKeyAndVisible()
     }
 

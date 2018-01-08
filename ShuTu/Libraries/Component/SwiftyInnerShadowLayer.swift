@@ -62,7 +62,7 @@ public class SwiftyInnerShadowLayer: CAShapeLayer {
         generateShadowPath()
     }
     
-    func generateShadowPath() {
+    func generateShadowPath(delta: CGFloat = 6) {
         let top = shadowRadius - shadowOffset.height
         let bottom = shadowRadius + shadowOffset.height
         let left = shadowRadius - shadowOffset.width
@@ -73,7 +73,6 @@ public class SwiftyInnerShadowLayer: CAShapeLayer {
                                 height: bounds.height + top + bottom)
         
         let path = CGMutablePath()
-        let delta: CGFloat = 1
         let rect = CGRect(x: bounds.origin.x - delta, y: bounds.origin.y - delta, width: bounds.width + delta * 2, height: bounds.height + delta * 2)
         let bezier: UIBezierPath = {
             if cornerRadius > 0 {

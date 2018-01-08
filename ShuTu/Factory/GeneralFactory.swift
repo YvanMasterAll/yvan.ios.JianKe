@@ -20,4 +20,16 @@ class GeneralFactory {
         let path = UIBezierPath(roundedRect: rect, cornerRadius: 0)
         layer.shadowPath = path.cgPath
     }
+    
+    public static func createImageWithColor(_ color: UIColor) -> UIImage {
+        let rect = CGRect.init(x: 0, y: 0, width: 1, height: 1)
+        UIGraphicsBeginImageContext(rect.size)
+        let context = UIGraphicsGetCurrentContext()
+        context?.setFillColor(color.cgColor)
+        context?.fill(rect)
+        let image = UIGraphicsGetImageFromCurrentImageContext()
+        UIGraphicsEndImageContext()
+        
+        return image!
+    }
 }

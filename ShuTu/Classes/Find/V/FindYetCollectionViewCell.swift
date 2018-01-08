@@ -1,18 +1,16 @@
 //
-//  FindHotCollectionViewCell.swift
+//  FindYetCollectionViewCell.swift
 //  ShuTu
 //
-//  Created by yiqiang on 2018/1/7.
+//  Created by yiqiang on 2018/1/8.
 //  Copyright © 2018年 yiqiang. All rights reserved.
 //
 
 import UIKit
 
-class FindHotCollectionViewCell: FSPagerViewCell {
+class FindYetCollectionViewCell: FSPagerViewCell {
 
-    @IBOutlet weak var score: UILabel!
-    @IBOutlet weak var title: UILabel!
-    @IBOutlet weak var view: UIView! {
+    @IBOutlet weak var view:  UIView! {
         didSet {
             self.view.layer.cornerRadius = 8
             self.view.layer.masksToBounds = true
@@ -35,10 +33,10 @@ class FindHotCollectionViewCell: FSPagerViewCell {
         view.layer.shadowOffset = CGSize.zero
         view.generateInnerShadow()
     }
-
+    
 }
 
-extension FindHotCollectionViewCell {
+extension FindYetCollectionViewCell {
     //初始化
     fileprivate func commonInit() {
         self.backgroundColor = UIColor.white

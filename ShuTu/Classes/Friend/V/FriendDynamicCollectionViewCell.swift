@@ -13,6 +13,13 @@ import RxDataSources
 
 class FriendDynamicCollectionViewCell: FSPagerViewCell {
     
+    @IBOutlet weak var sixinView: UIView! {
+        didSet {
+            self.sixinView.isUserInteractionEnabled = true
+            let tapGes = UITapGestureRecognizer.init(target: self, action: #selector(self.gotoSixin))
+            self.sixinView.addGestureRecognizer(tapGes)
+        }
+    }
     @IBOutlet weak var filterView: UIView!
     @IBOutlet weak var sixinImageView: UIView! {
         didSet {
@@ -124,6 +131,17 @@ extension FriendDynamicCollectionViewCell {
         self.emptyView.hide()
         tableView.isHidden = false
         self.tableView.switchRefreshHeader(to: .refreshing)
+    }
+    //转到私信
+    @objc fileprivate func gotoSixin() {
+        //跳转至详情
+        let friendStoryBoard = UIStoryboard(name: "Friend", bundle: nil)
+        let friendSixinVC = friendStoryBoard.instantiateViewController(withIdentifier: "FriendSixin") as! FriendSixinViewController
+        
+        //隐藏 Tabbar
+        self.navigationController.hidesBottomBarWhenPushed = true
+        self.navigationController.pushViewController(friendSixinVC, animated: true)
+        self.navigationController.hidesBottomBarWhenPushed = false
     }
 }
 

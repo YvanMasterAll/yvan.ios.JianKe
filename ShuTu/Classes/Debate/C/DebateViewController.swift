@@ -113,7 +113,9 @@ extension DebateViewController {
                 
                 //隐藏 Tabbar
                 self.hidesBottomBarWhenPushed = true
+                self.slideMenuController()?.removeLeftGestures()
                 self.navigationController?.pushViewController(debateDetailVC, animated: true)
+                self.slideMenuController()?.addLeftGestures()
                 self.hidesBottomBarWhenPushed = false
             })
             .disposed(by: disposeBag)

@@ -64,6 +64,9 @@ open class FSPagerViewCell: UICollectionViewCell {
         return view
     }
     
+    /// Generator Shadow
+    open var needShadow: Bool = true
+    
     open override var isHighlighted: Bool {
         set {
             super.isHighlighted = newValue
@@ -101,10 +104,6 @@ open class FSPagerViewCell: UICollectionViewCell {
     fileprivate func commonInit() {
         self.contentView.backgroundColor = UIColor.clear
         self.backgroundColor = UIColor.clear
-        self.contentView.layer.shadowColor = UIColor.black.cgColor
-        self.contentView.layer.shadowRadius = 5
-        self.contentView.layer.shadowOpacity = 0.75
-        self.contentView.layer.shadowOffset = .zero
     }
     
     deinit {
@@ -115,6 +114,13 @@ open class FSPagerViewCell: UICollectionViewCell {
     
     override open func layoutSubviews() {
         super.layoutSubviews()
+        
+        if self.needShadow {
+            self.contentView.layer.shadowColor = UIColor.black.cgColor
+            self.contentView.layer.shadowRadius = 5
+            self.contentView.layer.shadowOpacity = 0.75
+            self.contentView.layer.shadowOffset = .zero
+        }
         if let imageView = _imageView {
             imageView.frame = self.contentView.bounds
         }

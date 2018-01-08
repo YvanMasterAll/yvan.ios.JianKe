@@ -10,13 +10,42 @@ import UIKit
 
 class FindViewController: UIViewController {
 
+    @IBOutlet weak var collectionViewHeightConstraint: NSLayoutConstraint!
+    @IBOutlet weak var collectionView: UICollectionView! {
+        didSet {
+            self.collectionView.register(UINib(nibName: "FindGayCollectionViewCell", bundle: nil), forCellWithReuseIdentifier: "cell")
+            (self.collectionView.collectionViewLayout as! UICollectionViewFlowLayout).itemSize.width = SW
+            self.collectionView.showsVerticalScrollIndicator = false
+            self.collectionView.showsHorizontalScrollIndicator = false
+        }
+    }
+    @IBOutlet weak var pin1: UIView! {
+        didSet {
+            self.pin1.layer.cornerRadius = 1.5
+            self.pin1.layer.masksToBounds = true
+        }
+    }
+    @IBOutlet weak var pin2: UIView! {
+        didSet {
+            self.pin2.layer.cornerRadius = 1.5
+            self.pin2.layer.masksToBounds = true
+        }
+    }
+    
     @IBOutlet weak var pagerView1: FSPagerView! {
         didSet {
             self.pagerView1.tag = 10001
             self.pagerView1.register(UINib(nibName: "FindHotCollectionViewCell", bundle: nil), forCellWithReuseIdentifier: "findHotPagerCell")
-            self.pagerView1.itemSize = CGSize.init(width: SW - 20, height: 100)
-            self.pagerView1.interitemSpacing = 0
-//            self.pagerView1.transformer = FSPagerViewTransformer(type: .linear)
+            self.pagerView1.itemSize = CGSize.init(width: SW - 40, height: 100)
+            self.pagerView1.interitemSpacing = 4
+        }
+    }
+    @IBOutlet weak var pagerView2: FSPagerView! {
+        didSet {
+            self.pagerView2.tag = 10002
+            self.pagerView2.register(UINib(nibName: "FindYetCollectionViewCell", bundle: nil), forCellWithReuseIdentifier: "findYetPagerCell")
+            self.pagerView2.itemSize = CGSize.init(width: SW - 40, height: 100)
+            self.pagerView2.interitemSpacing = 4
         }
     }
     @IBOutlet weak var thumbnail: UIImageView! {
@@ -55,25 +84,33 @@ class FindViewController: UIViewController {
 extension FindViewController {
     //初始化
     fileprivate func setupUI() {
-    
+        //CollectionView
+        self.collectionViewHeightConstraint.constant = 62 * 4
     }
     fileprivate func bindRx() {
         
     }
 }
 
-extension FindViewController: FSPagerViewDelegate, FSPagerViewDataSource {
+extension FindViewController: FSPagerViewDelegate, FSPagerViewDataSource, UICollectionViewDelegate, UICollectionViewDataSource {
     //FSPagerView Delegate && DataSource
     public func numberOfItems(in pagerView: FSPagerView) -> Int {
-        return 10
+        if pagerView.tag == 10001 {
+            return 10
+        } else {
+            return 10
+        }
     }
     public func pagerView(_ pagerView: FSPagerView, cellForItemAt index: Int) -> FSPagerViewCell {
-//        if pagerView.tag == 10001 {
-//
-//        }
-        let cell = pagerView.dequeueReusableCell(withReuseIdentifier: "findHotPagerCell", at: index) as! FindHotCollectionViewCell
-        
-        return cell
+        if pagerView.tag == 10001 {
+            let cell = pagerView.dequeueReusableCell(withReuseIdentifier: "findHotPagerCell", at: index) as! FindHotCollectionViewCell
+            
+            return cell
+        } else {
+            let cell = pagerView.dequeueReusableCell(withReuseIdentifier: "findYetPagerCell", at: index) as! FindYetCollectionViewCell
+            
+            return cell
+        }
     }
     func pagerView(_ pagerView: FSPagerView, didSelectItemAt index: Int) {
         pagerView.deselectItem(at: index, animated: true)
@@ -81,5 +118,20 @@ extension FindViewController: FSPagerViewDelegate, FSPagerViewDataSource {
     }
     func pagerView(_ pagerView: FSPagerView, shouldHighlightItemAt index: Int) -> Bool {
         return false
+    }
+    //CollectionViewDelegate && DataSource
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        collectionView.deselectItem(at: indexPath, animated: true)
+    }
+    func numberOfSections(in collectionView: UICollectionView) -> Int {
+        return 1
+    }
+    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        return 4
+    }
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "cell", for: indexPath) as! FindGayCollectionViewCell
+        
+        return cell
     }
 }
