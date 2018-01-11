@@ -9,6 +9,7 @@
 import Foundation
 import UIKit
 import SnapKit
+import NVActivityIndicatorView
 
 @objc protocol EmptyViewDelegate {
     @objc optional func emptyViewClicked()
@@ -23,6 +24,7 @@ public enum EmptyViewType {
 
 public enum EmptyViewLoadingType {
     case rotate
+    case indicator1
 }
 
 class EmptyView {
@@ -32,6 +34,7 @@ class EmptyView {
     fileprivate var view: UIView!
     fileprivate var target: UIView!
     fileprivate var imageView: UIImageView!
+    fileprivate var indicatorView: NVActivityIndicatorView!
     
     init(target: UIView) {
         self.target = target
@@ -61,6 +64,7 @@ extension EmptyView {
         let tapGes = UITapGestureRecognizer(target: self, action: #selector(self.clicked))
         self.view.addGestureRecognizer(tapGes)
     }
+    //渲染
     fileprivate func setupEmptyViewContent(type: EmptyViewType, frame: CGRect) {
         //清空
         for view in self.view.subviews {
@@ -68,7 +72,6 @@ extension EmptyView {
         }
         //填充 View
         self.view.frame = frame
-        
         switch type {
         case .empty:
             if let imageName = self.delegate?.emptyViewImage?() {
@@ -106,13 +109,22 @@ extension EmptyView {
             self.imageView.layer.add(animation, forKey: nil)
             
             break
+        case .indicator1:
+            self.indicatorView = NVActivityIndicatorView.init(frame: CGRect.init(x: 0, y: 0, width: 40, height: 40), type: NVActivityIndicatorType.ballBeat, color: GMColor.grey500Color(), padding: 0)
+            self.view.addSubview(indicatorView)
+            self.indicatorView.snp.makeConstraints{ make in
+                make.center.equalTo(self.view)
+            }
+            self.indicatorView.startAnimating()
+            
+            break
         }
     }
-    //Animations
+    //动画
     fileprivate func rotateAnimation() -> CABasicAnimation {
         let animation = CABasicAnimation()
         animation.keyPath = "transform.rotation.z"
-        animation.duration = 0.8
+        animation.duration = 2
         animation.isCumulative = true
         animation.toValue = CGFloat.pi * 2
         animation.repeatCount = MAXFLOAT

@@ -64,6 +64,10 @@ public protocol FSPagerViewDelegate: NSObjectProtocol {
     @objc(pagerViewDidScroll:)
     optional func pagerViewDidScroll(_ pagerView: FSPagerView)
     
+    /// Tells the delegate when the user is in scrolling.
+    @objc(scrollViewInScroll:pagerViewInScroll:)
+    optional func pagerViewInScroll(_ scrollView: UIScrollView, _ pagerView: FSPagerView)
+    
     /// Tells the delegate when a scrolling animation in the pager view concludes.
     @objc(pagerViewDidEndScrollAnimation:)
     optional func pagerViewDidEndScrollAnimation(_ pagerView: FSPagerView)
@@ -365,6 +369,7 @@ open class FSPagerView: UIView,UICollectionViewDataSource,UICollectionViewDelega
     }
     
     public func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        self.delegate?.pagerViewInScroll?(scrollView, self)
         if self.numberOfItems > 0 {
             // In case someone is using KVO
             let currentIndex = lround(Double(self.scrollOffset)) % self.numberOfItems

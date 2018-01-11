@@ -12,7 +12,6 @@ class DebateTableViewCell: UITableViewCell {
 
     @IBOutlet weak var divider: UIView!
     @IBOutlet weak var follow: UILabel!
-    @IBOutlet weak var score: UILabel!
     @IBOutlet weak var thumbnail: UIImageView!
     @IBOutlet weak var title: UILabel!
     @IBOutlet weak var desc: UILabel!
@@ -62,8 +61,6 @@ extension DebateTableViewCell {
             self.descHeightConstraint.constant = height
         }
         self.desc.setNeedsUpdateConstraints()
-        
-        self.score.frame.size.width = self.score.widthOfString
     }
 }
 

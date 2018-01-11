@@ -114,7 +114,6 @@ extension FriendSectionModel: SectionModelType {
     }
 }
 
-
 public struct FriendDynamicViewModelInput {
     var refreshNewData: PublishSubject<Bool>
 }

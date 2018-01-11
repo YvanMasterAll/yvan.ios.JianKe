@@ -10,4 +10,5 @@ target 'ShuTu' do
 	pod 'SnapKit' #约束工具
 	pod 'PMSuperButton' #Ripple Button
 	pod 'IQKeyboardManager' #键盘管理
+	pod 'NVActivityIndicatorView' #加载图标
 end

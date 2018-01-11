@@ -55,7 +55,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func setupTabBar() {
         //MenuViewController
         let menuStoryboard = UIStoryboard.init(name: "Me", bundle: nil)
-        let menuViewController = menuStoryboard.instantiateViewController(withIdentifier: "Me")
+        let menuNavigationController = menuStoryboard.instantiateViewController(withIdentifier: "Me") as! UINavigationController
         //Tabbar Controller
         let tabBarController = UITabBarController()
         tabBarController.tabBar.tintColor = ColorPrimary
@@ -89,14 +89,20 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         findNavigationController.tabBarItem.setTitleTextAttributes([NSAttributedStringKey.font: UIFont.systemFont(ofSize: 11)], for: .normal)
         tabBarController.tabBar.frame.size = CGSize(width: SW, height: TarBarHeight)
         //TabBar Top Shadow
-        tabBarController.tabBar.layer.shadowOffset = CGSize(width: 0, height: 0)
-        tabBarController.tabBar.layer.shadowColor = GMColor.grey500Color().cgColor
-        tabBarController.tabBar.layer.shadowOpacity = 0.5
-        tabBarController.tabBar.layer.shadowRadius = 2
-        let path = UIBezierPath(roundedRect: CGRect(x: 0, y: -1, width: SW, height: 1), cornerRadius: 0)
-        tabBarController.tabBar.layer.shadowPath = path.cgPath
+//        tabBarController.tabBar.layer.shadowOffset = CGSize(width: 0, height: 0)
+//        tabBarController.tabBar.layer.shadowColor = GMColor.grey500Color().cgColor
+//        tabBarController.tabBar.layer.shadowOpacity = 0.5
+//        tabBarController.tabBar.layer.shadowRadius = 1
+//        let path = UIBezierPath(roundedRect: CGRect(x: 0, y: -0.5, width: SW, height: 0.5), cornerRadius: 0)
+//        tabBarController.tabBar.layer.shadowPath = path.cgPath
+        let gradient = GradientLayer.init(direction: .leftToRight, colors: [GMColor.grey300Color().withAlphaComponent(0.5), GMColor.grey300Color().withAlphaComponent(0)], cornerRadius: 0)
+        tabBarController.tabBar.addGradient(gradient, frame: CGRect.init(x: 0, y: -2, width: SW, height: 2))
+        //TabBar NavigaitonController
+        let tabBarNavigationController = UINavigationController.init(rootViewController: tabBarController)
+        tabBarController.navigationController?.setNavigationBarHidden(true, animated: false)
+        tabBarController.navigationItem.backBarButtonItem = UIBarButtonItem.init(title: "", style: .plain, target: self, action: nil)
         
-        self.window?.rootViewController = SlideMenuController.init(mainViewController: tabBarController, leftMenuViewController: menuViewController)
+        self.window?.rootViewController = SlideMenuController.init(mainViewController: tabBarNavigationController, leftMenuViewController: menuNavigationController)
         self.window?.makeKeyAndVisible()
     }
 

@@ -16,9 +16,13 @@ class GeneralFactory {
         layer.shadowOffset = CGSize(width: 0, height: 0)
         layer.shadowColor = color
         layer.shadowOpacity = 0.5
-        layer.shadowRadius = 2
+        layer.shadowRadius = 1
         let path = UIBezierPath(roundedRect: rect, cornerRadius: 0)
         layer.shadowPath = path.cgPath
+    }
+    public static func generateGradientShadow(view: UIView, direction: GradientDirection, rect: CGRect, color: UIColor) {
+        let gradient = GradientLayer.init(direction: direction, colors: [color.withAlphaComponent(0.5), color.withAlphaComponent(0)], cornerRadius: 0)
+        view.addGradient(gradient, frame: rect)
     }
     
     public static func createImageWithColor(_ color: UIColor) -> UIImage {

@@ -73,7 +73,8 @@ public class DebateViewModel: DebateViewModelInput, DebateViewModelOutput, Debat
                     self.pageIndex = 0
                     //拉取数据
                     service.getDebate(pageIndex: self.pageIndex)
-                        .subscribe(onNext: { data in
+                        .subscribe(onNext: { response in
+                            let data = response.0
                             if data.count > 0 {
                                 self.models.value.removeAll()
                                 self.models.value = data
@@ -98,7 +99,8 @@ public class DebateViewModel: DebateViewModelInput, DebateViewModelOutput, Debat
                     self.pageIndex += 1
                     //拉取数据
                     service.getDebate(pageIndex: self.pageIndex)
-                        .subscribe(onNext: { data in
+                        .subscribe(onNext: { response in
+                            let data = response.0
                             if data.count > 0 {
                                 self.models.value += data
                                 //结束刷新

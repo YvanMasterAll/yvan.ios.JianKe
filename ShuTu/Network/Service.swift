@@ -59,12 +59,15 @@ class DebateService {
     private init() {}
     
     //拉取 Debate
-    func getDebate(pageIndex: Int) -> Observable<[Debate]> {
+    func getDebate(pageIndex: Int) -> Observable<([Debate], Result)> {
         return ShuTuProvider.rx.request(.debate(pageIndex: pageIndex))
             .mapArray(Debate.self)
             .asObservable()
             .observeOn(MainScheduler.instance)
-            .catchErrorJustReturn([])
+            .map{ data in
+                return (data, Ok001)
+            }
+            .catchErrorJustReturn(([], Error001))
     }
     
     //拉取回答

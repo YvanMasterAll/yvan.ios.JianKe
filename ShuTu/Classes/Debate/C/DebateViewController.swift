@@ -14,7 +14,13 @@ import Kingfisher
 
 class DebateViewController: UIViewController {
 
-    @IBOutlet weak var addDebate: UILabel!
+    @IBOutlet weak var thumbnail: UIImageView! {
+        didSet {
+            self.thumbnail.layer.cornerRadius = self.thumbnail.frame.height/2
+            self.thumbnail.layer.masksToBounds = true
+        }
+    }
+    @IBOutlet weak var addDebate: UIView!
     @IBOutlet weak var tableView: UITableView!
     @IBOutlet weak var searchBar: UIView!
     @IBOutlet weak var pagerView: FSPagerView! {
@@ -51,6 +57,9 @@ class DebateViewController: UIViewController {
         
         //隐藏导航栏
         self.navigationController?.setNavigationBarHidden(true, animated: false)
+        //阴影
+        GeneralFactory.generateRectShadow(layer: self.searchBar.layer, rect: CGRect.init(x: 0, y: self.searchBar.frame.height, width: SW, height: 0.5), color: GMColor.grey800Color().cgColor)
+        self.view.bringSubview(toFront: self.searchBar)
     }
 
     override func didReceiveMemoryWarning() {
@@ -97,7 +106,6 @@ extension DebateViewController {
                 cell.title.text = item.title
                 cell.desc.text = item.desc
                 cell.thumbnail.kf.setImage(with: URL(string: item.thumbnail!))
-                cell.score.text = "\(item.yc ?? 0) 声援 · \(item.sc ?? 0) 殊途 · "
                 //计算 desc label 高度
                 cell.setupConstraint()
                 return cell
@@ -165,7 +173,6 @@ extension DebateViewController: UITableViewDelegate, FSPagerViewDelegate, FSPage
     }
     //TableViewDelegate
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        tableView.deselectRow(at: indexPath, animated: true)
         //取消cell选中状态
         tableView.deselectRow(at: indexPath, animated: true)
     }

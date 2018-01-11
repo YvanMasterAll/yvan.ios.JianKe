@@ -55,7 +55,8 @@ class DebateAddNewViewController: UIViewController {
         //隐藏导航栏
         self.navigationController?.setNavigationBarHidden(true, animated: false)
         //添加 ActionView 的阴影
-        GeneralFactory.generateRectShadow(layer: self.actionView.layer, rect: CGRect(x: 0, y: -1, width: SW, height: 1), color: GMColor.grey600Color().cgColor)
+        GeneralFactory.generateRectShadow(layer: self.actionView.layer, rect: CGRect(x: 0, y: -1, width: SW, height: 1), color: GMColor.grey800Color().cgColor)
+        self.view.bringSubview(toFront: self.actionView)
     }
     
     deinit {
@@ -117,7 +118,7 @@ extension DebateAddNewViewController {
         //TextView
         self.textView.delegate = self
         //NavigationBarView
-        GeneralFactory.generateRectShadow(layer: self.navigationBar.layer, rect: CGRect(x: 0, y: self.navigationBar.frame.size.height, width: SW, height: 0.5), color: GMColor.grey900Color().cgColor)
+        GeneralFactory.generateRectShadow(layer: self.navigationBar.layer, rect: CGRect(x: 0, y: self.navigationBar.frame.size.height, width: SW, height: 0.5), color: GMColor.grey800Color().cgColor)
         self.navigationBarLeftImage.setIcon(icon: .fontAwesome(.angleLeft), textColor: GMColor.grey900Color(), backgroundColor: UIColor.clear, size: nil)
         self.navigationBarLeftImage.isUserInteractionEnabled = true
         let goBackTapGes = UITapGestureRecognizer(target: self, action: #selector(self.goBack))

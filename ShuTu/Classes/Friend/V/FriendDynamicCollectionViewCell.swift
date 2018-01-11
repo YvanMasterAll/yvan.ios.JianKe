@@ -55,7 +55,7 @@ class FriendDynamicCollectionViewCell: FSPagerViewCell {
         super.layoutSubviews()
         
         //阴影
-        GeneralFactory.generateRectShadow(layer: self.filterView.layer, rect: CGRect(x: 0, y: self.filterView.frame.height, width: SW, height: 0.5), color: GMColor.grey300Color().cgColor)
+        GeneralFactory.generateRectShadow(layer: self.filterView.layer, rect: CGRect(x: 0, y: self.filterView.frame.height, width: SW, height: 0.5), color: GMColor.grey800Color().cgColor)
         self.bringSubview(toFront: self.filterView)
     }
     
@@ -151,7 +151,6 @@ extension FriendDynamicCollectionViewCell: UITableViewDelegate, EmptyViewDelegat
         return UITableViewAutomaticDimension
     }
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        tableView.deselectRow(at: indexPath, animated: true)
         //取消cell选中状态
         tableView.deselectRow(at: indexPath, animated: true)
     }

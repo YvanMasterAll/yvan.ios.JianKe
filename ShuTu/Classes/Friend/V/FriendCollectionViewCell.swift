@@ -57,7 +57,7 @@ class FriendCollectionViewCell: FSPagerViewCell {
         super.layoutSubviews()
         
         //阴影
-        GeneralFactory.generateRectShadow(layer: self.searchBar.layer, rect: CGRect.init(x: 0, y: self.searchBar.frame.height, width: SW, height: 0.5), color: GMColor.grey300Color().cgColor)
+        GeneralFactory.generateRectShadow(layer: self.searchBar.layer, rect: CGRect.init(x: 0, y: self.searchBar.frame.height, width: SW, height: 0.5), color: GMColor.grey800Color().cgColor)
         self.bringSubview(toFront: self.searchBar)
     }
     
@@ -155,7 +155,6 @@ extension FriendCollectionViewCell: UITableViewDelegate, EmptyViewDelegate {
         return UITableViewAutomaticDimension
     }
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        tableView.deselectRow(at: indexPath, animated: true)
         //取消cell选中状态
         tableView.deselectRow(at: indexPath, animated: true)
     }

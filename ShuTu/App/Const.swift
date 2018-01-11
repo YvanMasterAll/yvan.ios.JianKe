@@ -29,5 +29,9 @@ let Error002 = Result.failed(message: "输入不合法")
 let Error003 = Result.failed(message: "网络请求失败")
 let Ok001 = Result.ok(message: "成功")
 
+//通知
+let NotificationName1 = "SubScrollViewDidScrollNotification"
+let NotificationName2 = "SubTableViewDidRefreshNotification"
+
 
 

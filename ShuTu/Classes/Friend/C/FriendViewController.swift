@@ -42,7 +42,7 @@ class FriendViewController: UIViewController {
         //NavigationBar
         self.navigationItem.backBarButtonItem = UIBarButtonItem.init(title: "", style: .plain, target: self, action: nil)
         self.navigationController?.navigationBar.barTintColor = GMColor.grey50Color()
-        //GeneralFactory.generateRectShadow(layer: self.navigationController!.navigationBar.layer, rect: CGRect.init(x: 0, y: self.navigationController!.navigationBar.frame.height, width: SW, height: 0.5), color: GMColor.grey400Color().cgColor)
+        //GeneralFactory.generateRectShadow(layer: self.navigationController!.navigationBar.layer, rect: CGRect.init(x: 0, y: self.navigationController!.navigationBar.frame.height, width: SW, height: 0.5), color: GMColor.grey800Color().cgColor)
     }
     
     //私有成员

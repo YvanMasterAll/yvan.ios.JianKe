@@ -87,7 +87,6 @@ extension FriendSixinViewController {
 extension FriendSixinViewController: UITableViewDelegate {
     //TableViewDelegate
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        tableView.deselectRow(at: indexPath, animated: true)
         //取消cell选中状态
         tableView.deselectRow(at: indexPath, animated: true)
     }
