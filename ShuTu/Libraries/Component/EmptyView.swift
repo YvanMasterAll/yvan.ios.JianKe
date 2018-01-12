@@ -60,9 +60,6 @@ extension EmptyView {
         target.addSubview(self.view)
         self.view.backgroundColor = UIColor.white
         self.view.isHidden = true
-        //添加点击事件
-        let tapGes = UITapGestureRecognizer(target: self, action: #selector(self.clicked))
-        self.view.addGestureRecognizer(tapGes)
     }
     //渲染
     fileprivate func setupEmptyViewContent(type: EmptyViewType, frame: CGRect) {
@@ -83,6 +80,10 @@ extension EmptyView {
             self.imageView.snp.makeConstraints { make in
                 make.center.equalTo(self.view)
             }
+            //添加点击事件
+            let tapGes = UITapGestureRecognizer(target: self, action: #selector(self.clicked))
+            self.view.removeGestureRecognizer(tapGes)
+            self.view.addGestureRecognizer(tapGes)
             
             break
         case .loading(let type):
@@ -110,7 +111,7 @@ extension EmptyView {
             
             break
         case .indicator1:
-            self.indicatorView = NVActivityIndicatorView.init(frame: CGRect.init(x: 0, y: 0, width: 40, height: 40), type: NVActivityIndicatorType.ballBeat, color: GMColor.grey500Color(), padding: 0)
+            self.indicatorView = NVActivityIndicatorView.init(frame: CGRect.init(x: 0, y: 0, width: 30, height: 30), type: NVActivityIndicatorType.ballBeat, color: GMColor.grey500Color(), padding: 0)
             self.view.addSubview(indicatorView)
             self.indicatorView.snp.makeConstraints{ make in
                 make.center.equalTo(self.view)

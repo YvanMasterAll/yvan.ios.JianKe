@@ -149,6 +149,7 @@
                     </view>
                     <navigationItem key="navigationItem" id="w80-a7-uA3"/>
                     <connections>
+                        <outlet property="date" destination="emw-i7-cDt" id="7tx-Zc-mY5"/>
                         <outlet property="tableView" destination="owv-Vc-kCQ" id="Ulb-Ln-xcy"/>
                         <outlet property="thumbnail" destination="XqG-fK-LGK" id="DNV-9p-Dqk"/>
                     </connections>

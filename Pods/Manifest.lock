@@ -21,6 +21,9 @@ PODS:
     - Differentiator (~> 3.0)
     - RxCocoa (~> 4.0)
     - RxSwift (~> 4.0)
+  - RxGesture (1.2.1):
+    - RxCocoa (~> 4.0)
+    - RxSwift (~> 4.0)
   - RxSwift (4.0.0)
   - SnapKit (4.0.0)
 
@@ -33,6 +36,7 @@ DEPENDENCIES:
   - PMSuperButton
   - RxCocoa
   - RxDataSources
+  - RxGesture
   - RxSwift
   - SnapKit
 
@@ -48,9 +52,10 @@ SPEC CHECKSUMS:
   Result: d2d07204ce72856f1fd9130bbe42c35a7b0fea10
   RxCocoa: d62846ca96495d862fa4c59ea7d87e5031d7340e
   RxDataSources: cb7c31e652a87ebb919da45f716bbb87b3765f6b
+  RxGesture: c278eb05b187abd47e11e65464ae4de53ab71d95
   RxSwift: fd680d75283beb5e2559486f3c0ff852f0d35334
   SnapKit: a42d492c16e80209130a3379f73596c3454b7694
 
-PODFILE CHECKSUM: 978dcc192e87bfa0c5ad81c9ae6b244fe6f6138d
+PODFILE CHECKSUM: 8665caa2d4d604f40cb3d331341f6ddcf45104f6
 
 COCOAPODS: 1.3.1

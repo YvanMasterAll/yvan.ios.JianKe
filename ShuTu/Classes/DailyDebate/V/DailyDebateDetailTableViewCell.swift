@@ -116,7 +116,7 @@ extension DailyDebateDetailTableViewCell: WKNavigationDelegate, EmptyViewDelegat
     }
     //页面加载失败
     func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
-        
+        self.emptyView.hide()
     }
     //EmptyViewDelegate
     func emptyViewClicked() {

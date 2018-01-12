@@ -40,6 +40,7 @@ class MeSpaceDynamicCollectionViewCell: FSPagerViewCell {
     //私有成员
     fileprivate var dataSource: RxTableViewSectionedReloadDataSource<MeSpaceDynamicSectionModel>!
     fileprivate var emptyView: EmptyView!
+    fileprivate var scrollOffset: CGFloat = 0
 
 }
 
@@ -52,7 +53,6 @@ extension MeSpaceDynamicCollectionViewCell {
         //PullToRefreshKit
         let secondHeader = SecondRefreshHeader()
         self.tableView.configRefreshHeader(with: secondHeader, action: { [weak self] () -> Void in
-            self?.postRefreshState(true)
             self?.viewModel.inputs.refreshNewData.onNext(true)
         })
         self.tableView.configRefreshFooter(with: FirstRefreshFooter(), action: { [weak self] () -> Void in
@@ -80,14 +80,12 @@ extension MeSpaceDynamicCollectionViewCell {
             .subscribe(onNext: { state in
                 switch state {
                 case .noData:
-                    self.postRefreshState(false)
                     self.tableView.switchRefreshHeader(to: .normal(.none, 0))
                     self.showEmptyView(type: .empty)
                     break
                 case .beginHeaderRefresh:
                     break
                 case .endHeaderRefresh:
-                    self.postRefreshState(false)
                     self.tableView.switchRefreshHeader(to: .normal(.success, 0))
                     break
                 case .beginFooterRefresh:
@@ -108,7 +106,6 @@ extension MeSpaceDynamicCollectionViewCell {
             .disposed(by: disposeBag)
         //刷新
         self.tableView.switchRefreshHeader(to: .refreshing)
-        self.postRefreshState(true)
     }
     //显示 & 隐藏 Empty Zone
     fileprivate func showEmptyView(type: EmptyViewType) {
@@ -119,10 +116,6 @@ extension MeSpaceDynamicCollectionViewCell {
         self.emptyView.hide()
         tableView.isHidden = false
         self.tableView.switchRefreshHeader(to: .refreshing)
-    }
-    //发送刷新状态
-    fileprivate func postRefreshState(_ refresh: Bool) {
-        NotificationCenter.default.post(name: NSNotification.Name(rawValue: NotificationName2), object: nil, userInfo: ["refresh": refresh])
     }
 }
 

@@ -5,6 +5,7 @@ target 'ShuTu' do
 	pod 'RxCocoa'
 	pod 'RxDataSources'
 	pod 'Moya/RxSwift'
+	pod "RxGesture"
 	pod 'ObjectMapper'
 	pod 'Kingfisher' #缓存方案
 	pod 'SnapKit' #约束工具

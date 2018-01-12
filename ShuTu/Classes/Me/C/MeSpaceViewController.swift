@@ -8,6 +8,9 @@
 
 import UIKit
 import PMSuperButton
+import RxSwift
+import RxCocoa
+import RxGesture
 
 class MeSpaceViewController: UIViewController {
     
@@ -58,6 +61,11 @@ class MeSpaceViewController: UIViewController {
     deinit {
         print("deinit: \(type(of: self))")
     }
+    
+    //私有成员
+    fileprivate var isScrollEnabled: Bool = true
+    fileprivate var panOffset: CGFloat = 0
+    fileprivate var disposeBag = DisposeBag()
 
 }
 
@@ -66,17 +74,35 @@ extension MeSpaceViewController {
     fileprivate func setupUI() {
         //Navigation
         self.navigationItem.title = ""
-        //滚动通知
-        NotificationCenter.default.addObserver(self, selector: #selector(self.subScrollViewDidScroll), name: NSNotification.Name(rawValue: NotificationName1), object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(self.subTableViewDidRefresh), name: NSNotification.Name(rawValue: NotificationName2), object: nil)
+        //View Gesture
+        self.view.rx
+            .panGesture()
+            .when(.began)
+            .subscribe(onNext: { [weak self] gesture in
+                self?.panOffset = gesture.location(in: self?.view).y
+            })
+            .disposed(by: self.disposeBag)
+        self.view.rx
+            .panGesture()
+            .when(.changed)
+            .subscribe(onNext: { [weak self] gesture in
+                guard let _ = self else { return }
+                
+                let currentPanOffset = gesture.location(in: self!.view).y
+                let scrollOffset = currentPanOffset - self!.panOffset
+                self!.scrollHeader(scrollOffset)
+                self!.panOffset = currentPanOffset
+            })
+            .disposed(by: self.disposeBag)
     }
-    //Notification
-    @objc fileprivate func subScrollViewDidScroll() {
-        
-    }
-    @objc fileprivate func subTableViewDidRefresh(_ notification: Notification) {
-        let refresh = notification.userInfo!["refresh"] as! Bool
-        self.tableView.isScrollEnabled = !refresh
+    //滚动头部
+    fileprivate func scrollHeader(_ scrollOffset: CGFloat) {
+        let height = self.tableView.tableHeaderView!.frame.height
+        let contentOffset = self.tableView.contentOffset.y
+        let distance = contentOffset - scrollOffset
+        if (scrollOffset < 0 && distance < height) || (scrollOffset >= 0 && distance >= 0) { //向下滚动 & 向上滚动
+            self.tableView.setContentOffset(CGPoint.init(x: self.tableView.contentOffset.x, y: distance), animated: false)
+        }
     }
 }
 

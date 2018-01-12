@@ -18,6 +18,9 @@ class DebateViewController: UIViewController {
         didSet {
             self.thumbnail.layer.cornerRadius = self.thumbnail.frame.height/2
             self.thumbnail.layer.masksToBounds = true
+            self.thumbnail.isUserInteractionEnabled = true
+            let tapGes = UITapGestureRecognizer.init(target: self, action: #selector(self.openLeft))
+            self.thumbnail.addGestureRecognizer(tapGes)
         }
     }
     @IBOutlet weak var addDebate: UIView!
@@ -56,6 +59,7 @@ class DebateViewController: UIViewController {
         super.viewWillAppear(animated)
         
         //隐藏导航栏
+        self.navigationItem.backBarButtonItem = UIBarButtonItem.init(title: "", style: .plain, target: self, action: nil)
         self.navigationController?.setNavigationBarHidden(true, animated: false)
         //阴影
         GeneralFactory.generateRectShadow(layer: self.searchBar.layer, rect: CGRect.init(x: 0, y: self.searchBar.frame.height, width: SW, height: 0.5), color: GMColor.grey800Color().cgColor)
@@ -80,6 +84,8 @@ extension DebateViewController {
         //TableView
         self.tableView.tableFooterView = UIView() //消除底部视图
         self.tableView.separatorStyle = .none //消除分割线
+        self.tableView.showsVerticalScrollIndicator = false
+        self.tableView.showsHorizontalScrollIndicator = false
         //PullToRefreshKit
         let firstHeader = FirstRefreshHeader()
         self.tableView.configRefreshHeader(with: firstHeader, action: {

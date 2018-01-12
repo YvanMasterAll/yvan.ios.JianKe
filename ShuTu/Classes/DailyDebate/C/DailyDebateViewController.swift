@@ -14,6 +14,11 @@ import NVActivityIndicatorView
 
 class DailyDebateViewController: UIViewController {
     
+    @IBOutlet weak var date: UILabel! {
+        didSet {
+            self.date.text = Date.toString(date: Date.init(), dateFormat: "MM月dd日 eeee")
+        }
+    }
     @IBOutlet weak var tableView: UITableView! {
         didSet {
             self.tableView.tableFooterView = UIView() //消除底部视图
@@ -26,6 +31,9 @@ class DailyDebateViewController: UIViewController {
         didSet {
             self.thumbnail.layer.cornerRadius = self.thumbnail.frame.height/2
             self.thumbnail.layer.masksToBounds = true
+            self.thumbnail.isUserInteractionEnabled = true
+            let tapGes = UITapGestureRecognizer.init(target: self, action: #selector(self.openLeft))
+            self.thumbnail.addGestureRecognizer(tapGes)
         }
     }
     

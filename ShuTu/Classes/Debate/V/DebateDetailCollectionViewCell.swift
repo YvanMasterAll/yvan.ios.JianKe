@@ -11,10 +11,6 @@ import RxDataSources
 import RxCocoa
 import RxSwift
 
-@objc protocol DebateDetailCollectionViewCellDelegate {
-    func scrollViewDidScroll(_ scrollView: UIScrollView, _ offset: CGPoint)
-}
-
 class DebateDetailCollectionViewCell: FSPagerViewCell {
 
     @IBOutlet weak var tableView: UITableView! {
@@ -32,14 +28,11 @@ class DebateDetailCollectionViewCell: FSPagerViewCell {
         }
     }
     public var section: Debate!
-    public weak var delegate: DebateDetailCollectionViewCellDelegate?
     public var navigationController: UINavigationController!
     //私有成员
     fileprivate var disposeBag = DisposeBag()
     fileprivate var dataSource: RxTableViewSectionedReloadDataSource<DebateDetailSectionModel>!
     fileprivate var emptyView: EmptyView!
-    fileprivate var currentOffset = CGPoint(x: 0, y: 0)
-    fileprivate var isDraged = false
     
     override func awakeFromNib() {
         super.awakeFromNib()
@@ -182,19 +175,6 @@ extension DebateDetailCollectionViewCell: UITableViewDelegate, EmptyViewDelegate
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         //取消cell选中状态
         tableView.deselectRow(at: indexPath, animated: true)
-    }
-    func scrollViewDidScroll(_ scrollView: UIScrollView) {
-        if !self.isDraged || scrollView.contentOffset.y < 0 { return }
-        let offset = CGPoint(x: scrollView.contentOffset.x - currentOffset.x, y: scrollView.contentOffset.y - currentOffset.y)
-        currentOffset = scrollView.contentOffset
-        self.delegate?.scrollViewDidScroll(scrollView, offset)
-    }
-    func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
-        currentOffset = scrollView.contentOffset
-        self.isDraged = true
-    }
-    func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
-        self.isDraged = false
     }
     //EmptyView Delegate
     func emptyViewClicked() {

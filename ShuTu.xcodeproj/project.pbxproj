@@ -177,6 +177,7 @@
 		C6A054552000C3E300BBFE2C /* DailyDebate.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C6A054542000C3E300BBFE2C /* DailyDebate.storyboard */; };
 		C6A0545A2000C43900BBFE2C /* DailyDebateViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6A054592000C43900BBFE2C /* DailyDebateViewController.swift */; };
 		C6A1B9F41FF51387008AAFD8 /* DebateAnswerCommentViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6A1B9F31FF51387008AAFD8 /* DebateAnswerCommentViewController.swift */; };
+		C6B6BEBA20089E2C00155D24 /* DebateDetailTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6B6BEB920089E2C00155D24 /* DebateDetailTableViewCell.swift */; };
 		C6B84B2E1FEA8178000B74A4 /* DebateSearchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6B84B2D1FEA8178000B74A4 /* DebateSearchView.swift */; };
 		C6C130891FE3A2CA00E2B21D /* Debate.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C6C130881FE3A2CA00E2B21D /* Debate.storyboard */; };
 		C6C1308F1FE3ABB500E2B21D /* DebateViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6C1308E1FE3ABB500E2B21D /* DebateViewController.swift */; };
@@ -402,6 +403,7 @@
 		C6A054542000C3E300BBFE2C /* DailyDebate.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = DailyDebate.storyboard; sourceTree = "<group>"; };
 		C6A054592000C43900BBFE2C /* DailyDebateViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DailyDebateViewController.swift; sourceTree = "<group>"; };
 		C6A1B9F31FF51387008AAFD8 /* DebateAnswerCommentViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebateAnswerCommentViewController.swift; sourceTree = "<group>"; };
+		C6B6BEB920089E2C00155D24 /* DebateDetailTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebateDetailTableViewCell.swift; sourceTree = "<group>"; };
 		C6B84B2D1FEA8178000B74A4 /* DebateSearchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebateSearchView.swift; sourceTree = "<group>"; };
 		C6C130881FE3A2CA00E2B21D /* Debate.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = Debate.storyboard; sourceTree = "<group>"; };
 		C6C1308E1FE3ABB500E2B21D /* DebateViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebateViewController.swift; sourceTree = "<group>"; };
@@ -1000,6 +1002,7 @@
 				C67ED6811FEE3C88008E4853 /* DebateDetailAnswerTableViewCell.swift */,
 				C67ED6821FEE3C88008E4853 /* DebateDetailAnswerTableViewCell.xib */,
 				C63776461FF8C096004EE194 /* DebateAnswerCommentTableViewCell.swift */,
+				C6B6BEB920089E2C00155D24 /* DebateDetailTableViewCell.swift */,
 			);
 			path = V;
 			sourceTree = "<group>";
@@ -1281,6 +1284,7 @@
 				"${BUILT_PRODUCTS_DIR}/Result/Result.framework",
 				"${BUILT_PRODUCTS_DIR}/RxCocoa/RxCocoa.framework",
 				"${BUILT_PRODUCTS_DIR}/RxDataSources/RxDataSources.framework",
+				"${BUILT_PRODUCTS_DIR}/RxGesture/RxGesture.framework",
 				"${BUILT_PRODUCTS_DIR}/RxSwift/RxSwift.framework",
 				"${BUILT_PRODUCTS_DIR}/SnapKit/SnapKit.framework",
 			);
@@ -1297,6 +1301,7 @@
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Result.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RxCocoa.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RxDataSources.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RxGesture.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RxSwift.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SnapKit.framework",
 			);
@@ -1432,6 +1437,7 @@
 				C63BD0681FF0C3CC00272A55 /* SecondRefreshHeader.swift in Sources */,
 				C61596582006429500FBB918 /* MeSpaceDynamicTableViewCell.swift in Sources */,
 				C66609062007639600F0B32C /* DailyDebateViewModel.swift in Sources */,
+				C6B6BEBA20089E2C00155D24 /* DebateDetailTableViewCell.swift in Sources */,
 				C63776471FF8C096004EE194 /* DebateAnswerCommentTableViewCell.swift in Sources */,
 				C61596372006118100FBB918 /* TabView.swift in Sources */,
 				C6E273951FEA77FE00D78520 /* FSPagerView.swift in Sources */,
