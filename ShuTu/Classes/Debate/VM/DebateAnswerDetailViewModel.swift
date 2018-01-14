@@ -49,7 +49,7 @@ class DebateAnswerDetailViewModel {
         self.inputs.refreshData.asObserver()
             .subscribe(onNext: {
                 //显示加载
-                self.outputs.emptyStateObserver.value = .loading(type: .rotate)
+                self.outputs.emptyStateObserver.value = .loading(type: .indicator1)
                 //Request
                 self.service.getAnswerDetail(id: section.id!).asObservable()
                     .subscribe(onNext: { response in

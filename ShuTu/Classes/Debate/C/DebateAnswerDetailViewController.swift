@@ -16,8 +16,6 @@ class DebateAnswerDetailViewController: UIViewController {
     
     @IBOutlet weak var debateTitleBar: UIView!
     @IBOutlet weak var debateTitle: UILabel!
-    @IBOutlet weak var navigationBar: UIView!
-    @IBOutlet weak var navigationBarLeftImage: UIImageView!
     @IBOutlet weak var userBar: UIView!
     @IBOutlet weak var userBarName: UILabel!
     @IBOutlet weak var userBarThumbnail: UIImageView!
@@ -44,11 +42,20 @@ class DebateAnswerDetailViewController: UIViewController {
         print("deinit: \(type(of: self))")
     }
     
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
         
         //隐藏导航栏
         self.navigationController?.setNavigationBarHidden(true, animated: false)
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        
+        //显示导航栏
+        self.navigationItem.title = "回答详情"
+        self.navigationItem.backBarButtonItem = UIBarButtonItem.init(title: "", style: .plain, target: self, action: nil)
+        self.navigationController?.setNavigationBarHidden(false, animated: false)
         //UserBar 添加下边框
         let bottomBorderLayer = CALayer()
         bottomBorderLayer.frame = CGRect(x: 0, y: userBar.frame.height - 1, width: SW, height: 1)
@@ -75,7 +82,7 @@ class DebateAnswerDetailViewController: UIViewController {
         return emptyView
     }()
     //Action Bar
-    fileprivate lazy var actionButtonSY: UIButton = { //声援按钮
+    fileprivate lazy var actionButtonSY: UIButton = { //赞同按钮
         let w = SW/5
         let h = self.actionBar.frame.height
         let imageSize: CGFloat = 30
@@ -83,10 +90,10 @@ class DebateAnswerDetailViewController: UIViewController {
         let labelTop = (h + imageSize - imageBottom)/2
         let button = PMSuperButton(frame: CGRect(x: 0, y: 0, width: w, height: h))
         button.ripple = true
-        button.setImage(UIImage.init(icon: .fontAwesome(.ils), size: CGSize(width: 30, height: 30), textColor: GMColor.grey600Color(), backgroundColor: UIColor.clear), for: .normal)
+        button.setImage(UIImage.init(icon: .fontAwesome(.thumbsOUp), size: CGSize(width: 30, height: 30), textColor: GMColor.grey600Color(), backgroundColor: UIColor.clear), for: .normal)
         button.imageEdgeInsets.bottom = imageBottom
         let label = UILabel(frame: CGRect(x: 0, y: labelTop, width: w, height: 0))
-        label.text = "声援"
+        label.text = "赞"
         label.font = UIFont.systemFont(ofSize: 11)
         label.frame.size.height = label.heightOfLine
         label.textColor = GMColor.grey600Color()
@@ -94,7 +101,7 @@ class DebateAnswerDetailViewController: UIViewController {
         button.addSubview(label)
         return button
     }()
-    fileprivate lazy var actionButtonST: UIButton = { //殊途按钮
+    fileprivate lazy var actionButtonST: UIButton = { //踩按钮
         let w = SW/5
         let h = self.actionBar.frame.height
         let imageSize: CGFloat = 30
@@ -102,10 +109,10 @@ class DebateAnswerDetailViewController: UIViewController {
         let labelTop = (h + imageSize - imageBottom)/2
         let button = PMSuperButton(frame: CGRect(x: w, y: 0, width: w, height: h))
         button.ripple = true
-        button.setImage(UIImage.init(icon: .fontAwesome(.strikethrough), size: CGSize(width: 30, height: 30), textColor: GMColor.grey600Color(), backgroundColor: UIColor.clear), for: .normal)
+        button.setImage(UIImage.init(icon: .fontAwesome(.thumbsODown), size: CGSize(width: 30, height: 30), textColor: GMColor.grey600Color(), backgroundColor: UIColor.clear), for: .normal)
         button.imageEdgeInsets.bottom = imageBottom
         let label = UILabel(frame: CGRect(x: 0, y: labelTop, width: w, height: 0))
-        label.text = "殊途"
+        label.text = "踩"
         label.font = UIFont.systemFont(ofSize: 11)
         label.frame.size.height = label.heightOfLine
         label.textColor = GMColor.grey600Color()
@@ -193,13 +200,6 @@ extension DebateAnswerDetailViewController {
         self.userBarFollowButton.setImage(UIImage.init(icon: .fontAwesome(.plus), size: CGSize(width: 20, height: 20), textColor: ColorPrimary, backgroundColor: UIColor.clear), for: .normal)
         self.userBarFollowButton.contentEdgeInsets.left = 8
         self.userBarFollowButton.contentEdgeInsets.right = 8
-        //NavigationBarView
-        GeneralFactory.generateRectShadow(layer: self.navigationBar.layer, rect: CGRect(x: 0, y: self.navigationBar.frame.size.height, width: SW, height: 0.5), color: GMColor.grey800Color().cgColor)
-        self.navigationBarLeftImage.setIcon(icon: .fontAwesome(.angleLeft), textColor: GMColor.grey900Color(), backgroundColor: UIColor.clear, size: nil)
-        self.navigationBarLeftImage.isUserInteractionEnabled = true
-        let goBackTapGes = UITapGestureRecognizer(target: self, action: #selector(self.goBack))
-        self.navigationBarLeftImage.addGestureRecognizer(goBackTapGes)
-        self.view.bringSubview(toFront: self.navigationBar)
         //ActionBar
         self.actionBar.backgroundColor = GMColor.grey50Color()
         self.actionBar.addSubview(self.actionButtonSY)

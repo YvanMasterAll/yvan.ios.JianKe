@@ -14,6 +14,13 @@ import Kingfisher
 
 class DebateViewController: UIViewController {
 
+    @IBOutlet weak var searchView: UIView! {
+        didSet {
+            self.searchView.isUserInteractionEnabled = true
+            let tapGes = UITapGestureRecognizer.init(target: self, action: #selector(self.gotoSearchPage))
+            self.searchView.addGestureRecognizer(tapGes)
+        }
+    }
     @IBOutlet weak var thumbnail: UIImageView! {
         didSet {
             self.thumbnail.layer.cornerRadius = self.thumbnail.frame.height/2
@@ -147,6 +154,16 @@ extension DebateViewController {
         //隐藏 Tabbar
         self.hidesBottomBarWhenPushed = true
         self.navigationController?.pushViewController(debateAddNewVC, animated: true)
+        self.hidesBottomBarWhenPushed = false
+    }
+    //跳转到搜索页
+    @objc fileprivate func gotoSearchPage() {
+        let debateStoryBoard = UIStoryboard(name: "Debate", bundle: nil)
+        let debateSearchVC = debateStoryBoard.instantiateViewController(withIdentifier: "DebateSearch") as! DebateSearchViewController
+        
+        //隐藏 Tabbar
+        self.hidesBottomBarWhenPushed = true
+        self.navigationController?.pushViewController(debateSearchVC, animated: true)
         self.hidesBottomBarWhenPushed = false
     }
 }

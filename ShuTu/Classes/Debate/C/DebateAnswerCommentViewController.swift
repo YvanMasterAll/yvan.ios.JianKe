@@ -15,12 +15,9 @@ import RxDataSources
 class DebateAnswerCommentViewController: UIViewController {
     
     @IBOutlet weak var tableView: UITableView!
-    @IBOutlet weak var navigationBar: UIView!
-    @IBOutlet weak var navigationBarLeftImage: UIImageView!
     @IBOutlet weak var SlackTextView: UIView!
     @IBOutlet weak var textView: GrowingTextView!
     @IBOutlet weak var sendButton: PMSuperButton!
-    @IBOutlet weak var slackTextViewHeightC: NSLayoutConstraint!
     
     //声明区
     public var section: Answer!
@@ -51,14 +48,23 @@ class DebateAnswerCommentViewController: UIViewController {
         print("deinit: \(type(of: self))")
     }
     
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
         
         //隐藏导航栏
         self.navigationController?.setNavigationBarHidden(true, animated: false)
-        //添加 SlackTextView 的阴影
-        GeneralFactory.generateRectShadow(layer: self.SlackTextView.layer, rect: CGRect(x: 0, y: -1, width: SW, height: 1), color: GMColor.grey800Color().cgColor)
-        self.view.bringSubview(toFront: self.SlackTextView)
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        
+        //显示导航栏
+        self.navigationItem.title = "评论"
+        self.navigationItem.backBarButtonItem = UIBarButtonItem.init(title: "", style: .plain, target: self, action: nil)
+        self.navigationController?.setNavigationBarHidden(false, animated: false)
+//        //添加 SlackTextView 的阴影
+//        GeneralFactory.generateRectShadow(layer: self.SlackTextView.layer, rect: CGRect(x: 0, y: -1, width: SW, height: 1), color: GMColor.grey800Color().cgColor)
+//        self.view.bringSubview(toFront: self.SlackTextView)
     }
     
 }
@@ -66,22 +72,17 @@ class DebateAnswerCommentViewController: UIViewController {
 extension DebateAnswerCommentViewController {
     //初始化
     fileprivate func setupUI() {
-        //NavigationBarView
-        GeneralFactory.generateRectShadow(layer: self.navigationBar.layer, rect: CGRect(x: 0, y: self.navigationBar.frame.size.height, width: SW, height: 0.5), color: GMColor.grey800Color().cgColor)
-        self.navigationBarLeftImage.setIcon(icon: .fontAwesome(.angleLeft), textColor: GMColor.grey900Color(), backgroundColor: UIColor.clear, size: nil)
-        self.navigationBarLeftImage.isUserInteractionEnabled = true
-        let goBackTapGes = UITapGestureRecognizer(target: self, action: #selector(self.goBack))
-        self.navigationBarLeftImage.addGestureRecognizer(goBackTapGes)
-        self.view.bringSubview(toFront: self.navigationBar)
         //SlackTextView
         self.textView.layer.cornerRadius = 4
         self.textView.delegate = self
         //TableView
         self.tableView.tableFooterView = UIView() //消除底部视图
         self.tableView.separatorStyle = .none //消除分割线
+        self.tableView.showsVerticalScrollIndicator = false
+        self.tableView.showsVerticalScrollIndicator = false
         //PullToRefreshKit
-        let firstHeader = FirstRefreshHeader()
-        self.tableView.configRefreshHeader(with: firstHeader, action: { [weak self] () -> Void in
+        let secondHeader = SecondRefreshHeader()
+        self.tableView.configRefreshHeader(with: secondHeader, action: { [weak self] () -> Void in
             self?.viewModel.inputs.refreshNewData.onNext(true)
         })
         self.tableView.configRefreshFooter(with: FirstRefreshFooter(), action: { [weak self] () -> Void in
@@ -97,6 +98,7 @@ extension DebateAnswerCommentViewController {
         dataSource = RxTableViewSectionedReloadDataSource<AnswerCommentSectionModel>(
             configureCell: { ds, tv, ip, item in
                 let cell = tv.dequeueReusableCell(withIdentifier: "cell", for: ip) as! DebateAnswerCommentTableViewCell
+                cell.selectionStyle = .none
                 cell.thumbnail.kf.setImage(with: URL(string: item.thumbnail!))
                 cell.name.text = item.username
                 cell.comment.text = item.commment
@@ -111,12 +113,7 @@ extension DebateAnswerCommentViewController {
         self.tableView.rx
             .modelSelected(AnswerComment.self)
             .subscribe(onNext: { data in
-//                //跳转至详情
-//                let debateStoryBoard = UIStoryboard(name: "Debate", bundle: nil)
-//                let debateDetailVC = debateStoryBoard.instantiateViewController(withIdentifier: "DebateDetail") as! DebateDetailViewController
-//                debateDetailVC.section = data
-//
-//                self.navigationController?.pushViewController(debateDetailVC, animated: true)
+                //跳转
             })
             .disposed(by: disposeBag)
         viewModel.outputs.sections!.asDriver()
@@ -159,9 +156,7 @@ extension DebateAnswerCommentViewController {
 extension DebateAnswerCommentViewController: GrowingTextViewDelegate, UITableViewDelegate, EmptyViewDelegate {
     //GrowingTextViewDelegate
     func textViewDidChangeHeight(_ textView: GrowingTextView, height: CGFloat) {
-        UIView.animate(withDuration: 0.3, delay: 0.0, usingSpringWithDamping: 0.7, initialSpringVelocity: 0.7, options: [.curveLinear], animations: { () -> Void in
-            self.slackTextViewHeightC.constant = height + 10
-        }, completion: nil)
+        //TextView 高度改变
     }
     //TableViewDelegate
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {

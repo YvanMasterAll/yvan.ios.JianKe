@@ -19,6 +19,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         self.window = UIWindow(frame: UIScreen.main.bounds)
         self.window?.backgroundColor = UIColor.white
         
+        //FPS 监听
+        #if DEBUG
+            GDPerformanceMonitor.sharedInstance.startMonitoring()
+        #endif
+        
         //启动键盘管理
         IQKeyboardManager.shared().isEnabled = true
         IQKeyboardManager.shared().shouldResignOnTouchOutside = true //点击背景隐藏键盘

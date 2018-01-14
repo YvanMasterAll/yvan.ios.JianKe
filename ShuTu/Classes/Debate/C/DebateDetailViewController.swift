@@ -75,6 +75,7 @@ class DebateDetailViewController: UIViewController {
         
         //导航栏
         self.navigationItem.title = "辩题详情"
+        self.navigationItem.backBarButtonItem = UIBarButtonItem.init(title: "", style: .plain, target: self, action: nil)
         self.navigationController?.setNavigationBarHidden(false, animated: false)
     }
     
@@ -83,6 +84,12 @@ class DebateDetailViewController: UIViewController {
         
         //隐藏导航栏
         self.navigationController?.setNavigationBarHidden(true, animated: false)
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        //WebView
+        self.webViewLoad()
+        self.emptyView.show(type: .loading(type: .indicator1), frame: CGRect.init(x: self.webView.frame.origin.x, y: self.webView.frame.origin.y, width: SW - 28, height: self.webViewContainer.frame.height))
     }
     
     deinit {
@@ -113,6 +120,7 @@ extension DebateDetailViewController {
         self.hidesBottomBarWhenPushed = true
         //Buttons
         self.inviteButton.setImage(UIImage(icon: .fontAwesome(.userPlus), size: CGSize(width: 14, height: 14), textColor: GMColor.grey600Color(), backgroundColor: UIColor.clear), for: .normal)
+        self.inviteButton.addTarget(self, action: #selector(self.gotoInvitePage), for: UIControlEvents.touchUpInside)
         self.answerButton.setImage(UIImage(icon: .fontAwesome(.edit), size: CGSize(width: 14, height: 14), textColor: GMColor.grey600Color(), backgroundColor: UIColor.clear), for: .normal)
         let answerTapGes = UITapGestureRecognizer.init(target: self, action: #selector(self.gotoAddAnswer))
         self.answerButton.addGestureRecognizer(answerTapGes)
@@ -141,9 +149,6 @@ extension DebateDetailViewController {
                 self!.panOffset = currentPanOffset
             })
             .disposed(by: self.disposeBag)
-        //WebView
-        self.webViewLoad()
-        self.emptyView.show(type: .loading(type: .indicator1), frame: CGRect.init(x: self.webView.frame.origin.x, y: self.webView.frame.origin.y, width: SW - 28, height: self.webViewContainer.frame.height))
     }
     fileprivate func setupWebViewLayout() {
         self.webView.scrollView.isScrollEnabled = false
@@ -231,6 +236,16 @@ extension DebateDetailViewController {
         html += "</body>"
         html += "</html>"
         return html
+    }
+    //跳转到邀请页
+    @objc fileprivate func gotoInvitePage() {
+        let debateStoryBoard = UIStoryboard(name: "Debate", bundle: nil)
+        let debateInviteVC = debateStoryBoard.instantiateViewController(withIdentifier: "DebateInvite") as! DebateInviteViewController
+        
+        //隐藏 Tabbar
+        self.hidesBottomBarWhenPushed = true
+        self.navigationController?.pushViewController(debateInviteVC, animated: true)
+        self.hidesBottomBarWhenPushed = false
     }
 }
 

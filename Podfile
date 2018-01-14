@@ -12,4 +12,5 @@ target 'ShuTu' do
 	pod 'PMSuperButton' #Ripple Button
 	pod 'IQKeyboardManager' #键盘管理
 	pod 'NVActivityIndicatorView' #加载图标
+	pod 'RichEditorView' #富文本编辑器
 end

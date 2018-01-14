@@ -8,13 +8,19 @@
 
 import UIKit
 import PMSuperButton
+import Photos
+import RichEditorView
 
 class DebateAnswerAddNewViewController: UIViewController {
     
+    @IBOutlet weak var richEditorView: RichEditorView! {
+        didSet {
+            self.richEditorView.delegate = self
+        }
+    }
     @IBOutlet weak var navigationBar: UIView!
     @IBOutlet weak var navigationBarLeftImage: UIImageView!
     @IBOutlet weak var stepButton: PMSuperButton!
-    @IBOutlet weak var textView: RichTextView!
     @IBOutlet weak var actionView: UIView!
     @IBOutlet weak var actionAddImage: UIImageView!
     @IBOutlet weak var actionAddAt: UIImageView!
@@ -56,6 +62,22 @@ class DebateAnswerAddNewViewController: UIViewController {
     //私有成员
     fileprivate var isKeyboardShow: Bool = false
     fileprivate var keyboardHeight: CGFloat = 0
+    fileprivate lazy var photoPicker: TLPhotosPickerViewController = {
+        let photoPicker = TLPhotosPickerViewController()
+        photoPicker.delegate = self
+        photoPicker.didExceedMaximumNumberOfSelection = { [weak self] (picker) in
+            //图片数超过设定
+        }
+        var configure = TLPhotosPickerConfigure()
+        configure.maxSelectedAssets = 1
+        configure.numberOfColumn = 3
+        configure.allowedVideo = false
+        photoPicker.configure = configure
+        photoPicker.selectedAssets = self.selectedAssets
+        
+        return photoPicker
+    }()
+    fileprivate var selectedAssets = [TLPHAsset]()
     
 }
 
@@ -72,6 +94,8 @@ extension DebateAnswerAddNewViewController {
         //Action View
         self.actionAddImage.setIcon(icon: .fontAwesome(.fileImageO), textColor: GMColor.grey600Color(), backgroundColor: UIColor.clear, size: nil)
         self.actionAddImage.isUserInteractionEnabled = true
+        let addImageTapGes = UITapGestureRecognizer(target: self, action: #selector(self.gotoPhotoPicker))
+        self.actionAddImage.addGestureRecognizer(addImageTapGes)
         self.actionAddAt.setIcon(icon: .fontAwesome(.at), textColor: GMColor.grey600Color(), backgroundColor: UIColor.clear, size: nil)
         self.actionAddAt.isUserInteractionEnabled = true
         self.actionSet.setIcon(icon: .fontAwesome(.cog), textColor: GMColor.grey600Color(), backgroundColor: UIColor.clear, size: nil)
@@ -87,18 +111,11 @@ extension DebateAnswerAddNewViewController {
     }
     //Keyboard Notification
     @objc fileprivate func keyBoardWillShow(_ notification: Notification) {
-        isKeyboardShow = true
         //获取键盘高度
         let kbInfo = notification.userInfo
         let kbRect = (kbInfo?[UIKeyboardFrameEndUserInfoKey] as! NSValue).cgRectValue
-        var height = kbRect.height
-        let offHeight = SH - height
+        let height = kbRect.height
         self.keyboardHeight = height
-        
-        if self.textView.isFirstResponder {
-            height += -self.textView.frame.origin.y + 20 + 4
-            self.textView.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: self.textView.frame.height - offHeight + self.actionView.frame.height + 20 + 4, right: 0)
-        }
         
         UIView.animate(withDuration: 0.25, animations: { [weak self] () -> Void in
             self?.actionViewBottomConstraint.constant = height
@@ -106,12 +123,58 @@ extension DebateAnswerAddNewViewController {
         })
     }
     @objc fileprivate func keyBoardWillHide(_ notification: Notification) {
-        isKeyboardShow = true
-        
         UIView.animate(withDuration: 0.25, animations: { [weak self] () -> Void in
-            self?.textView.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
             self?.actionViewBottomConstraint.constant = 0
             self?.view.layoutIfNeeded()
         })
     }
+    //插入图片
+    fileprivate func insertImage() {
+        guard self.selectedAssets.count == 1  else { return }
+        
+        let option = PHContentEditingInputRequestOptions.init()
+        option.canHandleAdjustmentData = {(adjustmeta: PHAdjustmentData)
+            -> Bool in
+            return true
+        }
+        self.selectedAssets[0].phAsset?.requestContentEditingInput(with: option, completionHandler: { [weak self] (contentEditingInput:PHContentEditingInput?, info: [AnyHashable : Any]) in
+            let originPath = contentEditingInput!.fullSizeImageURL!.absoluteString
+            let imagePath = String(originPath[originPath.index(originPath.startIndex, offsetBy: 7)...])
+            self?.richEditorView.insertImage(imagePath, alt: self?.selectedAssets[0].originalFileName ?? "")
+        })
+    }
+    //ActionView Action
+    @objc fileprivate func gotoPhotoPicker() {
+        //隐藏 Tabbar
+        self.hidesBottomBarWhenPushed = true
+        self.present(self.photoPicker, animated: true, completion: nil)
+        self.hidesBottomBarWhenPushed = false
+    }
+}
+
+extension DebateAnswerAddNewViewController: TLPhotosPickerViewControllerDelegate, RichEditorDelegate {
+    //TLPhotosPickerViewControllerDelegate
+    func dismissPhotoPicker(withTLPHAssets: [TLPHAsset]) {
+        //获取选中图片
+        self.selectedAssets = withTLPHAssets
+        //插入图片
+        self.insertImage()
+    }
+    func dismissComplete() {
+        
+    }
+    func photoPickerDidCancel() {
+        
+    }
+    func didExceedMaximumNumberOfSelection(picker: TLPhotosPickerViewController) {
+        
+    }
+    //RichEditorDelegate
+    func richEditorDidLoad(_ editor: RichEditorView) {
+        self.richEditorView.setTextColor(GMColor.grey900Color())
+        self.richEditorView.placeholder = "请输入问题描述"
+        self.richEditorView.setFontSize(13)
+        self.richEditorView.lineHeight = 15
+    }
+    
 }
