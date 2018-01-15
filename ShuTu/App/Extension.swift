@@ -308,3 +308,11 @@ extension UIImage {
         return tintedImage!
     }
 }
+
+//扩展 String
+extension String {
+    //除去空格
+    public var trimmed: String {
+        return trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+}

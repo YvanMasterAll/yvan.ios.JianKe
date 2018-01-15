@@ -11,6 +11,7 @@ import PMSuperButton
 import RxSwift
 import RxCocoa
 import WebKit
+import Stellar
 
 class DebateAnswerDetailViewController: UIViewController {
     
@@ -203,6 +204,8 @@ extension DebateAnswerDetailViewController {
         //ActionBar
         self.actionBar.backgroundColor = GMColor.grey50Color()
         self.actionBar.addSubview(self.actionButtonSY)
+        let tapGes = UITapGestureRecognizer.init(target: self, action: #selector(self.zanClicked))
+        self.actionButtonSY.addGestureRecognizer(tapGes)
         self.actionBar.addSubview(self.actionButtonST)
         self.actionBar.addSubview(self.actionButtonTG)
         self.actionBar.addSubview(self.actionButtonKeep)
@@ -271,6 +274,10 @@ extension DebateAnswerDetailViewController {
         let debateAnswerCommentVC = storyBoard.instantiateViewController(withIdentifier: "AnswerComment") as! DebateAnswerCommentViewController
         debateAnswerCommentVC.section = self.section
         self.navigationController?.pushViewController(debateAnswerCommentVC, animated: true)
+    }
+    @objc fileprivate func zanClicked() {
+        //点赞
+        
     }
 }
 

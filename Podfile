@@ -13,4 +13,5 @@ target 'ShuTu' do
 	pod 'IQKeyboardManager' #键盘管理
 	pod 'NVActivityIndicatorView' #加载图标
 	pod 'RichEditorView' #富文本编辑器
+	pod 'Stellar', :git => 'https://github.com/AugustRush/Stellar.git' #动画封装库
 end

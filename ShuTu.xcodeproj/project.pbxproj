@@ -87,6 +87,8 @@
 		C63776491FF8DE3D004EE194 /* DebateAddNewViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C63776481FF8DE3D004EE194 /* DebateAddNewViewController.swift */; };
 		C637764B1FF8DEE6004EE194 /* DebateAnswerAddNewViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C637764A1FF8DEE6004EE194 /* DebateAnswerAddNewViewController.swift */; };
 		C637A9C61FFCFCCA007F50BC /* DebateAddNewViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C637A9C51FFCFCCA007F50BC /* DebateAddNewViewModel.swift */; };
+		C63BA58F200C9CC700B8C1CE /* DebateInviteTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = C63BA58E200C9CC700B8C1CE /* DebateInviteTableViewCell.swift */; };
+		C63BA593200CB32A00B8C1CE /* DebateInviteViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C63BA592200CB32A00B8C1CE /* DebateInviteViewModel.swift */; };
 		C63BD0681FF0C3CC00272A55 /* SecondRefreshHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = C63BD0671FF0C3CC00272A55 /* SecondRefreshHeader.swift */; };
 		C63BE3B21FF24EE6006080FA /* DebateAnswerDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C63BE3B11FF24EE6006080FA /* DebateAnswerDetailViewController.swift */; };
 		C63EAC771FF6176E00A69EAA /* SlackTextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C63EAC761FF6176E00A69EAA /* SlackTextView.swift */; };
@@ -316,6 +318,8 @@
 		C63776481FF8DE3D004EE194 /* DebateAddNewViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebateAddNewViewController.swift; sourceTree = "<group>"; };
 		C637764A1FF8DEE6004EE194 /* DebateAnswerAddNewViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebateAnswerAddNewViewController.swift; sourceTree = "<group>"; };
 		C637A9C51FFCFCCA007F50BC /* DebateAddNewViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebateAddNewViewModel.swift; sourceTree = "<group>"; };
+		C63BA58E200C9CC700B8C1CE /* DebateInviteTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebateInviteTableViewCell.swift; sourceTree = "<group>"; };
+		C63BA592200CB32A00B8C1CE /* DebateInviteViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebateInviteViewModel.swift; sourceTree = "<group>"; };
 		C63BD0671FF0C3CC00272A55 /* SecondRefreshHeader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecondRefreshHeader.swift; sourceTree = "<group>"; };
 		C63BE3B11FF24EE6006080FA /* DebateAnswerDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebateAnswerDetailViewController.swift; sourceTree = "<group>"; };
 		C63EAC761FF6176E00A69EAA /* SlackTextView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SlackTextView.swift; sourceTree = "<group>"; };
@@ -1015,6 +1019,7 @@
 				C6816E901FF4B4F600219420 /* DebateAnswerDetailViewModel.swift */,
 				C680B26D1FF7A26A002B9B16 /* DebateAnswerCommentViewModel.swift */,
 				C637A9C51FFCFCCA007F50BC /* DebateAddNewViewModel.swift */,
+				C63BA592200CB32A00B8C1CE /* DebateInviteViewModel.swift */,
 			);
 			path = VM;
 			sourceTree = "<group>";
@@ -1029,6 +1034,7 @@
 				C67ED6821FEE3C88008E4853 /* DebateDetailAnswerTableViewCell.xib */,
 				C63776461FF8C096004EE194 /* DebateAnswerCommentTableViewCell.swift */,
 				C6B6BEB920089E2C00155D24 /* DebateDetailTableViewCell.swift */,
+				C63BA58E200C9CC700B8C1CE /* DebateInviteTableViewCell.swift */,
 			);
 			path = V;
 			sourceTree = "<group>";
@@ -1314,6 +1320,7 @@
 				"${BUILT_PRODUCTS_DIR}/RxGesture/RxGesture.framework",
 				"${BUILT_PRODUCTS_DIR}/RxSwift/RxSwift.framework",
 				"${BUILT_PRODUCTS_DIR}/SnapKit/SnapKit.framework",
+				"${BUILT_PRODUCTS_DIR}/Stellar/Stellar.framework",
 			);
 			name = "[CP] Embed Pods Frameworks";
 			outputPaths = (
@@ -1332,6 +1339,7 @@
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RxGesture.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RxSwift.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SnapKit.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Stellar.framework",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -1488,6 +1496,7 @@
 				C66D21FE1FFE083F006AA0AE /* FriendCollectionViewCell.swift in Sources */,
 				C6E52DC620024C4500EEBA28 /* SwiftyInnerShadowView.swift in Sources */,
 				C68983DD1FDF983000C53E95 /* LoginViewModel.swift in Sources */,
+				C63BA58F200C9CC700B8C1CE /* DebateInviteTableViewCell.swift in Sources */,
 				C62103231FFB3E3300BE43F8 /* JiroTextField.swift in Sources */,
 				C623B2C12006599600F2A9D1 /* UIGradientHelper.swift in Sources */,
 				C66D22051FFE0DA7006AA0AE /* FriendViewModel.swift in Sources */,
@@ -1510,6 +1519,7 @@
 				C633BDB61FEF72A7009CD1DC /* Answer.swift in Sources */,
 				C67ED6831FEE3C88008E4853 /* DebateDetailAnswerTableViewCell.swift in Sources */,
 				C62AABBA200A3F23005148B2 /* GDWindowViewController.swift in Sources */,
+				C63BA593200CB32A00B8C1CE /* DebateInviteViewModel.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

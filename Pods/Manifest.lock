@@ -27,6 +27,7 @@ PODS:
     - RxSwift (~> 4.0)
   - RxSwift (4.0.0)
   - SnapKit (4.0.0)
+  - Stellar (0.66)
 
 DEPENDENCIES:
   - IQKeyboardManager
@@ -41,6 +42,16 @@ DEPENDENCIES:
   - RxGesture
   - RxSwift
   - SnapKit
+  - Stellar (from `https://github.com/AugustRush/Stellar.git`)
+
+EXTERNAL SOURCES:
+  Stellar:
+    :git: https://github.com/AugustRush/Stellar.git
+
+CHECKOUT OPTIONS:
+  Stellar:
+    :commit: 8b76462f614f8cada1f59e1c17bf85a7045b2009
+    :git: https://github.com/AugustRush/Stellar.git
 
 SPEC CHECKSUMS:
   Alamofire: f41a599bd63041760b26d393ec1069d9d7b917f4
@@ -58,7 +69,8 @@ SPEC CHECKSUMS:
   RxGesture: c278eb05b187abd47e11e65464ae4de53ab71d95
   RxSwift: fd680d75283beb5e2559486f3c0ff852f0d35334
   SnapKit: a42d492c16e80209130a3379f73596c3454b7694
+  Stellar: 0fef0b57654a5128a05664c3c2e42993dc59a88c
 
-PODFILE CHECKSUM: afa8d0faf70ab82515d150de5b5ddf2f4ad80cad
+PODFILE CHECKSUM: b6dad466cc8637a10694ff21ca712e9af58aec87
 
 COCOAPODS: 1.3.1

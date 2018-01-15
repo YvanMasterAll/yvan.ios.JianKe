@@ -14,6 +14,7 @@ import RxGesture
 
 class DebateDetailViewController: UIViewController {
 
+    @IBOutlet weak var titleHeightC: NSLayoutConstraint!
     @IBOutlet weak var webViewContainerHeightC: NSLayoutConstraint!
     @IBOutlet weak var webViewContainer: UIView!
     @IBOutlet weak var webView: WKWebView! {
@@ -149,6 +150,20 @@ extension DebateDetailViewController {
                 self!.panOffset = currentPanOffset
             })
             .disposed(by: self.disposeBag)
+        //标题高度
+        self.setupTitleLayout()
+    }
+    fileprivate func setupTitleLayout() {
+        let width = self.debateTitle.widthOfString
+        var height: CGFloat = 0
+        if width > (SW - 28) {
+            height = self.debateTitle.heightOfLines(by: 2) + 1
+        } else {
+            height = self.debateTitle.heightOfLines(by: 1)
+        }
+        self.tableView.tableHeaderView!.frame.size.height += height - self.titleHeightC.constant
+        self.titleHeightC.constant = height
+        self.tableView.tableHeaderView = self.tableView.tableHeaderView!
     }
     fileprivate func setupWebViewLayout() {
         self.webView.scrollView.isScrollEnabled = false
