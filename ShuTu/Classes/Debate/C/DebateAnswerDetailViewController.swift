@@ -11,6 +11,7 @@ import PMSuperButton
 import RxSwift
 import RxCocoa
 import WebKit
+import Stellar
 
 class DebateAnswerDetailViewController: UIViewController {
     
@@ -90,8 +91,10 @@ class DebateAnswerDetailViewController: UIViewController {
         let labelTop = (h + imageSize - imageBottom)/2
         let button = PMSuperButton(frame: CGRect(x: 0, y: 0, width: w, height: h))
         button.ripple = true
-        button.setImage(UIImage.init(icon: .fontAwesome(.thumbsOUp), size: CGSize(width: 30, height: 30), textColor: GMColor.grey600Color(), backgroundColor: UIColor.clear), for: .normal)
-        button.imageEdgeInsets.bottom = imageBottom
+        let imageView = UIImageView.init(image: UIImage.init(icon: .fontAwesome(.thumbsOUp), size: CGSize(width: 30, height: 30), textColor: GMColor.grey600Color(), backgroundColor: UIColor.clear))
+        imageView.frame.origin = CGPoint.init(x: (w-30)/2, y: 4)
+        imageView.tag = 10001
+        button.addSubview(imageView)
         let label = UILabel(frame: CGRect(x: 0, y: labelTop, width: w, height: 0))
         label.text = "赞"
         label.font = UIFont.systemFont(ofSize: 11)
@@ -203,6 +206,8 @@ extension DebateAnswerDetailViewController {
         //ActionBar
         self.actionBar.backgroundColor = GMColor.grey50Color()
         self.actionBar.addSubview(self.actionButtonSY)
+        let tapGes = UITapGestureRecognizer.init(target: self, action: #selector(self.zanClicked))
+        self.actionButtonSY.addGestureRecognizer(tapGes)
         self.actionBar.addSubview(self.actionButtonST)
         self.actionBar.addSubview(self.actionButtonTG)
         self.actionBar.addSubview(self.actionButtonKeep)
@@ -271,6 +276,14 @@ extension DebateAnswerDetailViewController {
         let debateAnswerCommentVC = storyBoard.instantiateViewController(withIdentifier: "AnswerComment") as! DebateAnswerCommentViewController
         debateAnswerCommentVC.section = self.section
         self.navigationController?.pushViewController(debateAnswerCommentVC, animated: true)
+    }
+    @objc fileprivate func zanClicked() {
+        //点赞
+        let imageView = self.actionButtonSY.viewWithTag(10001) as! UIImageView
+        self.actionButtonSY.isEnabled = false
+        imageView.scaleXY(1.2, 1.2).then().rotate(0.4).then().rotate(-0.8).then().rotate(0.4).then().scaleXY(1/1.2, 1/1.2).completion { [weak self] in
+            self?.actionButtonSY.isEnabled = true
+        }.animate()
     }
 }
 

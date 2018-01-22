@@ -7,9 +7,14 @@
 //
 
 import UIKit
+import SnapKit
+import RxSwift
+import RxCocoa
 
 class MeViewController: UIViewController {
 
+    @IBOutlet weak var headerView: UIView!
+    @IBOutlet weak var tableViewHeader: UIView!
     @IBOutlet weak var thumbnail: UIImageView! {
         didSet {
             self.thumbnail.layer.cornerRadius = self.thumbnail.frame.height/2
@@ -48,12 +53,63 @@ class MeViewController: UIViewController {
         print("deinit: \(type(of: self))")
     }
     
+    //私有成员
+    fileprivate lazy var headerView2: UIView = { //用户未登录的表头
+        let view = UIView.init(frame: CGRect.init(x: 0, y: 0, width: 0, height: 0))
+        let button = UIButton.init(frame: CGRect.zero)
+        view.addSubview(button)
+        button.snp.makeConstraints{ make in
+            make.width.equalTo(100)
+            make.height.equalTo(38)
+            make.center.equalTo(view)
+        }
+        button.setTitle("请先登录", for: .normal)
+        button.setTitleColor(ColorPrimary, for: .normal)
+        button.titleLabel?.font = UIFont.systemFont(ofSize: 15)
+        button.layer.cornerRadius = 4
+        button.clipsToBounds = true
+        button.layer.borderWidth = 1
+        button.layer.borderColor = ColorPrimary.cgColor
+        button.addTarget(self, action: #selector(self.gotoLogin), for: .touchUpInside)
+        self.tableViewHeader.addSubview(view)
+        view.snp.makeConstraints{ make in
+            make.left.equalTo(self.tableViewHeader)
+            make.right.equalTo(self.tableViewHeader)
+            make.top.equalTo(self.tableViewHeader)
+            make.bottom.equalTo(self.tableViewHeader)
+        }
+        view.isHidden = true
+        
+        return view
+    }()
+    fileprivate var isLogin: Bool = Environment.tokenExists //用户是否登录
+    fileprivate var disposeBag = DisposeBag()
+    
 }
 
 extension MeViewController {
     //初始化
     fileprivate func setupUI() {
-        
+        //判断用户是否登录
+        if !isLogin {
+            self.headerView.isHidden = true
+            self.headerView2.isHidden = false
+        }
+        //登录通知
+        LoginStatus.subscribe(onNext: { [weak self] state in
+            switch state {
+            case .ok:
+                self?.isLogin = true
+                self?.headerView.isHidden = false
+                self?.headerView2.isHidden = true
+            case .out:
+                self?.isLogin = false
+                self?.headerView.isHidden = true
+                self?.headerView2.isHidden = false
+            default:
+                break
+            }
+        }).disposed(by: self.disposeBag)
     }
     //Goto MeEdit
     @objc fileprivate func gotoMeEdit() {
@@ -61,7 +117,11 @@ extension MeViewController {
         let meeditVC = meStoryboard.instantiateViewController(withIdentifier: "MeEdit")
         
         self.slideMenuController()?.pushViewControllerFromMain(meeditVC, close: true)
-//        self.navigationController?.pushViewController(meeditVC, animated: true)
+    }
+    //Goto Login
+    @objc fileprivate func gotoLogin() {
+        self.slideMenuController()?.closeLeft()
+        NotificationCenter.default.post(name: NSNotification.Name(rawValue: NotificationName3), object: nil, userInfo: ["type": "push"])
     }
     
 }
@@ -72,6 +132,11 @@ extension MeViewController: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         //取消选中
         tableView.deselectRow(at: indexPath, animated: true)
+        //判断登录
+        if !self.isLogin {
+            self.gotoLogin()
+            return
+        }
         switch indexPath.row {
         case 0:
             let meStoryboard = UIStoryboard.init(name: "Me", bundle: nil)

@@ -20,7 +20,12 @@ public var GithubProvider = MoyaProvider<GitHubApi>(
 public var ZhihuProvider = MoyaProvider<ZhihuApi>()
 
 //Test Provider
-public var ShuTuProvider = MoyaProvider<ShuTuApi>()
+public var ShuTuProvider: MoyaProvider = MoyaProvider<ShuTuApi>()
+public var ShuTuProvider2: MoyaProvider = MoyaProvider<ShuTuApi2>(
+    endpointClosure: shutuEndpointClosure,
+    requestClosure: shutuRequestClosure,
+    plugins: [NetworkLoggerPlugin(verbose: false, responseDataFormatter: StubResponse.jsonResponseDataFormatter)]
+)
 
 //Test Api
 public enum ShuTuApi {
@@ -84,6 +89,81 @@ extension ShuTuApi: TargetType {
     public var validate: Bool {
         return false
     }
+}
+
+//Test Api
+public enum ShuTuApi2 {
+    case login(username: String, password: String)
+}
+extension ShuTuApi2: TargetType {
+    //The target's base `URL`
+    public var baseURL: URL {
+        return URL(string: "http://192.168.1.3:8181/api/v1")!
+    }
+    //The path to be appended to `baseURL` to form the full `URL`.
+    public var path: String {
+        switch self {
+        case .login:
+            return "/login"
+        }
+    }
+    //The HTTP method used in the request.
+    public var method: Moya.Method {
+        print("request(for: \(self.path))")
+        return .post
+    }
+    //The headers to be incoded in the request.
+    public var headers: [String : String]? {
+        return nil
+    }
+    //Provides stub data for use in testing.
+    public var sampleData: Data {
+        return "".data(using: String.Encoding.utf8)!
+    }
+    //The type of HTTP task to be performed.
+    public var task: Task {
+        switch self {
+        case .login(let username, let password):
+            return .requestParameters(parameters: ["username": username, "password": password], encoding: URLEncoding.default)
+        default:
+            return .requestPlain
+        }
+    }
+    //Whether or not to perform Alamofire validation. Defaults to `false`.
+    public var validate: Bool {
+        return false
+    }
+}
+let shutuRequestClosure = { (endpoint: Endpoint<ShuTuApi2>, done: MoyaProvider.RequestResultClosure) in
+    var request: URLRequest
+    do {
+        try request = endpoint.urlRequest()
+        
+        done(.success(request))
+    } catch {
+        done(.failure(MoyaError.requestMapping(endpoint.url)))
+    }
+}
+let shutuEndpointClosure = { (target: ShuTuApi2) -> Endpoint<ShuTuApi2> in
+    let defaultEndpoint = MoyaProvider.defaultEndpointMapping(for: target)
+    switch target {
+    case .login:
+        guard Environment.tokenExists else { break }
+        var properties: [HTTPCookiePropertyKey: Any] = [:]
+        properties[.name] = "TurnstileSession"
+        properties[.path] = "/"
+        properties[.value] = Environment.token!
+        properties[.domain] = ""
+        properties[.expires] = Date.init(timeIntervalSinceNow: 60*60*24*365)
+        properties[.secure] = false
+        var cookie = HTTPCookie.init(properties: properties)!
+        let url = target.baseURL.appendingPathComponent(target.path)
+        HTTPCookieStorage.shared.setCookies([cookie], for: url, mainDocumentURL: nil)
+    default:
+        break
+    }
+
+    return defaultEndpoint
 }
 
 //ZhiHu API
@@ -247,6 +327,7 @@ let githubRequestClosure = { (endpoint: Endpoint<GitHubApi>, done: MoyaProvider.
     do {
         try request = endpoint.urlRequest()
         //request.httpShouldHandleCookies = false
+        
         done(.success(request))
     } catch {
         done(.failure(MoyaError.requestMapping(endpoint.url)))
@@ -269,3 +350,4 @@ let githubEndpointClosure = { (target: GitHubApi) -> Endpoint<GitHubApi> in
         return defaultEndpoint.adding(newHTTPHeaderFields: ["Authorization": "token \(Environment.token!)"])
     }
 }
+

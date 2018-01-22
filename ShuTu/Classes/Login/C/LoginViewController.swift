@@ -16,6 +16,27 @@ class LoginViewController: UIViewController {
     @IBOutlet weak var passwordTextField: UITextField!
     @IBOutlet weak var loginButton: UIButton!
     
+    @IBAction func gotoRegister(_ sender: Any) {
+        let storyBoard = UIStoryboard.init(name: "Login", bundle: nil)
+        let registerVC = storyBoard.instantiateViewController(withIdentifier: "Register")
+        self.present(registerVC, animated: true, completion: nil)
+    }
+    @IBAction func goBackAction(_ sender: Any) {
+        self.navigationController?.popViewController(animated: true)
+    }
+    @IBOutlet weak var goBack: UIButton! {
+        didSet {
+            if self.isPushed {
+                self.goBack.isHidden = false
+            } else {
+                self.goBack.isHidden = true
+            }
+        }
+    }
+    
+    //声明区域
+    open var isPushed: Bool = false
+    
     //私有成员
     fileprivate let viewModel = LoginViewModel()
     fileprivate let disposeBag = DisposeBag()
@@ -27,9 +48,20 @@ class LoginViewController: UIViewController {
         setupUI()
         bindRx()
     }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        
+        //隐藏导航栏
+        self.navigationController?.setNavigationBarHidden(true, animated: false)
+    }
 
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
+    }
+    
+    deinit {
+        print("deinit: \(type(of: self))")
     }
 }
 
@@ -79,12 +111,16 @@ extension LoginViewController {
                 //关闭等待
                 HUD.hide()
                 switch result {
-                case let .ok(message):
-                    print(message)
+                case .ok:
+                    if self.isPushed {
+                        self.navigationController?.popViewController(animated: true)
+                    } else {
+                        self.dismiss(animated: true, completion: nil)
+                    }
                 case .empty:
-                    print("empty")
+                    break;
                 case let .failed(message):
-                    print(message)
+                    HUD.flash(HUDContentType.labeledError(title: message, subtitle: nil))
                 }
             })
             .disposed(by: disposeBag)

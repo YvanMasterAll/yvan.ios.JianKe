@@ -84,7 +84,6 @@ extension FriendCollectionViewCell {
     }
     fileprivate func bindRx() {
         //Rx
-        //TableView
         tableView.rx.setDelegate(self)
             .disposed(by: disposeBag)
         dataSource = RxTableViewSectionedReloadDataSource<FriendSectionModel>(
@@ -96,14 +95,7 @@ extension FriendCollectionViewCell {
         self.tableView.rx
             .modelSelected(Friend.self)
             .subscribe(onNext: { data in
-//                //跳转至详情
-//                let friendStoryBoard = UIStoryboard(name: "Friend", bundle: nil)
-//                let friendSixinVC = friendStoryBoard.instantiateViewController(withIdentifier: "FriendSixin") as! FriendSixinViewController
-//                
-//                //隐藏 Tabbar
-//                self.navigationController.hidesBottomBarWhenPushed = true
-//                self.navigationController.pushViewController(friendSixinVC, animated: true)
-//                self.navigationController.hidesBottomBarWhenPushed = false
+                //跳转
             })
             .disposed(by: disposeBag)
         self.viewModel.outputs.refreshStateObserver.asObservable()

@@ -66,6 +66,7 @@ class DailyDebateDetailViewController: UIViewController {
         
         //隐藏导航栏
         self.navigationController?.setNavigationBarHidden(true, animated: false)
+        self.navigationItem.backBarButtonItem = UIBarButtonItem.init(title: "", style: .plain, target: self, action: nil)
         self.hidesBottomBarWhenPushed = true
         //阴影
         GeneralFactory.generateRectShadow(layer: self.actionVIew.layer, rect: CGRect.init(x: 0, y: -0.5, width: SW, height: 0.5), color: GMColor.grey800Color().cgColor)

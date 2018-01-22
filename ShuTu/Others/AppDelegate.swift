@@ -13,12 +13,13 @@ import IQKeyboardManager
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
+    
+    var tabBarNavigationController: UINavigationController!
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
         //创建窗口
         self.window = UIWindow(frame: UIScreen.main.bounds)
         self.window?.backgroundColor = UIColor.white
-        
         //FPS 监听
         #if DEBUG
             GDPerformanceMonitor.sharedInstance.startMonitoring()
@@ -30,7 +31,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         IQKeyboardManager.shared().isEnableAutoToolbar = false //隐藏工具栏
         
         //测试 - 清空存储信息
-        //Environment.clear()
+        Environment.clear()
         
         //判断首次启动
         if Environment.isFirstLaunch {
@@ -107,8 +108,25 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         tabBarController.navigationController?.setNavigationBarHidden(true, animated: false)
         tabBarController.navigationItem.backBarButtonItem = UIBarButtonItem.init(title: "", style: .plain, target: self, action: nil)
         
-        self.window?.rootViewController = SlideMenuController.init(mainViewController: tabBarNavigationController, leftMenuViewController: menuNavigationController)
+        //添加通知, 用户未登录时发起需要登录后的操作, 将会转到登录界面
+        self.tabBarNavigationController = tabBarNavigationController
+        NotificationCenter.default.addObserver(self, selector: #selector(self.gotoLogin(_:)), name:NSNotification.Name(rawValue: NotificationName3), object: nil)
+        
+        self.window?.rootViewController = SlideMenuController.init(mainViewController: self.tabBarNavigationController, leftMenuViewController: menuNavigationController)
         self.window?.makeKeyAndVisible()
+    }
+    
+    @objc fileprivate func gotoLogin(_ notification: NSNotification) {
+        guard let type = (notification.userInfo!["type"] as? String) else { return }
+        if type == "push" { //跳转
+            let loginStoryboard = UIStoryboard.init(name: "Login", bundle: nil)
+            let loginVC = loginStoryboard.instantiateViewController(withIdentifier: "Login") as! LoginViewController
+            loginVC.isPushed = true
+            
+            self.tabBarNavigationController.pushViewController(loginVC, animated: true)
+        } else if type == "hud" { //提示
+            HUD.flash(HUDContentType.label("请先登录"))
+        }
     }
 
     func applicationWillResignActive(_ application: UIApplication) {
@@ -130,7 +148,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
 
     func applicationWillTerminate(_ application: UIApplication) {
-        // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
+        //删除通知
+        NotificationCenter.default.removeObserver(self)
     }
 
 
