@@ -116,6 +116,11 @@
 			<key>orderHint</key>
 			<integer>15</integer>
 		</dict>
+		<key>Stellar.xcscheme</key>
+		<dict>
+			<key>orderHint</key>
+			<integer>16</integer>
+		</dict>
 	</dict>
 	<key>SuppressBuildableAutocreation</key>
 	<dict/>
