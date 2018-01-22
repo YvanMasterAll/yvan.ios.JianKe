@@ -10,23 +10,6 @@ import Foundation
 import RxCocoa
 import RxSwift
 
-public enum Result {
-    case ok(message: String)
-    case empty
-    case failed(message: String)
-}
-
-extension Result {
-    var isVaild: Bool {
-        switch self {
-        case .ok:
-            return true
-        default:
-            return false
-        }
-    }
-}
-
 //Using RxSwift DelegateProxy as a delegate for UIApplicationDelegate
 fileprivate class RxUIApplicationDelegateProxy: DelegateProxy<AnyObject, AnyObject>, UIApplicationDelegate, DelegateProxyType {
     //注册 UIApplication

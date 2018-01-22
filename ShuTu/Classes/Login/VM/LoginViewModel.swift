@@ -16,10 +16,10 @@ public protocol LoginViewModelInput {
     var loginTap: PublishSubject<Void>{ get }
 }
 public protocol LoginViewModelOutput {
-    var usernameUsable: Driver<Result>{ get }
+    var usernameUsable: Driver<Result2>{ get }
     var passwordUsable: Driver<Bool>{ get }
     var loginButtonEnabled: Driver<Bool>{ get }
-    var loginResult: Driver<Result>{ get }
+    var loginResult: Driver<Result2>{ get }
 }
 public protocol LoginViewModelType {
     var inputs: LoginViewModelInput { get }
@@ -32,10 +32,10 @@ public class LoginViewModel: LoginViewModelInput, LoginViewModelOutput, LoginVie
     public var password = PublishSubject<String?>()
     public var loginTap = PublishSubject<Void>()
     //outputs
-    public var usernameUsable: Driver<Result>
+    public var usernameUsable: Driver<Result2>
     public var passwordUsable: Driver<Bool>
     public var loginButtonEnabled: Driver<Bool>
-    public var loginResult: Driver<Result>
+    public var loginResult: Driver<Result2>
     //get
     public var inputs: LoginViewModelInput { return self }
     public var outputs: LoginViewModelOutput { return self }

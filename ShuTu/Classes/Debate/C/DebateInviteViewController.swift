@@ -58,6 +58,10 @@ class DebateInviteViewController: UIViewController {
         super.didReceiveMemoryWarning()
     }
     
+    deinit {
+        print("deinit: \(type(of: self))")
+    }
+    
     //私有成员
     fileprivate var disposeBag = DisposeBag()
     fileprivate var viewModel: DebateInviteViewModel!

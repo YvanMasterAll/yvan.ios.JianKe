@@ -59,6 +59,10 @@ class DebateSearchViewController: UIViewController {
         super.didReceiveMemoryWarning()
     }
     
+    deinit {
+        print("deinit: \(type(of: self))")
+    }
+    
     //私有成员
     fileprivate var categories: [String]!
     fileprivate var histories: [String]!
