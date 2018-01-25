@@ -8,8 +8,9 @@
 
 import Foundation
 
+/// 应用程序的环境变量
 struct Environment {
-    
+    /// 搜索模块: 搜索历史纪录
     static var searchHistory: [String]? {
         get {
             return self.userDefaults.value(forKey: UserDefaultsKeys.History.rawValue) as! [String]?
@@ -18,7 +19,6 @@ struct Environment {
             self.userDefaults.setValue(newValue, forKey: UserDefaultsKeys.History.rawValue)
         }
     }
-    
     static func addHistory(_ history: String) {
         if self.searchHistory == nil {
             self.userDefaults.setValue([history], forKey: UserDefaultsKeys.History.rawValue)
@@ -31,13 +31,12 @@ struct Environment {
             self.userDefaults.setValue(histories, forKey: UserDefaultsKeys.History.rawValue)
         }
     }
-    
     static func removeHistory(_ index: Int) {
         guard var histoies = self.searchHistory else { return }
         histoies.remove(at: index)
         self.searchHistory = histoies
     }
-    
+    /// 搜索模块: 热门搜索记录
     static var searchHot: [String]? {
         get {
             return self.userDefaults.value(forKey: UserDefaultsKeys.Hot.rawValue) as! [String]?
@@ -46,7 +45,6 @@ struct Environment {
             self.userDefaults.setValue(newValue, forKey: UserDefaultsKeys.Hot.rawValue)
         }
     }
-    
     static func addHot(_ hot: String) {
         if self.searchHistory == nil {
             self.userDefaults.setValue([hot], forKey: UserDefaultsKeys.Hot.rawValue)
@@ -59,7 +57,7 @@ struct Environment {
             self.userDefaults.setValue(hots, forKey: UserDefaultsKeys.Hot.rawValue)
         }
     }
-    
+    /// 认证模块
     static var token: String? {
         get {
             return self.userDefaults.value(forKey: UserDefaultsKeys.Token.rawValue) as! String?
@@ -75,7 +73,7 @@ struct Environment {
         }
         return true
     }
-    
+    /// 程序版本更新
     static var firstLaunch: String? {
         get {
             return self.userDefaults.value(forKey: UserDefaultsKeys.Launch.rawValue) as! String?
@@ -84,7 +82,6 @@ struct Environment {
             self.userDefaults.setValue(newValue, forKey: UserDefaultsKeys.Launch.rawValue)
         }
     }
-    
     static var isFirstLaunch: Bool {
         guard let _ = firstLaunch else {
             //存储版本信息
@@ -94,7 +91,6 @@ struct Environment {
         }
         return false
     }
-    
     static var version: String? {
         get {
             return self.userDefaults.value(forKey: UserDefaultsKeys.Version.rawValue) as! String?
@@ -103,7 +99,6 @@ struct Environment {
             self.userDefaults.setValue(newValue, forKey: UserDefaultsKeys.Version.rawValue)
         }
     }
-    
     static var isFirstLaunchOfNewVersion: Bool {
         guard let lastVersion = version else {
             return false
@@ -117,7 +112,7 @@ struct Environment {
         
         return false
     }
-    
+    /// 清空环境
     static func clear() {
         self.userDefaults.removeObject(forKey: UserDefaultsKeys.Token.rawValue)
     }

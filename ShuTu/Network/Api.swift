@@ -157,8 +157,16 @@ let shutuEndpointClosure = { (target: ShuTuApi2) -> Endpoint<ShuTuApi2> in
         properties[.expires] = Date.init(timeIntervalSinceNow: 60*60*24*365)
         properties[.secure] = false
         var cookie = HTTPCookie.init(properties: properties)!
+        var properties2: [HTTPCookiePropertyKey: Any] = [:]
+        properties2[.name] = "AppVersion"
+        properties2[.path] = "/"
+        properties2[.value] = AppVersion
+        properties2[.domain] = ""
+        properties2[.expires] = Date.init(timeIntervalSinceNow: 60*60*24*365)
+        properties2[.secure] = false
+        var cookie2 = HTTPCookie.init(properties: properties2)!
         let url = target.baseURL.appendingPathComponent(target.path)
-        HTTPCookieStorage.shared.setCookies([cookie], for: url, mainDocumentURL: nil)
+        HTTPCookieStorage.shared.setCookies([cookie, cookie2], for: url, mainDocumentURL: nil)
     default:
         break
     }

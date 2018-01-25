@@ -31,6 +31,8 @@
 import Foundation
 import UIKit
 
+/// 字体图标库, fontAwesome
+
 public extension UIImage {
     
     /**

@@ -134,6 +134,18 @@ open class RichEditorView: UIView, UIScrollViewDelegate, UIWebViewDelegate, UIGe
         self.setup()
     }
     
+    /// 加载需要的资源并缓存
+    open static func loadResource() {
+        DispatchQueue.main.async {
+            let tmpWebView = UIWebView.init()
+            if let filePath = Bundle(for: RichEditorView.self).path(forResource: "rich_editor", ofType: "html") {
+                let url = URL(fileURLWithPath: filePath, isDirectory: false)
+                let request = URLRequest(url: url)
+                tmpWebView.loadRequest(request)
+            }
+        }
+    }
+    
     fileprivate func setup() {
         backgroundColor = .red
         

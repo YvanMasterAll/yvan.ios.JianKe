@@ -22,7 +22,8 @@ import UIKit
      
      This property applies a color to the bounds of the control. The default value for this property is a clear color.
     */
-    @IBInspectable dynamic open var borderColor: UIColor? {
+    @IBInspectable
+    public dynamic override var borderColor: UIColor? {
         didSet {
             updateBorder()
         }

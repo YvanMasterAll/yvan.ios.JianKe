@@ -60,8 +60,13 @@ class DebateViewController: UIViewController {
         
         setupUI()
         bindRx()
+        
+        //测试
+        let alertBox = TestAlertBox.init()
+        let alertModal = AlertModal.init(alertBox: alertBox)
+        alertModal.show(.fade)
     }
-    
+
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         

@@ -6,6 +6,8 @@
 //  Copyright © 2017年 yiqiang. All rights reserved.
 //
 
+/// 常量
+
 import Foundation
 import UIKit
 

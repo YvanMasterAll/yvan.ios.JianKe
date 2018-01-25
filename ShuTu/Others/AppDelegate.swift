@@ -8,6 +8,7 @@
 
 import UIKit
 import IQKeyboardManager
+import RichEditorView
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -24,6 +25,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         #if DEBUG
             GDPerformanceMonitor.sharedInstance.startMonitoring()
         #endif
+        
+        //初始化富文本编辑器
+        RichEditorView.loadResource()
         
         //启动键盘管理
         IQKeyboardManager.shared().isEnabled = true

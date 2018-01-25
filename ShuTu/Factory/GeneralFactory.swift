@@ -9,9 +9,10 @@
 import Foundation
 import UIKit
 
+///常用工厂
 class GeneralFactory {
     
-    //添加阴影
+    /// 添加阴影
     public static func generateRectShadow(layer: CALayer, rect: CGRect, color: CGColor) {
         layer.shadowOffset = CGSize(width: 0, height: 0)
         layer.shadowColor = color
@@ -24,7 +25,7 @@ class GeneralFactory {
         let gradient = GradientLayer.init(direction: direction, colors: [color.withAlphaComponent(0.5), color.withAlphaComponent(0)], cornerRadius: 0)
         view.addGradient(gradient, frame: rect)
     }
-    
+    /// 通过颜色生成图片
     public static func createImageWithColor(_ color: UIColor) -> UIImage {
         let rect = CGRect.init(x: 0, y: 0, width: 1, height: 1)
         UIGraphicsBeginImageContext(rect.size)

@@ -24,7 +24,7 @@ open class SwiftyInnerShadowView: UIView {
         }
     }
     
-    open var cornerRadius: CGFloat = 0 {
+    public override var cornerRadius: CGFloat {
         didSet {
             layer.cornerRadius = cornerRadius
             shadowLayer.cornerRadius = cornerRadius

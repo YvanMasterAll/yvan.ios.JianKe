@@ -6,6 +6,11 @@
 //  Copyright © 2017年 yiqiang. All rights reserved.
 //
 
+/// Google Material Colors, 谷歌发布的颜色标准
+/// 颜色处理
+/// @处理一 颜色加深
+/// @处理二 颜色变浅
+
 import UIKit
 
 extension UIColor {

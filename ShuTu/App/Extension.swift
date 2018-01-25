@@ -204,6 +204,15 @@ extension UILabel {
 //UIView 扩展
 
 extension UIView {
+    /// 加载 XIB, 返回 UIView
+    func loadViewFromNib() -> UIView {
+        let className = type(of: self)
+        let bundle = Bundle(for: className)
+        let name = NSStringFromClass(className).components(separatedBy: ".").last
+        let nib = UINib(nibName: name!, bundle: bundle)
+        let view = nib.instantiate(withOwner: self, options: nil).first as! UIView
+        return view
+    }
     //生成外阴影
     open func generateOuterShadow() {
         let view = UIView()

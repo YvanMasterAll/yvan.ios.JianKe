@@ -20,6 +20,8 @@
 // THE SOFTWARE.
 //
 
+/// FPS, CPU 实时显示
+
 import UIKit
 import QuartzCore
 
