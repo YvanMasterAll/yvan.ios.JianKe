@@ -64,6 +64,9 @@
             <viewLayoutGuide key="safeArea" id="ZTg-uK-7eu"/>
             <size key="customSize" width="394" height="146"/>
             <connections>
+                <outlet property="opposeButton" destination="LkS-Fc-l9K" id="tno-fg-sbZ"/>
+                <outlet property="supportButton" destination="Qqm-yM-Rn2" id="g9n-OD-JS0"/>
+                <outlet property="title" destination="acl-DY-bCA" id="F6s-pW-Rjv"/>
                 <outlet property="view" destination="u7o-A8-nvf" id="SPS-4O-LRN"/>
             </connections>
             <point key="canvasLocation" x="197" y="100"/>

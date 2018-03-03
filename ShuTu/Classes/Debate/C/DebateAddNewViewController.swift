@@ -16,7 +16,7 @@ import RichEditorView
 import Photos
 import Kingfisher
 
-class DebateAddNewViewController: UIViewController {
+class DebateAddNewViewController: BaseViewController {
 
     @IBOutlet weak var richEditorView: RichEditorView! {
         didSet {
@@ -30,7 +30,6 @@ class DebateAddNewViewController: UIViewController {
     }
     @IBOutlet weak var actionViewBottomConstraint: NSLayoutConstraint!
     @IBOutlet weak var textField: HoshiTextField!
-    @IBOutlet weak var actionSet: UIImageView!
     @IBOutlet weak var actionAddAt: UIImageView!
     @IBOutlet weak var actionAddImage: UIImageView!
     @IBOutlet weak var actionView: UIView!
@@ -58,20 +57,9 @@ class DebateAddNewViewController: UIViewController {
         self.stepButton.isEnabled = false
     }
     
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-
-        //隐藏导航栏
-        self.navigationController?.setNavigationBarHidden(true, animated: false)
-        //添加 ActionView 的阴影
-        GeneralFactory.generateRectShadow(layer: self.actionView.layer, rect: CGRect(x: 0, y: -1, width: SW, height: 1), color: GMColor.grey800Color().cgColor)
-        self.view.bringSubview(toFront: self.actionView)
-    }
-    
     deinit {
         //移除通知
         NotificationCenter.default.removeObserver(self)
-        print("deinit: \(type(of: self))")
     }
     
     //私有成员
@@ -93,19 +81,20 @@ class DebateAddNewViewController: UIViewController {
     fileprivate var selectedAssets = [TLPHAsset]()
     fileprivate var keyboardHeight: CGFloat = 0
     fileprivate var currentStep: Int = 0 //步骤
-    //第二步页面
-    fileprivate lazy var secondTextField: HoshiTextField = {
-        let textField = HoshiTextField(frame: CGRect.zero)
-        textField.borderInactiveColor = ColorPrimary
-        textField.borderActiveColor = GMColor.grey300Color()
-        textField.placeholderColor = GMColor.grey500Color()
-        textField.placeholder = "搜索并添加相关话题"
-        textField.borderStyle = UITextBorderStyle.none
-        textField.font = UIFont.systemFont(ofSize: 14)
-        textField.isHidden = true //隐藏
-        self.view.addSubview(textField)
+    fileprivate lazy var emojiView: EmojiView = { //表情键盘
+        let emojiView = EmojiView.init(frame: CGRect.init(x: 0, y: SH, width: SW, height: 200))
+        emojiView.isHidden = false
+        self.view.addSubview(emojiView)
+        emojiView.snp.makeConstraints{ make in
+            make.left.equalTo(self.view)
+            make.right.equalTo(self.view)
+            make.top.equalTo(self.actionView.snp.bottom)
+            make.height.equalTo(200)
+        }
+        emojiView.delegate = self
+        self.view.bringSubview(toFront: emojiView)
         
-        return textField
+        return emojiView
     }()
     //ViewModel
     fileprivate var viewModel: DebateAddNewViewModel!
@@ -116,13 +105,7 @@ extension DebateAddNewViewController {
     //初始化
     fileprivate func setupUI() {
         //Step
-        self.secondTextField.snp.makeConstraints { make in
-            make.height.equalTo(50)
-            make.left.equalTo(14)
-            make.right.equalTo(14)
-            make.top.equalTo(self.navigationBar.snp.bottom).offset(4)
-        }
-        self.stepButton.addTarget(self, action: #selector(self.stepChanged), for: .touchUpInside)
+        self.stepButton.addTarget(self, action: #selector(self.send), for: .touchUpInside)
         //NavigationBarView
         GeneralFactory.generateRectShadow(layer: self.navigationBar.layer, rect: CGRect(x: 0, y: self.navigationBar.frame.size.height, width: SW, height: 0.5), color: GMColor.grey800Color().cgColor)
         self.navigationBarLeftImage.setIcon(icon: .fontAwesome(.angleLeft), textColor: GMColor.grey900Color(), backgroundColor: UIColor.clear, size: nil)
@@ -135,10 +118,13 @@ extension DebateAddNewViewController {
         self.actionAddImage.isUserInteractionEnabled = true
         let addImageTapGes = UITapGestureRecognizer(target: self, action: #selector(self.gotoPhotoPicker))
         self.actionAddImage.addGestureRecognizer(addImageTapGes)
-        self.actionAddAt.setIcon(icon: .fontAwesome(.at), textColor: GMColor.grey600Color(), backgroundColor: UIColor.clear, size: nil)
+        self.actionAddAt.setIcon(icon: .fontAwesome(.smileO), textColor: GMColor.grey600Color(), backgroundColor: UIColor.clear, size: nil)
         self.actionAddAt.isUserInteractionEnabled = true
-        self.actionSet.setIcon(icon: .fontAwesome(.cog), textColor: GMColor.grey600Color(), backgroundColor: UIColor.clear, size: nil)
-        self.actionSet.isUserInteractionEnabled = true
+        let addEmojiTapGes = UITapGestureRecognizer(target: self, action: #selector(self.showEmoji))
+        self.actionAddAt.addGestureRecognizer(addEmojiTapGes)
+        //添加 ActionView 的阴影
+        GeneralFactory.generateRectShadow(layer: self.actionView.layer, rect: CGRect(x: 0, y: -1, width: SW, height: 1), color: GMColor.grey800Color().cgColor)
+        self.view.bringSubview(toFront: self.actionView)
     }
     fileprivate func bindRx() {
         //View Model
@@ -154,6 +140,22 @@ extension DebateAddNewViewController {
                     self?.textField.borderInactiveColor = ColorPrimary
                 } else {
                     self?.textField.borderInactiveColor = GMColor.red900Color()
+                }
+            })
+            .disposed(by: self.disposeBag)
+        viewModel.outputs.sendResult
+            .asObservable()
+            .subscribe(onNext: { result in
+                switch result {
+                case .ok:
+                    HUD.flash(.label("成功添加话题"))
+                    break
+                case .failed:
+                    HUD.flash(.label("添加话题失败"))
+                    break
+                default:
+                    HUD.hide()
+                    break
                 }
             })
             .disposed(by: self.disposeBag)
@@ -173,8 +175,20 @@ extension DebateAddNewViewController {
         self.present(self.photoPicker, animated: true, completion: nil)
         self.hidesBottomBarWhenPushed = false
     }
+    @objc fileprivate func showEmoji() {
+        //取消焦点
+        self.textField.resignFirstResponder()
+        self.richEditorView.blur()
+        self.emojiView.isHidden = false
+        
+        UIView.animate(withDuration: 0.25, animations: { [weak self] () -> Void in
+            self?.actionViewBottomConstraint.constant = 200
+            self?.view.layoutIfNeeded()
+        })
+    }
     //Keyboard Notification
     @objc fileprivate func keyBoardWillShow(_ notification: Notification) {
+        self.emojiView.isHidden = true
         //获取键盘高度
         let kbInfo = notification.userInfo
         let kbRect = (kbInfo?[UIKeyboardFrameEndUserInfoKey] as! NSValue).cgRectValue
@@ -192,19 +206,10 @@ extension DebateAddNewViewController {
             self?.view.layoutIfNeeded()
         })
     }
-    //Step Action
-    @objc fileprivate func stepChanged() {
-        if self.currentStep == 0 { //跳转到第二步
-            currentStep = 1
-            self.textField.isHidden = true
-            self.secondTextField.isHidden = false
-            self.stepButton.setTitle("上一步", for: .normal)
-        } else { //返回第一步
-            currentStep = 0
-            self.secondTextField.isHidden = true
-            self.textField.isHidden = false
-            self.stepButton.setTitle("下一步", for: .normal)
-        }
+    //按钮事件
+    @objc fileprivate func send() {
+        HUD.show(.progress)
+        self.viewModel.inputs.sendTap.onNext((self.textField.text!, self.richEditorView.contentHTML))
     }
     //Button Enabled
     fileprivate func buttonEnabled(_ enabled: Bool) {
@@ -232,7 +237,11 @@ extension DebateAddNewViewController {
     }
 }
 
-extension DebateAddNewViewController: TLPhotosPickerViewControllerDelegate, RichEditorDelegate {
+extension DebateAddNewViewController: TLPhotosPickerViewControllerDelegate, RichEditorDelegate, EmojiViewDelegate {
+    //表情选择事件
+    func emojiClicked(_ imageUrl: String) {
+        self.richEditorView.insertImage(imageUrl, alt: "emoji")
+    }
     //TLPhotosPickerViewControllerDelegate
     func dismissPhotoPicker(withTLPHAssets: [TLPHAsset]) {
         //获取选中图片

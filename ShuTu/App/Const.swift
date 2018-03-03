@@ -10,26 +10,28 @@
 
 import Foundation
 import UIKit
+import RxSwift
+import RxCocoa
 
-//尺寸
+///尺寸
 let SW = UIScreen.main.bounds.size.width
 let SH = UIScreen.main.bounds.size.height
 let TarBarHeight: CGFloat = 40
-
-//版本信息
+///版本信息
 let AppVersion = Bundle.main.infoDictionary!["CFBundleShortVersionString"] as! String
-
-//颜色
+///颜色
 let ColorPrimary = UIColor(rgb: 0x0f88eb) //主色
 let ColorSecondary = UIColor(rgb: 0x000000) //第二主色
 let ColorSupport = UIColor(rgb: 0x000000) //辅助颜色
 let ColorDot = UIColor(rgb: 0x000000) //点睛色
 
-//信号
+///信号
 public enum Result2 {
+    case none
     case ok(message: String)
     case empty
     case failed(message: String)
+    case exist
 }
 extension Result2 {
     var isVaild: Bool {
@@ -46,14 +48,8 @@ let Error002 = Result2.failed(message: "输入不合法")
 let Error003 = Result2.failed(message: "网络请求失败")
 let Ok001 = Result2.ok(message: "成功")
 
-//通知
-let NotificationName1 = "SubScrollViewDidScrollNotification" //子滚动条滚动通知
-let NotificationName2 = "SubTableViewDidRefreshNotification" //子表刷新通知
+///通知
 let NotificationName3 = "GotoLoginVCNotification" //转到登录页面通知
-
-//登录绑定
-import RxSwift
-import RxCocoa
 public enum LoginState {
     case none //未知状态
     case out //登出状态

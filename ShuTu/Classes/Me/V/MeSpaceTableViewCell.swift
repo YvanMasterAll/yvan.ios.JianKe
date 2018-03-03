@@ -16,8 +16,8 @@ class MeSpaceTableViewCell: UITableViewCell {
     @IBOutlet weak var pagerView: FSPagerView! {
         didSet {
             self.pagerView.register(UINib(nibName: "MeSpaceDynamicCollectionViewCell", bundle: nil), forCellWithReuseIdentifier: "dynamic")
-            self.pagerView.register(UINib(nibName: "MeSpaceQuizCollectionViewCell", bundle: nil), forCellWithReuseIdentifier: "quiz")
-            self.pagerView.register(UINib(nibName: "MeSpaceAnswerCollectionViewCell", bundle: nil), forCellWithReuseIdentifier: "answer")
+            self.pagerView.register(UINib(nibName: "MeSpaceDynamicCollectionViewCell", bundle: nil), forCellWithReuseIdentifier: "answer")
+            self.pagerView.register(UINib(nibName: "MeSpaceDynamicCollectionViewCell", bundle: nil), forCellWithReuseIdentifier: "topic")
             self.pagerView.itemSize = .zero
             self.pagerView.delegate = self
             self.pagerView.dataSource = self
@@ -57,7 +57,7 @@ class MeSpaceTableViewCell: UITableViewCell {
     
     //私有成员
     fileprivate var dynamicViewModel: MeSpaceDynamicViewModel!
-    fileprivate var quizViewModel: MeSpaceQuizViewModel!
+    fileprivate var topicViewModel: MeSpaceTopicViewModel!
     fileprivate var answerViewModel: MeSpaceAnswerViewModel!
     fileprivate var disposeBag = DisposeBag()
     fileprivate var currentIndex: Int = 0
@@ -69,9 +69,9 @@ extension MeSpaceTableViewCell {
     //初始化
     fileprivate func commonInit() {
         //View Model
-        self.dynamicViewModel = MeSpaceDynamicViewModel.init(disposeBag: self.disposeBag, section: Auth())
-        self.quizViewModel = MeSpaceQuizViewModel.init(disposeBag: self.disposeBag, section: Auth())
-        self.answerViewModel = MeSpaceAnswerViewModel.init(disposeBag: self.disposeBag, section: Auth())
+        self.dynamicViewModel = MeSpaceDynamicViewModel.init(disposeBag: self.disposeBag)
+        self.topicViewModel = MeSpaceTopicViewModel.init(disposeBag: self.disposeBag)
+        self.answerViewModel = MeSpaceAnswerViewModel.init(disposeBag: self.disposeBag)
     }
     //TabView 点击事件
     fileprivate func tabView(itemSelectedAtIndex index: Int) {
@@ -107,30 +107,34 @@ extension MeSpaceTableViewCell: FSPagerViewDelegate, FSPagerViewDataSource {
             let cell = pagerView.dequeueReusableCell(withReuseIdentifier: "dynamic", at: index) as! MeSpaceDynamicCollectionViewCell
             cell.backgroundColor = UIColor.white
             cell.disposeBag = self.disposeBag
-            if cell.viewModel == nil {
-                cell.viewModel = self.dynamicViewModel
+            cell.dynamicT = .dynamic
+            if cell.dynamicViewModel == nil {
+                cell.dynamicViewModel = self.dynamicViewModel
             }
             
             return cell
         } else if index == 1 {
-            let cell = pagerView.dequeueReusableCell(withReuseIdentifier: "quiz", at: index) as! MeSpaceQuizCollectionViewCell
+            let cell = pagerView.dequeueReusableCell(withReuseIdentifier: "answer", at: index) as! MeSpaceDynamicCollectionViewCell
             cell.backgroundColor = UIColor.white
             cell.disposeBag = self.disposeBag
-            if cell.viewModel == nil {
-                cell.viewModel = self.quizViewModel
+            cell.dynamicT = .viewpoint
+            if cell.answerViewModel == nil {
+                cell.answerViewModel = self.answerViewModel
             }
             
             return cell
         } else {
-            let cell = pagerView.dequeueReusableCell(withReuseIdentifier: "answer", at: index) as! MeSpaceAnswerCollectionViewCell
+            let cell = pagerView.dequeueReusableCell(withReuseIdentifier: "topic", at: index) as! MeSpaceDynamicCollectionViewCell
             cell.backgroundColor = UIColor.white
             cell.disposeBag = self.disposeBag
-            if cell.viewModel == nil {
-                cell.viewModel = self.answerViewModel
+            cell.dynamicT = .topic
+            if cell.topicViewModel == nil {
+                cell.topicViewModel = self.topicViewModel
             }
             
             return cell
         }
+        
     }
     func pagerView(_ pagerView: FSPagerView, didSelectItemAt index: Int) {
         pagerView.deselectItem(at: index, animated: true)

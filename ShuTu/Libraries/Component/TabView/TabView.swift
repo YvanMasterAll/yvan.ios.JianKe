@@ -200,10 +200,10 @@ public class TabView: UIView {
 extension TabView {
     
     /**
-     Called when you swipe in isInfinityTabPageViewController, moves the contentOffset of collectionView
+     Called when you swipe in TabPageViewController, moves the contentOffset of collectionView
      
      - parameter index: Next Index
-     - parameter contentOffsetX: contentOffset.x of scrollView of isInfinityTabPageViewController
+     - parameter contentOffsetX: contentOffset.x of scrollView of TabPageViewController
      */
     func scrollCurrentBarView(contentOffsetX: CGFloat) {
         guard self.shouldTabBarScroll else { return }
@@ -260,7 +260,7 @@ extension TabView {
     }
     
     /**
-     Called in after the transition is complete pages in isInfinityTabPageViewController in the process of updating the current
+     Called in after the transition is complete pages in TabPageViewController in the process of updating the current
      
      - parameter index: Next Index
      */
@@ -273,7 +273,7 @@ extension TabView {
         moveCurrentBarView(indexPath, animated: true, shouldScroll: shouldScroll)
     }
     /**
-     Make the tapped cell the current if isInfinity is true
+     Make the tapped cell the current
      
      - parameter index: Next IndexPath√
      */
@@ -289,7 +289,7 @@ extension TabView {
      Move the collectionView to IndexPath of Current
      
      - parameter indexPath: Next IndexPath
-     - parameter animated: true when you tap to move the isInfinityTabCollectionCell
+     - parameter animated: true when you tap to move the TabCollectionCell
      - parameter shouldScroll:
      */
     fileprivate func moveCurrentBarView(_ indexPath: IndexPath, animated: Bool, shouldScroll: Bool) {

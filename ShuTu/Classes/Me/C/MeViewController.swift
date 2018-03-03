@@ -11,8 +11,26 @@ import SnapKit
 import RxSwift
 import RxCocoa
 
-class MeViewController: UIViewController {
+class MeViewController: BaseViewController {
 
+    @IBOutlet weak var fans: UIView! {
+        didSet {
+            self.fans.isUserInteractionEnabled = true
+            self.fans.addGestureRecognizer(UITapGestureRecognizer.init(target: self, action: #selector(self.gotoMeJoinFA)))
+        }
+    }
+    @IBOutlet weak var followPerson: UIView! {
+        didSet {
+            self.followPerson.isUserInteractionEnabled = true
+            self.followPerson.addGestureRecognizer(UITapGestureRecognizer.init(target: self, action: #selector(self.gotoMeJoinFP)))
+        }
+    }
+    @IBOutlet weak var followTopic: UIView! {
+        didSet {
+            self.followTopic.isUserInteractionEnabled = true
+            self.followTopic.addGestureRecognizer(UITapGestureRecognizer.init(target: self, action: #selector(self.gotoMeJoinFT)))
+        }
+    }
     @IBOutlet weak var headerView: UIView!
     @IBOutlet weak var tableViewHeader: UIView!
     @IBOutlet weak var thumbnail: UIImageView! {
@@ -22,6 +40,9 @@ class MeViewController: UIViewController {
             self.thumbnail.isUserInteractionEnabled = true
             let tapGes = UITapGestureRecognizer.init(target: self, action: #selector(self.gotoMeEdit))
             self.thumbnail.addGestureRecognizer(tapGes)
+            if let t = Environment.protrait {
+                self.thumbnail.kf.setImage(with: URL.init(string: t))
+            }
         }
     }
     @IBOutlet weak var tableView: UITableView! {
@@ -35,22 +56,21 @@ class MeViewController: UIViewController {
         super.viewDidLoad()
         
         setupUI()
+        self.setupUserInfo()
     }
 
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
     }
-    
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        
-        //导航栏
-        self.navigationController?.setNavigationBarHidden(true, animated: false)
-        self.navigationItem.backBarButtonItem = UIBarButtonItem.init(title: "", style: .plain, target: self, action: nil)
+
+    override func loginIn() {
+        self.headerView.isHidden = false
+        self.headerView2.isHidden = true
     }
-    
-    deinit {
-        print("deinit: \(type(of: self))")
+
+    override func loginOut() {
+        self.headerView.isHidden = true
+        self.headerView2.isHidden = false
     }
     
     //私有成员
@@ -82,8 +102,8 @@ class MeViewController: UIViewController {
         
         return view
     }()
-    fileprivate var isLogin: Bool = Environment.tokenExists //用户是否登录
     fileprivate var disposeBag = DisposeBag()
+    fileprivate var menuData: [[String: Any]] = [[:]]
     
 }
 
@@ -95,38 +115,78 @@ extension MeViewController {
             self.headerView.isHidden = true
             self.headerView2.isHidden = false
         }
-        //登录通知
-        LoginStatus.subscribe(onNext: { [weak self] state in
-            switch state {
-            case .ok:
-                self?.isLogin = true
-                self?.headerView.isHidden = false
-                self?.headerView2.isHidden = true
-            case .out:
-                self?.isLogin = false
-                self?.headerView.isHidden = true
-                self?.headerView2.isHidden = false
-            default:
-                break
-            }
-        }).disposed(by: self.disposeBag)
+        //获取菜单数据
+        self.setupMenuData()
     }
-    //Goto MeEdit
+    fileprivate func setupMenuData() {
+        //Json
+        guard let path = Bundle.main.path(forResource: "menuData.json", ofType: nil),
+            let data = NSData.init(contentsOfFile: path),
+            let jsonData = try? JSONSerialization.jsonObject(with: data as Data, options: []) as? [[String: Any]]
+            else { return }
+        self.menuData = jsonData!
+    }
+    fileprivate func setupUserInfo() {
+        //初始化获取用户信息
+        let label1 = self.followTopic.viewWithTag(10001) as! UILabel
+        let label2 = self.followPerson.viewWithTag(10002) as! UILabel
+        let label3 = self.fans.viewWithTag(10003) as! UILabel
+        label1.text = "\(Environment.followtopics ?? 0)"
+        label2.text = "\(Environment.followpersons ?? 0)"
+        label3.text = "\(Environment.fans ?? 0)"
+        if isLogin {
+            MeService.instance.userinfo().asObservable()
+                .subscribe(onNext: { response in
+                    let userinfo = response.0
+                    let result = response.1
+                    switch result {
+                    case .ok:
+                        label1.text = "\(userinfo?.followtopics ?? 0)"
+                        label2.text = "\(userinfo?.follows ?? 0)"
+                        label3.text = "\(userinfo?.fans ?? 0)"
+                        break
+                    default:
+                        break
+                    }
+                })
+                .disposed(by: self.disposeBag)
+        }
+    }
+    
+    //按钮事件
     @objc fileprivate func gotoMeEdit() {
-        let meStoryboard = UIStoryboard.init(name: "Me", bundle: nil)
-        let meeditVC = meStoryboard.instantiateViewController(withIdentifier: "MeEdit")
+        let meeditVC = GeneralFactory.getVCfromSb("Me", "MeEdit")
         
         self.slideMenuController()?.pushViewControllerFromMain(meeditVC, close: true)
     }
-    //Goto Login
     @objc fileprivate func gotoLogin() {
         self.slideMenuController()?.closeLeft()
-        NotificationCenter.default.post(name: NSNotification.Name(rawValue: NotificationName3), object: nil, userInfo: ["type": "push"])
+        self.gotoLoginPage()
+    }
+    @objc fileprivate func gotoMeJoinFT() {
+        let meJoinVC = GeneralFactory.getVCfromSb("Me", "MeJoin") as! MeJoinViewController
+        meJoinVC.navTitle = "我关注的话题"
+        meJoinVC.type = MeJoinType.followtopic
+        
+        self.slideMenuController()?.pushViewControllerFromMain(meJoinVC, close: true)
+    }
+    @objc fileprivate func gotoMeJoinFA() {
+        let meJoinVC = GeneralFactory.getVCfromSb("Me", "MeJoin") as! MeJoinViewController
+        meJoinVC.navTitle = "关注我的人"
+        meJoinVC.type = MeJoinType.fan
+        
+        self.slideMenuController()?.pushViewControllerFromMain(meJoinVC, close: true)
+    }
+    @objc fileprivate func gotoMeJoinFP() {
+        let meJoinVC = GeneralFactory.getVCfromSb("Me", "MeJoin") as! MeJoinViewController
+        meJoinVC.navTitle = "我关注的人"
+        meJoinVC.type = MeJoinType.followperson
+        
+        self.slideMenuController()?.pushViewControllerFromMain(meJoinVC, close: true)
     }
     
 }
 
-fileprivate var data: Dictionary<String, [String]> = ["title": ["所有动态", "我的收藏", "我的声援", "我的殊途", "我的同归"], "icon": ["icon_dynamic_grey500", "icon_keep_grey500", "icon_sy_grey500", "icon_st_grey500", "icon_tg_grey500"]]
 extension MeViewController: UITableViewDelegate, UITableViewDataSource {
     //TableView Delegate && DataSource
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
@@ -139,24 +199,56 @@ extension MeViewController: UITableViewDelegate, UITableViewDataSource {
         }
         switch indexPath.row {
         case 0:
-            let meStoryboard = UIStoryboard.init(name: "Me", bundle: nil)
-            let meSpaceVC = meStoryboard.instantiateViewController(withIdentifier: "MeSpace")
-            
+            let meSpaceVC = GeneralFactory.getVCfromSb("Me", "MeSpace")
             self.slideMenuController()?.pushViewControllerFromMain(meSpaceVC, close: true)
             break
+        case 1:
+            let meJoinVC = GeneralFactory.getVCfromSb("Me", "MeJoin") as! MeJoinViewController
+            meJoinVC.navTitle = "我的收藏"
+            meJoinVC.type = MeJoinType.collect
+            self.slideMenuController()?.pushViewControllerFromMain(meJoinVC, close: true)
+            break
+        case 2:
+            let meJoinVC = GeneralFactory.getVCfromSb("Me", "MeJoin") as! MeJoinViewController
+            meJoinVC.navTitle = "我的支持"
+            meJoinVC.type = MeJoinType.support
+            self.slideMenuController()?.pushViewControllerFromMain(meJoinVC, close: true)
+            break
+        case 3:
+            let meJoinVC = GeneralFactory.getVCfromSb("Me", "MeJoin") as! MeJoinViewController
+            meJoinVC.navTitle = "我的话题"
+            meJoinVC.type = MeJoinType.topic
+            self.slideMenuController()?.pushViewControllerFromMain(meJoinVC, close: true)
+            break
+        case 4:
+            let meJoinVC = GeneralFactory.getVCfromSb("Me", "MeJoin") as! MeJoinViewController
+            meJoinVC.navTitle = "我的观点"
+            meJoinVC.type = MeJoinType.viewpoint
+            self.slideMenuController()?.pushViewControllerFromMain(meJoinVC, close: true)
+            break
+        case 5:
+            let alertController = UIAlertController(title: "提示", message: "退出登录？", preferredStyle: .alert)
+            let cancelAction = UIAlertAction(title: "取消", style: .cancel, handler: nil)
+            let okAction = UIAlertAction(title: "确定", style: .default, handler: { _ in
+                Environment.clearUserInfo()
+                LoginStatus.onNext(LoginState.out)
+            })
+            alertController.addAction(cancelAction)
+            alertController.addAction(okAction)
+            self.present(alertController, animated: true, completion: nil)
         default:
             break
         }
     }
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return 5
+        return self.menuData.count
     }
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath)
         let title = cell.viewWithTag(10001) as! UILabel
-        title.text = data["title"]![indexPath.row]
+        title.text = menuData[indexPath.row]["title"] as? String
         let image = cell.viewWithTag(10002) as! UIImageView
-        image.image = UIImage.init(named: data["icon"]![indexPath.row])
+        image.image = UIImage.init(named: (menuData[indexPath.row]["icon"] as? String)!)
         
         return cell
     }

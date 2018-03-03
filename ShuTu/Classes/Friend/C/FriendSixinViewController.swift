@@ -11,7 +11,7 @@ import RxCocoa
 import RxSwift
 import RxDataSources
 
-class FriendSixinViewController: UIViewController {
+class FriendSixinViewController: BaseViewController {
     
     @IBOutlet weak var tableView: UITableView! {
         didSet {
@@ -25,14 +25,6 @@ class FriendSixinViewController: UIViewController {
         
         setupUI()
         bindRx()
-    }
-    
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-    }
-    
-    deinit {
-        print("deinit: \(type(of: self))")
     }
     
     //私有成员

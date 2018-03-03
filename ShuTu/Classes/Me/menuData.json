@@ -1,0 +1,26 @@
+[
+  {
+    "title" : "所有动态",
+    "icon" : "icon_dynamic_grey500"
+  },
+  {
+    "title" : "我的收藏",
+    "icon" : "icon_keep_grey500"
+  },
+  {
+    "title" : "我的支持",
+    "icon" : "icon_sy_grey500"
+  },
+  {
+    "title" : "我的话题",
+    "icon" : "icon_st_grey500"
+  },
+  {
+    "title" : "我的观点",
+    "icon" : "icon_tg_grey500"
+  },
+  {
+    "title" : "退出登录",
+    "icon" : "icon_exit_grey500"
+  }
+]

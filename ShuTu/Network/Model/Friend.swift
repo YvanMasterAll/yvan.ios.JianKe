@@ -31,18 +31,34 @@ public struct Friend: Mappable {
 
 public struct Dynamic: Mappable {
     
-    var name: String?
-    var title: String?
+    var userid: Int?
+    var topicid: Int?
+    var vpid: Int?
+    var category: String?
+    var status: String?
+    var type: String?
     var content: String?
-    var time: String?
+    var stand: String?
+    var title: String?
+    var nickname: String?
+    var portrait: String?
+    var createtime: String?
     
     public init(){}
     public init?(map: Map) {}
     
     public mutating func mapping(map: Map) {
-        name <- map["name"]
-        title <- map["title"]
+        userid <- map["userid"]
+        topicid <- map["topicid"]
+        vpid <- map["vpid"]
+        category <- map["category"]
+        status <- map["status"]
+        type <- map["type"]
         content <- map["content"]
-        time <- map["time"]
+        stand <- map["stand"]
+        title <- map["title"]
+        nickname <- map["nickname"]
+        portrait <- map["portrait"]
+        createtime <- map["createtime"]
     }
 }

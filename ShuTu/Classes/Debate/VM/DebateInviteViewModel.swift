@@ -21,9 +21,8 @@ public struct DebateInviteViewModelOutput {
 public class DebateInviteViewModel {
     fileprivate struct InviteModel {
         var pageIndex: Int
-        var section: Auth
         var disposeBag: DisposeBag
-        var models: Variable<[Friend]>
+        var models: Variable<[User]>
     }
     //私有成员
     fileprivate var inviteModel: InviteModel!
@@ -37,8 +36,8 @@ public class DebateInviteViewModel {
         return DebateInviteViewModelOutput(sections: nil, refreshStateObserver: Variable<RefreshStatus>(.none))
     }()
     
-    init(disposeBag: DisposeBag, section: Auth) {
-        self.inviteModel = InviteModel(pageIndex: 0, section: section, disposeBag: disposeBag, models: Variable<[Friend]>([]))
+    init(disposeBag: DisposeBag) {
+        self.inviteModel = InviteModel(pageIndex: 0, disposeBag: disposeBag, models: Variable<[User]>([]))
         //Rx
         self.outputs.sections = self.inviteModel.models.asObservable()
             .map{ models in
@@ -106,7 +105,7 @@ public struct DebateInviteSectionModel {
 }
 
 extension DebateInviteSectionModel: SectionModelType {
-    public typealias item = Friend
+    public typealias item = User
     
     public init(original: DebateInviteSectionModel, items: [DebateInviteSectionModel.item]) {
         self = original

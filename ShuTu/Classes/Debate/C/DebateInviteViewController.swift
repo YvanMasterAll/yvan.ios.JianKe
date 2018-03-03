@@ -11,7 +11,7 @@ import RxCocoa
 import RxSwift
 import RxDataSources
 
-class DebateInviteViewController: UIViewController {
+class DebateInviteViewController: BaseViewController {
 
     @IBOutlet weak var tableView: UITableView! {
         didSet {
@@ -45,21 +45,9 @@ class DebateInviteViewController: UIViewController {
         self.setupUI()
         self.bindRx()
     }
-    
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        
-        //阴影
-        GeneralFactory.generateRectShadow(layer: self.searchView.layer, rect: CGRect.init(x: 0, y: self.searchView.frame.height, width: SW, height: 0.5), color: GMColor.grey800Color().cgColor)
-        self.view.bringSubview(toFront: self.searchView)
-    }
 
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
-    }
-    
-    deinit {
-        print("deinit: \(type(of: self))")
     }
     
     //私有成员
@@ -76,10 +64,13 @@ extension DebateInviteViewController {
         self.tableView.configRefreshFooter(with: FirstRefreshFooter(), action: { [weak self] () -> Void in
             self?.viewModel.inputs.refreshNewData.onNext(false)
         })
+        //阴影
+        GeneralFactory.generateRectShadow(layer: self.searchView.layer, rect: CGRect.init(x: 0, y: self.searchView.frame.height, width: SW, height: 0.5), color: GMColor.grey800Color().cgColor)
+        self.view.bringSubview(toFront: self.searchView)
     }
     fileprivate func bindRx() {
         //View Model
-        self.viewModel = DebateInviteViewModel.init(disposeBag: self.disposeBag, section: Auth.init())
+        self.viewModel = DebateInviteViewModel.init(disposeBag: self.disposeBag)
         //Rx
         tableView.rx.setDelegate(self)
             .disposed(by: disposeBag)
@@ -96,22 +87,22 @@ extension DebateInviteViewController {
             })
             .disposed(by: disposeBag)
         self.viewModel.outputs.refreshStateObserver.asObservable()
-            .subscribe(onNext: { state in
+            .subscribe(onNext: { [weak self] state in
                 switch state {
                 case .noData:
                     break
                 case .beginHeaderRefresh:
                     break
                 case .endHeaderRefresh:
-                    self.tableView.switchRefreshHeader(to: .normal(.success, 0))
+                    self?.tableView.switchRefreshHeader(to: .normal(.success, 0))
                     break
                 case .beginFooterRefresh:
                     break
                 case .endFooterRefresh:
-                    self.tableView.switchRefreshFooter(to: .normal)
+                    self?.tableView.switchRefreshFooter(to: .normal)
                     break
                 case .endRefreshWithoutData:
-                    self.tableView.switchRefreshFooter(to: .noMoreData)
+                    self?.tableView.switchRefreshFooter(to: .noMoreData)
                     break
                 default:
                     break

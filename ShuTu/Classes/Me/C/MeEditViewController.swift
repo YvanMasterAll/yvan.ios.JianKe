@@ -8,14 +8,14 @@
 
 import UIKit
 
-class MeEditViewController: UIViewController {
+class MeEditViewController: BaseViewController {
     
     @IBOutlet weak var thumbnail: UIImageView! {
         didSet {
             self.thumbnail.layer.cornerRadius = self.thumbnail.frame.height/2
             self.thumbnail.layer.masksToBounds = true
-            let tapGes = UITapGestureRecognizer.init(target: self, action: #selector(self.gotoPhotoPicker))
             self.thumbnail.isUserInteractionEnabled = true
+            let tapGes = UITapGestureRecognizer.init(target: self, action: #selector(self.gotoPhotoPicker))
             self.thumbnail.addGestureRecognizer(tapGes)
         }
     }
@@ -29,29 +29,14 @@ class MeEditViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
+        showNavbar = true
+        hideNavbar = true
+        navBarTitle = "资料编辑"
         setupUI()
     }
 
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
-    }
-    
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        
-        //显示导航栏
-        self.navigationController?.setNavigationBarHidden(false, animated: false)
-    }
-    
-    override func viewWillDisappear(_ animated: Bool) {
-        super.viewWillDisappear(animated)
-        
-        //隐藏导航栏
-        self.navigationController?.setNavigationBarHidden(true, animated: false)
-    }
-
-    deinit {
-        print("deinit: \(type(of: self))")
     }
     
     //私有成员
@@ -77,9 +62,7 @@ class MeEditViewController: UIViewController {
 extension MeEditViewController {
     //初始化
     fileprivate func setupUI() {
-        //Navigation
-        self.navigationItem.title = "资料编辑"
-        self.navigationItem.backBarButtonItem = UIBarButtonItem.init(title: "", style: .plain, target: self, action: nil)
+        
     }
     //修改头像
     @objc fileprivate func gotoPhotoPicker() {
@@ -136,8 +119,7 @@ extension MeEditViewController: UITableViewDelegate, TLPhotosPickerViewControlle
             self.present(alert, animated: true, completion: nil)
             break
         case 2:
-            let meStoryboard = UIStoryboard.init(name: "Me", bundle: nil)
-            let meEditIntroVC = meStoryboard.instantiateViewController(withIdentifier: "MeEditIntro") as! MeEditIntroViewController
+            let meEditIntroVC = GeneralFactory.getVCfromSb("Me", "MeEditIntro") as! MeEditIntroViewController
             meEditIntroVC.intro = data["content"]![2]
             meEditIntroVC.block = { [weak self] text in
                 data["content"]![2] = text

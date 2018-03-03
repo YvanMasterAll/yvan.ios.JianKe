@@ -96,6 +96,8 @@
             <size key="customSize" width="397" height="64"/>
             <connections>
                 <outlet property="followButton" destination="2lE-eO-D5k" id="07g-ZT-cJZ"/>
+                <outlet property="name" destination="h7o-ih-C8F" id="QK0-pg-iB9"/>
+                <outlet property="sign" destination="BY6-Bx-leG" id="v8I-iH-BAf"/>
                 <outlet property="thumbnail" destination="mkx-tt-lUl" id="eb5-Xc-4Ce"/>
             </connections>
             <point key="canvasLocation" x="275.5" y="67.5"/>

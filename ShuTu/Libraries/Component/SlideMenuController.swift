@@ -7,6 +7,8 @@
 import Foundation
 import UIKit
 
+///菜单控件
+
 @objc public protocol SlideMenuControllerDelegate {
     @objc optional func leftWillOpen()
     @objc optional func leftDidOpen()
@@ -20,7 +22,7 @@ import UIKit
 
 public struct SlideMenuOptions {
     public static var leftViewWidth: CGFloat = 320.0
-    public static var leftBezelWidth: CGFloat? = 32.0
+    public static var leftBezelWidth: CGFloat? = 16.0
     public static var contentViewScale: CGFloat = 0.96
     public static var contentViewOpacity: CGFloat = 0.5
     public static var contentViewDrag: Bool = true

@@ -11,11 +11,24 @@ import RxCocoa
 import RxSwift
 import RxDataSources
 
+public enum DynamicType: String {
+    case dynamic
+    case viewpoint
+    case topic
+}
+
 class MeSpaceDynamicCollectionViewCell: FSPagerViewCell {
 
     @IBOutlet weak var tableView: UITableView! {
         didSet {
-            self.tableView.register(UINib(nibName: "MeSpaceDynamicTableViewCell", bundle: nil), forCellReuseIdentifier: "dynamic")
+            switch self.dynamicT {
+            case .dynamic:
+                self.tableView.register(UINib(nibName: "MeSpaceDynamicTableViewCell", bundle: nil), forCellReuseIdentifier: "dynamic")
+            case .viewpoint:
+                self.tableView.register(UINib(nibName: "MeSpaceDynamicTableViewCell", bundle: nil), forCellReuseIdentifier: "answer")
+            case .topic:
+                self.tableView.register(UINib(nibName: "MeSpaceDynamicTableViewCell", bundle: nil), forCellReuseIdentifier: "topic")
+            }
             self.tableView.showsVerticalScrollIndicator = false
             self.tableView.tableFooterView = UIView() //消除底部视图
             self.tableView.separatorStyle = .none //消除分割线
@@ -25,11 +38,22 @@ class MeSpaceDynamicCollectionViewCell: FSPagerViewCell {
     //声明区
     open var navigationController: UINavigationController!
     open var disposeBag: DisposeBag!
-    open var viewModel: MeSpaceDynamicViewModel! {
+    open var dynamicViewModel: MeSpaceDynamicViewModel! {
         didSet {
             self.bindRx()
         }
     }
+    open var answerViewModel: MeSpaceAnswerViewModel! {
+        didSet {
+            self.bindRx()
+        }
+    }
+    open var topicViewModel: MeSpaceTopicViewModel! {
+        didSet {
+            self.bindRx()
+        }
+    }
+    open var dynamicT: DynamicType = .dynamic
     
     override func awakeFromNib() {
         super.awakeFromNib()
@@ -38,7 +62,9 @@ class MeSpaceDynamicCollectionViewCell: FSPagerViewCell {
     }
     
     //私有成员
-    fileprivate var dataSource: RxTableViewSectionedReloadDataSource<MeSpaceDynamicSectionModel>!
+    fileprivate var dynamicDataSource: RxTableViewSectionedReloadDataSource<MeSpaceDynamicSectionModel>!
+    fileprivate var answerDataSource: RxTableViewSectionedReloadDataSource<MeSpaceAnswerSectionModel>!
+    fileprivate var topicDataSource: RxTableViewSectionedReloadDataSource<MeSpaceTopicSectionModel>!
     fileprivate var emptyView: EmptyView!
     fileprivate var scrollOffset: CGFloat = 0
 
@@ -52,58 +78,169 @@ extension MeSpaceDynamicCollectionViewCell {
         self.emptyView.delegate = self
         //PullToRefreshKit
         let secondHeader = SecondRefreshHeader()
-        self.tableView.configRefreshHeader(with: secondHeader, action: { [weak self] () -> Void in
-            self?.viewModel.inputs.refreshNewData.onNext(true)
+        self.tableView.configRefreshHeader(with: secondHeader, action: { [unowned self] () -> Void in
+            switch self.dynamicT {
+            case .dynamic:
+                self.dynamicViewModel.inputs.refreshNewData.onNext(true)
+            case .viewpoint:
+                self.answerViewModel.inputs.refreshNewData.onNext(true)
+            case .topic:
+                self.topicViewModel.inputs.refreshNewData.onNext(true)
+            }
+            
         })
-        self.tableView.configRefreshFooter(with: FirstRefreshFooter(), action: { [weak self] () -> Void in
-            self?.viewModel.inputs.refreshNewData.onNext(false)
+        self.tableView.configRefreshFooter(with: FirstRefreshFooter(), action: { [unowned self] () -> Void in
+            switch self.dynamicT {
+            case .dynamic:
+                self.dynamicViewModel.inputs.refreshNewData.onNext(false)
+            case .viewpoint:
+                self.answerViewModel.inputs.refreshNewData.onNext(false)
+            case .topic:
+                self.topicViewModel.inputs.refreshNewData.onNext(false)
+            }
         })
     }
     fileprivate func bindRx() {
         //Rx
-        //TableView
         tableView.rx.setDelegate(self)
             .disposed(by: disposeBag)
-        dataSource = RxTableViewSectionedReloadDataSource<MeSpaceDynamicSectionModel>(
-            configureCell: { ds, tv, ip, item in
-                let cell = tv.dequeueReusableCell(withIdentifier: "dynamic", for: ip) as! MeSpaceDynamicTableViewCell
-                
-                return cell
-        })
-        self.tableView.rx
-            .modelSelected(Debate.self)
-            .subscribe(onNext: { data in
-                //跳转
+        switch self.dynamicT {
+        case .dynamic:
+            dynamicDataSource = RxTableViewSectionedReloadDataSource<MeSpaceDynamicSectionModel>(
+                configureCell: { ds, tv, ip, item in
+                    let cell = tv.dequeueReusableCell(withIdentifier: "dynamic", for: ip) as! MeSpaceDynamicTableViewCell
+                    cell.thumbnail.kf.setImage(with: URL(string: item.portrait!))
+                    if let type = item.category {
+                        switch type {
+                        case TrendType.new_topic.rawValue:
+                            cell.label1.text = "你发起了新的话题"
+                        case TrendType.new_answer.rawValue:
+                            cell.label1.text = "你发表了新的观点"
+                        default:
+                            break
+                        }
+                    }
+                    cell.title.text = item.title
+                    
+                    return cell
             })
-            .disposed(by: disposeBag)
-        self.viewModel.outputs.refreshStateObserver.asObservable()
-            .subscribe(onNext: { state in
-                switch state {
-                case .noData:
-                    self.tableView.switchRefreshHeader(to: .normal(.none, 0))
-                    self.showEmptyView(type: .empty)
-                    break
-                case .beginHeaderRefresh:
-                    break
-                case .endHeaderRefresh:
-                    self.tableView.switchRefreshHeader(to: .normal(.success, 0))
-                    break
-                case .beginFooterRefresh:
-                    break
-                case .endFooterRefresh:
-                    self.tableView.switchRefreshFooter(to: .normal)
-                    break
-                case .endRefreshWithoutData:
-                    self.tableView.switchRefreshFooter(to: .noMoreData)
-                    break
-                default:
-                    break
-                }
+            dynamicViewModel.outputs.sections!.asDriver()
+                .drive(tableView.rx.items(dataSource: dynamicDataSource))
+                .disposed(by: disposeBag)
+            self.tableView.rx
+                .modelSelected(Debate.self)
+                .subscribe(onNext: { data in
+                    //跳转
+                })
+                .disposed(by: disposeBag)
+            self.dynamicViewModel.outputs.refreshStateObserver.asObservable()
+                .subscribe(onNext: { [weak self] state in
+                    switch state {
+                    case .noData:
+                        self?.tableView.switchRefreshHeader(to: .normal(.none, 0))
+                        self?.showEmptyView(type: .empty(size: nil))
+                        break
+                    case .beginHeaderRefresh:
+                        break
+                    case .endHeaderRefresh:
+                        self?.tableView.switchRefreshHeader(to: .normal(.success, 0))
+                        break
+                    case .beginFooterRefresh:
+                        break
+                    case .endFooterRefresh:
+                        self?.tableView.switchRefreshFooter(to: .normal)
+                        break
+                    case .endRefreshWithoutData:
+                        self?.tableView.switchRefreshFooter(to: .noMoreData)
+                        break
+                    default:
+                        break
+                    }
+                })
+                .disposed(by: disposeBag)
+        case .viewpoint:
+            answerDataSource = RxTableViewSectionedReloadDataSource<MeSpaceAnswerSectionModel>(
+                configureCell: { ds, tv, ip, item in
+                    let cell = tv.dequeueReusableCell(withIdentifier: "answer", for: ip) as! MeSpaceDynamicTableViewCell
+                    
+                    return cell
             })
-            .disposed(by: disposeBag)
-        viewModel.outputs.sections!.asDriver()
-            .drive(tableView.rx.items(dataSource: dataSource))
-            .disposed(by: disposeBag)
+            answerViewModel.outputs.sections!.asDriver()
+                .drive(tableView.rx.items(dataSource: answerDataSource))
+                .disposed(by: disposeBag)
+            self.tableView.rx
+                .modelSelected(Debate.self)
+                .subscribe(onNext: { data in
+                    //跳转
+                })
+                .disposed(by: disposeBag)
+            self.answerViewModel.outputs.refreshStateObserver.asObservable()
+                .subscribe(onNext: { [weak self] state in
+                    switch state {
+                    case .noData:
+                        self?.tableView.switchRefreshHeader(to: .normal(.none, 0))
+                        self?.showEmptyView(type: .empty(size: nil))
+                        break
+                    case .beginHeaderRefresh:
+                        break
+                    case .endHeaderRefresh:
+                        self?.tableView.switchRefreshHeader(to: .normal(.success, 0))
+                        break
+                    case .beginFooterRefresh:
+                        break
+                    case .endFooterRefresh:
+                        self?.tableView.switchRefreshFooter(to: .normal)
+                        break
+                    case .endRefreshWithoutData:
+                        self?.tableView.switchRefreshFooter(to: .noMoreData)
+                        break
+                    default:
+                        break
+                    }
+                })
+                .disposed(by: disposeBag)
+        case .topic:
+            topicDataSource = RxTableViewSectionedReloadDataSource<MeSpaceTopicSectionModel>(
+                configureCell: { ds, tv, ip, item in
+                    let cell = tv.dequeueReusableCell(withIdentifier: "topic", for: ip) as! MeSpaceDynamicTableViewCell
+                    
+                    return cell
+            })
+            topicViewModel.outputs.sections!.asDriver()
+                .drive(tableView.rx.items(dataSource: topicDataSource))
+                .disposed(by: disposeBag)
+            self.tableView.rx
+                .modelSelected(Debate.self)
+                .subscribe(onNext: { data in
+                    //跳转
+                })
+                .disposed(by: disposeBag)
+            self.topicViewModel.outputs.refreshStateObserver.asObservable()
+                .subscribe(onNext: { [weak self] state in
+                    switch state {
+                    case .noData:
+                        self?.tableView.switchRefreshHeader(to: .normal(.none, 0))
+                        self?.showEmptyView(type: .empty(size: nil))
+                        break
+                    case .beginHeaderRefresh:
+                        break
+                    case .endHeaderRefresh:
+                        self?.tableView.switchRefreshHeader(to: .normal(.success, 0))
+                        break
+                    case .beginFooterRefresh:
+                        break
+                    case .endFooterRefresh:
+                        self?.tableView.switchRefreshFooter(to: .normal)
+                        break
+                    case .endRefreshWithoutData:
+                        self?.tableView.switchRefreshFooter(to: .noMoreData)
+                        break
+                    default:
+                        break
+                    }
+                })
+                .disposed(by: disposeBag)
+        }
         //刷新
         self.tableView.switchRefreshHeader(to: .refreshing)
     }

@@ -21,9 +21,8 @@ public struct FriendViewModelOutput {
 public class FriendViewModel {
     fileprivate struct FriendModel {
         var pageIndex: Int
-        var section: Auth
         var disposeBag: DisposeBag
-        var models: Variable<[Friend]>
+        var models: Variable<[User]>
     }
     //私有成员
     fileprivate var friendModel: FriendModel!
@@ -37,8 +36,8 @@ public class FriendViewModel {
         return FriendViewModelOutput(sections: nil, refreshStateObserver: Variable<RefreshStatus>(.none))
     }()
     
-    init(disposeBag: DisposeBag, section: Auth) {
-        self.friendModel = FriendModel(pageIndex: 0, section: section, disposeBag: disposeBag, models: Variable<[Friend]>([]))
+    init(disposeBag: DisposeBag) {
+        self.friendModel = FriendModel(pageIndex: 0, disposeBag: disposeBag, models: Variable<[User]>([]))
         //Rx
         self.outputs.sections = self.friendModel.models.asObservable()
             .map{ models in
@@ -50,7 +49,7 @@ public class FriendViewModel {
                 if full {//头部刷新
                     self.outputs.refreshStateObserver.value = .endFooterRefresh
                     //初始化
-                    self.friendModel.pageIndex = 0
+                    self.friendModel.pageIndex = 1
                     //拉取数据
                     self.service.getFriend(id: 0, pageIndex: self.friendModel.pageIndex)
                         .subscribe(onNext: { response in
@@ -106,7 +105,7 @@ public struct FriendSectionModel {
 }
 
 extension FriendSectionModel: SectionModelType {
-    public typealias item = Friend
+    public typealias item = User
     
     public init(original: FriendSectionModel, items: [FriendSectionModel.item]) {
         self = original
@@ -124,7 +123,6 @@ public struct FriendDynamicViewModelOutput {
 public class FriendDynamicViewModel {
     fileprivate struct FriendDynamicModel {
         var pageIndex: Int
-        var section: Auth
         var disposeBag: DisposeBag
         var models: Variable<[Dynamic]>
     }
@@ -140,8 +138,8 @@ public class FriendDynamicViewModel {
         return FriendDynamicViewModelOutput(sections: nil, refreshStateObserver: Variable<RefreshStatus>(.none))
     }()
     
-    init(disposeBag: DisposeBag, section: Auth) {
-        self.dynamicModel = FriendDynamicModel(pageIndex: 0, section: section, disposeBag: disposeBag, models: Variable<[Dynamic]>([]))
+    init(disposeBag: DisposeBag) {
+        self.dynamicModel = FriendDynamicModel(pageIndex: 0, disposeBag: disposeBag, models: Variable<[Dynamic]>([]))
         //Rx
         self.outputs.sections = self.dynamicModel.models.asObservable()
             .map{ models in
@@ -153,9 +151,9 @@ public class FriendDynamicViewModel {
                 if full {//头部刷新
                     self.outputs.refreshStateObserver.value = .endFooterRefresh
                     //初始化
-                    self.dynamicModel.pageIndex = 0
+                    self.dynamicModel.pageIndex = 1
                     //拉取数据
-                    self.service.getDynamic(id: 0, pageIndex: self.dynamicModel.pageIndex)
+                    self.service.trend(self.dynamicModel.pageIndex)
                         .subscribe(onNext: { response in
                             let data = response.0
                             let result = response.1
@@ -176,7 +174,7 @@ public class FriendDynamicViewModel {
                 } else {//加载更多
                     self.dynamicModel.pageIndex += 1
                     //拉取数据
-                    self.service.getDynamic(id: 0, pageIndex: self.dynamicModel.pageIndex)
+                    self.service.trend(self.dynamicModel.pageIndex)
                         .subscribe(onNext: { response in
                             let data = response.0
                             let result = response.1

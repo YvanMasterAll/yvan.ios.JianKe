@@ -62,25 +62,19 @@ class DebateDetailViewModel {
                 if full {//头部刷新
                     self.answerY.refreshStateObserver.value = .endFooterRefresh
                     //初始化
-                    self.answerY.pageIndex = 0
+                    self.answerY.pageIndex = 1
                     //拉取数据
                     self.service.getAnswer(id: self.section.id!, pageIndex: self.answerY.pageIndex, side: .SY)
                         .subscribe(onNext: { response in
                             let data = response.0
-                            let result = response.1
+                            //let result = response.1
                             if data.count > 0 {
                                 self.answerY.models.value.removeAll()
                                 self.answerY.models.value = data
                                 //结束刷新
                                 self.answerY.refreshStateObserver.value = .endHeaderRefresh
                             } else {
-                                switch result {
-                                case .failed:
-                                    //请求错误
-                                    self.answerY.refreshStateObserver.value = .noData
-                                default:
-                                    break
-                                }
+                                self.answerY.refreshStateObserver.value = .noData
                             }
                         })
                         .disposed(by: self.answerY.disposeBag)
@@ -90,7 +84,7 @@ class DebateDetailViewModel {
                     self.service.getAnswer(id: self.section.id!, pageIndex: self.answerY.pageIndex, side: .SY)
                         .subscribe(onNext: { response in
                             let data = response.0
-                            // let result = response.1
+                            //let result = response.1
                             if data.count > 0 {
                                 self.answerY.models.value += data
                                 //结束刷新
@@ -108,7 +102,7 @@ class DebateDetailViewModel {
             .subscribe(onNext: { state in
                 switch state {
                 case .noData:
-                    self.outputsY.emptyStateObserver.value = .empty
+                    self.outputsY.emptyStateObserver.value = .empty(size: nil)
                     break
                 case .beginHeaderRefresh:
                     break
@@ -142,25 +136,20 @@ class DebateDetailViewModel {
                 if full {//头部刷新
                     self.answerS.refreshStateObserver.value = .endFooterRefresh
                     //初始化
-                    self.answerS.pageIndex = 0
+                    self.answerS.pageIndex = 1
                     //拉取数据
-                    self.service.getAnswer(id: self.section.id!, pageIndex: self.answerS.pageIndex, side: .SY)
+                    self.service.getAnswer(id: self.section.id!, pageIndex: self.answerS.pageIndex, side: .ST)
                         .subscribe(onNext: { response in
                             let data = response.0
-                            let result = response.1
+//                            let result = response.1
                             if data.count > 0 {
                                 self.answerS.models.value.removeAll()
                                 self.answerS.models.value = data
                                 //结束刷新
                                 self.answerS.refreshStateObserver.value = .endHeaderRefresh
                             } else {
-                                switch result {
-                                case .failed:
-                                    //没有数据
-                                    self.answerS.refreshStateObserver.value = .noData
-                                default:
-                                    break
-                                }
+                                //没有数据
+                                self.answerS.refreshStateObserver.value = .noData
                             }
                         })
                         .disposed(by: self.answerS.disposeBag)
@@ -188,7 +177,7 @@ class DebateDetailViewModel {
             .subscribe(onNext: { state in
                 switch state {
                 case .noData:
-                    self.outputsS.emptyStateObserver.value = .empty
+                    self.outputsS.emptyStateObserver.value = .empty(size: nil)
                     break
                 case .beginHeaderRefresh:
                     break
@@ -223,4 +212,73 @@ extension DebateDetailSectionModel: SectionModelType {
         self.items = items
     }
 }
+
+public struct DebateDetailViewModelInput2 {
+    var followTap: PublishSubject<Bool>
+    var followCheck: PublishSubject<Void>
+}
+public struct DebateDetailViewModelOutput2 {
+    var followResult: Variable<Result2>
+    var followCheck: Variable<Result2>
+}
+class DebateDetailViewModel2 {
+    fileprivate struct DebateDetaillModel {
+        var disposeBag: DisposeBag
+        var section: Debate
+    }
+    //私有成员
+    fileprivate var detailModel: DebateDetaillModel!
+    fileprivate var service = DebateService.instance
+    //inputs
+    public var inputs: DebateDetailViewModelInput2! = {
+        return DebateDetailViewModelInput2(followTap: PublishSubject(), followCheck: PublishSubject())
+    }()
+    //outputs
+    public var outputs: DebateDetailViewModelOutput2! = {
+        return DebateDetailViewModelOutput2(followResult: Variable<Result2>(.empty), followCheck: Variable<Result2>(.none))
+    }()
+    
+    init(disposeBag: DisposeBag, section: Debate) {
+        //初始化
+        self.detailModel = DebateDetaillModel(disposeBag: disposeBag, section: section)
+        //Rx
+        self.inputs.followCheck.asObserver()
+            .subscribe(onNext: {
+                guard Environment.tokenExists  else {
+                    return
+                }
+                self.service.followCheck(self.detailModel.section.id!).asObservable()
+                    .subscribe(onNext: { result in
+                        self.outputs.followCheck.value = result
+                    })
+                    .disposed(by: self.detailModel.disposeBag)
+            })
+            .disposed(by: self.detailModel.disposeBag)
+        self.inputs.followTap.asObserver()
+            .subscribe(onNext: { add in
+                guard Environment.tokenExists  else {
+                    HUD.flash(.label("请先登录"))
+                    return
+                }
+                HUD.show(.progress)
+                if add {
+                    self.service.followAdd(self.detailModel.section.id!, Toggle.on)
+                        .subscribe(onNext: { result in
+                            HUD.hide()
+                            self.outputs.followResult.value = result
+                        })
+                        .disposed(by: self.detailModel.disposeBag)
+                } else {
+                    self.service.followAdd(self.detailModel.section.id!, Toggle.off)
+                        .subscribe(onNext: { result in
+                            HUD.hide()
+                            self.outputs.followResult.value = result
+                        })
+                        .disposed(by: self.detailModel.disposeBag)
+                }
+            })
+            .disposed(by: self.detailModel.disposeBag)
+    }
+}
+
 

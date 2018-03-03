@@ -41,9 +41,8 @@ public class LoginViewModel: LoginViewModelInput, LoginViewModelOutput, LoginVie
     public var outputs: LoginViewModelOutput { return self }
     
     init() {
-        //服务
+        //服务实例
         let service = UserService.instance
-        
         usernameUsable = username.asDriver(onErrorJustReturn: nil)
             .flatMapLatest { username in
                 return service.validateUsername(username!)

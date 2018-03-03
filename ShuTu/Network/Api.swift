@@ -8,24 +8,10 @@
 
 import Foundation
 import Moya
+import CryptoSwift
 
-//GitHub Provider
-public var GithubProvider = MoyaProvider<GitHubApi>(
-    endpointClosure: githubEndpointClosure,
-    requestClosure: githubRequestClosure,
-    plugins: [NetworkLoggerPlugin(verbose: false, responseDataFormatter: StubResponse.jsonResponseDataFormatter)]
-)
-
-//ZhiHu Provider
-public var ZhihuProvider = MoyaProvider<ZhihuApi>()
-
-//Test Provider
+///Test Provider
 public var ShuTuProvider: MoyaProvider = MoyaProvider<ShuTuApi>()
-public var ShuTuProvider2: MoyaProvider = MoyaProvider<ShuTuApi2>(
-    endpointClosure: shutuEndpointClosure,
-    requestClosure: shutuRequestClosure,
-    plugins: [NetworkLoggerPlugin(verbose: false, responseDataFormatter: StubResponse.jsonResponseDataFormatter)]
-)
 
 //Test Api
 public enum ShuTuApi {
@@ -39,8 +25,8 @@ public enum ShuTuApi {
     case friendDynamic(id: Int, pageIndex: Int)
 }
 public enum AnswerSide: String {
-    case SY = "y"
-    case ST = "s"
+    case SY = "support" //声援
+    case ST = "oppose" //殊途
 }
 extension ShuTuApi: TargetType {
     //The target's base `URL`
@@ -91,26 +77,168 @@ extension ShuTuApi: TargetType {
     }
 }
 
-//Test Api
+///Provider
+public var ShuTuProvider2: MoyaProvider = MoyaProvider<ShuTuApi2>(
+    endpointClosure: shutuEndpointClosure,
+    requestClosure: shutuRequestClosure
+)
+
+///Api
 public enum ShuTuApi2 {
     case login(username: String, password: String)
+    case register(username: String, password: String)
+    case topics(pageIndex: Int)
+    case topicadd(title: String, content: String, urls: [URL])
+    case topicsearch(title: String, pageIndex: Int)
+    case today(pageIndex: Int)
+    case viewpoint(id: Int, pageIndex: Int, side: AnswerSide)
+    case viewpointadd(id: Int, side: AnswerSide, viewpoint: String, urls: [URL])
+    case comments(id: Int, pageIndex: Int, type: CommentType)
+    case commentadd(id: Int, content: String)
+    case commentadd2(id: Int, cmid: Int, content: String) //回复评论
+    case friends(pageIndex: Int)
+    case findtopic
+    case findcollect
+    case findperson
+    case followcheck(type: FollowType, id: Int)
+    case followadd(type: FollowType, id: Int, toggle: Toggle)
+    case attitudecheck(id: Int)
+    case attitudeadd(id: Int, attitude: AttitudeStand, type: AttitudeType, toggle: Toggle)
+    case trend(pageIndex: Int) //关注动态
+    case trend2(pageIndex: Int) //用户动态
+    case vote(id: Int, attitude: AttitudeStand)
+    case collects(pageIndex: Int)
+    case supports(pageIndex: Int)
+    case mefollows(pageIndex: Int)
+    case mefans(pageIndex: Int)
+    case followtopics(pageIndex: Int)
+    case metopics(pageIndex: Int)
+    case meviewpoints(pageIndex: Int)
+    case userinfo
+    
+}
+public enum Toggle: String {
+    case on
+    case off
+}
+public enum TrendType: String {
+    case answer_topic = "回答辩题"
+    case new_answer = "新观点"
+    case new_topic = "新辩题"
+}
+public enum FollowType {
+    case topic
+    case person
+}
+public enum CommentType: String {
+    case viewpoint
+    case comment
+}
+public enum AttitudeStand: String {
+    case support = "support" //声援
+    case oppose = "oppose" //殊途
+    case bravo = "bravo" //同归
+    case neutral = "neutral" //中立
+    case collect = "collect" //收藏
+}
+public enum AttitudeType {
+    case viewpoint
+    case comment
 }
 extension ShuTuApi2: TargetType {
     //The target's base `URL`
     public var baseURL: URL {
-        return URL(string: "http://192.168.1.3:8181/api/v1")!
+        return URL(string: "http://127.0.0.1:8181/api/v1")!
     }
     //The path to be appended to `baseURL` to form the full `URL`.
     public var path: String {
         switch self {
         case .login:
             return "/login"
+        case .today:
+            return "/todays"
+        case .topics:
+            return "/topics"
+        case .topicadd(_, _, _):
+            return "/topic/add"
+        case .topicsearch:
+            return "/topic/search"
+        case .viewpoint(_, _, _):
+            return "/viewpoints"
+        case .viewpointadd(_, _, _, _):
+            return "/viewpoint/add"
+        case .comments(_, _, _):
+            return "/comments"
+        case .commentadd:
+            return "/comment/add"
+        case .commentadd2:
+            return "/comment/add"
+        case .friends(let pageIndex):
+            return "/friendship/\(pageIndex)"
+        case .register:
+            return "/register"
+        case .findtopic:
+            return "/trecommend"
+        case .findcollect:
+            return "/collect"
+        case .findperson:
+            return "/urecommend"
+        case .followcheck(let type, _):
+            switch type {
+            case .topic:
+                return "/topic/isfollowed"
+            case .person:
+                return "/friend/isfollowed"
+            }
+        case .followadd(let type, _, _):
+            switch type {
+            case .topic:
+                return "/topic/follow"
+            case .person:
+                return "/friend/follow"
+            }
+        case .attitudecheck(_):
+            return "/viewpoint/actcheck"
+        case .attitudeadd(_, _, let type, _):
+            switch type {
+            case .viewpoint:
+                return "/viewpoint/act"
+            case .comment:
+                return "/comment/act"
+            }
+        case .trend:
+            return "/trend"
+        case .trend2:
+            return "/trend2"
+        case .vote:
+            return "/tcvote"
+        case .collects:
+            return "/home/collects"
+        case .supports:
+            return "/home/supports"
+        case .mefollows:
+            return "/home/follows"
+        case .mefans:
+            return "/home/fans"
+        case .followtopics:
+            return "/home/followTopics"
+        case .metopics:
+            return "/home/topics"
+        case .meviewpoints:
+            return "/home/viewpoints"
+        case .userinfo:
+            return "/home/getUserInfo"
         }
     }
     //The HTTP method used in the request.
     public var method: Moya.Method {
         print("request(for: \(self.path))")
-        return .post
+        switch self {
+        case .login, .register, .viewpointadd, .followadd, .attitudecheck, .attitudeadd, .commentadd, .commentadd2, .topicadd, .vote:
+            return .post
+        default:
+            return .get
+        }
     }
     //The headers to be incoded in the request.
     public var headers: [String : String]? {
@@ -123,8 +251,69 @@ extension ShuTuApi2: TargetType {
     //The type of HTTP task to be performed.
     public var task: Task {
         switch self {
-        case .login(let username, let password):
-            return .requestParameters(parameters: ["username": username, "password": password], encoding: URLEncoding.default)
+        case .login(let username, let password), .register(let username, let password):
+            return .requestParameters(parameters: ["username": username, "password": password.sha1()], encoding: URLEncoding.default)
+        case .today(let pageIndex), .topics(let pageIndex):
+            return .requestParameters(parameters: ["page": pageIndex], encoding: URLEncoding.default)
+        case .topicsearch(let title, let pageIndex):
+            return .requestParameters(parameters: ["text": title, "page": pageIndex], encoding: URLEncoding.default)
+        case .viewpoint(let id, let pageIndex, let side):
+            return .requestParameters(parameters: ["topicid": id, "page": pageIndex, "stand": side.rawValue], encoding: URLEncoding.default)
+        case .comments(let id, let pageIndex, let type):
+            return .requestParameters(parameters: ["id": id, "page": pageIndex, "type": type.rawValue], encoding: URLEncoding.default)
+        case .commentadd(let id, let content):
+            return .requestParameters(parameters: ["vpid": id, "content": content, "anonymous": "f"], encoding: URLEncoding.default)
+        case .commentadd2(let id, let cmid, let content):
+            return .requestParameters(parameters: ["vpid": id, "commentid": cmid, "content": content, "anonymous": "f"], encoding: URLEncoding.default)
+        case .followcheck(let type, let id):
+            switch type {
+            case .topic:
+                return .requestParameters(parameters: ["topicid": id], encoding: URLEncoding.default)
+            case .person:
+                return .requestPlain
+            }
+        case .followadd(let type, let id, let toggle):
+            switch type {
+            case .topic:
+                return .requestParameters(parameters: ["topicid": id, "toggle": toggle.rawValue], encoding: URLEncoding.default)
+            case .person:
+                return .requestParameters(parameters: ["userid": id, "toggle": toggle.rawValue], encoding: URLEncoding.default)
+            }
+        case .topicadd(let title, let content, let files):
+            let parameters: [String: Any] = ["title": title, "content": content]
+            if files.count > 0 {
+                var formData: [MultipartFormData] = []
+                for file in files {
+                    formData.append(MultipartFormData.init(provider: .file(file), name: ""))
+                }
+                return .uploadCompositeMultipart(formData, urlParameters: parameters)
+            } else {
+                return .requestParameters(parameters: parameters, encoding: URLEncoding.default)
+            }
+        case .viewpointadd(let id, let side, let viewpoint, let files):
+            let parameters: [String: Any] = ["topicid": id, "content": viewpoint, "stand": side.rawValue, "anonymous": "f"]
+            if files.count > 0 {
+                var formData: [MultipartFormData] = []
+                for file in files {
+                    formData.append(MultipartFormData.init(provider: .file(file), name: ""))
+                }
+                return .uploadCompositeMultipart(formData, urlParameters: parameters)
+            } else {
+                return .requestParameters(parameters: parameters, encoding: URLEncoding.default)
+            }
+        case .attitudecheck(let id):
+            return .requestParameters(parameters: ["vpid": id], encoding: URLEncoding.default)
+        case .attitudeadd(let id, let attitude, let type, let toggle):
+            switch type {
+            case .viewpoint:
+                return .requestParameters(parameters: ["vpid": id, "act": attitude.rawValue, "toggle": toggle.rawValue], encoding: URLEncoding.default)
+            case .comment:
+                return .requestParameters(parameters: ["cmid": id, "act": attitude.rawValue, "toggle": toggle.rawValue], encoding: URLEncoding.default)
+            }
+        case .trend(let pageIndex), .trend2(let pageIndex), .collects(let pageIndex), .supports(let pageIndex), .mefollows(let pageIndex), .mefans(let pageIndex), .followtopics(let pageIndex), .metopics(let pageIndex), .meviewpoints(let pageIndex):
+            return .requestParameters(parameters: ["page": pageIndex], encoding: URLEncoding.default)
+        case .vote(let id, let attitude):
+            return .requestParameters(parameters: ["topicid": id, "attitude": attitude.rawValue], encoding: URLEncoding.default)
         default:
             return .requestPlain
         }
@@ -138,7 +327,12 @@ let shutuRequestClosure = { (endpoint: Endpoint<ShuTuApi2>, done: MoyaProvider.R
     var request: URLRequest
     do {
         try request = endpoint.urlRequest()
-        
+        request.httpShouldHandleCookies = true
+        if let token = Environment.token {
+            request.setValue("TurnstileSession=\(token);AppVersion=\(AppVersion)", forHTTPHeaderField: "Cookie")
+        } else {
+            request.setValue("AppVersion=\(AppVersion)", forHTTPHeaderField: "Cookie")
+        }
         done(.success(request))
     } catch {
         done(.failure(MoyaError.requestMapping(endpoint.url)))
@@ -146,216 +340,6 @@ let shutuRequestClosure = { (endpoint: Endpoint<ShuTuApi2>, done: MoyaProvider.R
 }
 let shutuEndpointClosure = { (target: ShuTuApi2) -> Endpoint<ShuTuApi2> in
     let defaultEndpoint = MoyaProvider.defaultEndpointMapping(for: target)
-    switch target {
-    case .login:
-        guard Environment.tokenExists else { break }
-        var properties: [HTTPCookiePropertyKey: Any] = [:]
-        properties[.name] = "TurnstileSession"
-        properties[.path] = "/"
-        properties[.value] = Environment.token!
-        properties[.domain] = ""
-        properties[.expires] = Date.init(timeIntervalSinceNow: 60*60*24*365)
-        properties[.secure] = false
-        var cookie = HTTPCookie.init(properties: properties)!
-        var properties2: [HTTPCookiePropertyKey: Any] = [:]
-        properties2[.name] = "AppVersion"
-        properties2[.path] = "/"
-        properties2[.value] = AppVersion
-        properties2[.domain] = ""
-        properties2[.expires] = Date.init(timeIntervalSinceNow: 60*60*24*365)
-        properties2[.secure] = false
-        var cookie2 = HTTPCookie.init(properties: properties2)!
-        let url = target.baseURL.appendingPathComponent(target.path)
-        HTTPCookieStorage.shared.setCookies([cookie, cookie2], for: url, mainDocumentURL: nil)
-    default:
-        break
-    }
 
     return defaultEndpoint
 }
-
-//ZhiHu API
-public enum ZhihuApi {
-    case getLaunchImg
-    case getNewsList
-    case getMoreNews(String)
-    case getThemeList
-    case getThemeDesc(Int)
-    case getNewsDesc(Int)
-}
-extension ZhihuApi: TargetType {
-    //The target's base `URL`
-    public var baseURL: URL {
-        return URL(string: "http://news-at.zhihu.com/api")!
-    }
-    //The path to be appended to `baseURL` to form the full `URL`.
-    public var path: String {
-        switch self {
-        case .getLaunchImg:
-            return "7/prefetch-launch-images/750*1142"
-        case .getNewsList:
-            return "4/news/latest"
-        case .getMoreNews(let date):
-            return "4/news/before/\(date)"
-        case .getThemeList:
-            return "4/themes"
-        case .getThemeDesc(let id):
-            return "4/theme/\(id)"
-        case .getNewsDesc(let id):
-            return "4/news/\(id)"
-        }
-    }
-    //The HTTP method used in the request.
-    public var method: Moya.Method {
-        return .get
-    }
-    //The headers to be incoded in the request.
-    public var headers: [String : String]? {
-        return nil
-    }
-    //Provides stub data for use in testing.
-    public var sampleData: Data {
-        return "".data(using: String.Encoding.utf8)!
-    }
-    //The type of HTTP task to be performed.
-    public var task: Task {
-        return .requestPlain
-    }
-    //Whether or not to perform Alamofire validation. Defaults to `false`.
-    public var validate: Bool {
-        return false
-    }
-}
-
-//GitHub API
-public enum GitHubApi {
-    case Token(username: String, password: String)
-    case RepoSearch(query: String, page:Int)
-    case TrendingReposSinceLastWeek(language: String, page:Int)
-    case Repo(fullname: String)
-    case RepoReadMe(fullname: String)
-    case Pulls(fullname: String)
-    case Issues(fullname: String)
-    case Commits(fullname: String)
-    case User
-}
-extension GitHubApi: TargetType {
-    //The target's base `URL`
-    public var baseURL: URL {
-        return URL(string: "https://api.github.com")!
-    }
-    //The path to be appended to `baseURL` to form the full `URL`.
-    public var path: String {
-        switch self {
-        case .Token(_, _):
-            return "/authorizations"
-        case .RepoSearch(_,_),
-             .TrendingReposSinceLastWeek(_,_):
-            return "/search/repositories"
-        case .Repo(let fullname):
-            return "/repos/\(fullname)"
-        case .RepoReadMe(let fullname):
-            return "/repos/\(fullname)/readme"
-        case .Pulls(let fullname):
-            return "/repos/\(fullname)/pulls"
-        case .Issues(let fullname):
-            return "/repos/\(fullname)/issues"
-        case .Commits(let fullname):
-            return "/repos/\(fullname)/commits"
-        case .User:
-            return "/user"
-            
-        }
-    }
-    //The HTTP method used in the request.
-    public var method: Moya.Method {
-        switch self {
-        case .Token(_, _):
-            return .post
-        case .RepoSearch(_),
-             .TrendingReposSinceLastWeek(_,_),
-             .Repo(_),
-             .RepoReadMe(_),
-             .Pulls(_),
-             .Issues(_),
-             .Commits(_),
-             .User:
-            return .get
-        }
-    }
-    //The headers to be incoded in the request.
-    public var headers: [String : String]? {
-        return nil
-    }
-    //Provides stub data for use in testing.
-    public var sampleData: Data {
-        switch self {
-        case   .RepoSearch(_),
-               .TrendingReposSinceLastWeek(_,_):
-            return StubResponse.fromJSONFile()
-        default:
-            return "".data(using: String.Encoding.utf8)!
-        }
-    }
-    //The type of HTTP task to be performed.
-    public var task: Task {
-        switch self {
-        case .Token(_, _):
-            return .requestParameters(parameters: [
-                "scopes": ["public_repo", "user"],
-                "note": "(\(NSDate()))"
-                ], encoding: JSONEncoding.default)
-        case .Repo(_),
-             .RepoReadMe(_),
-             .User,
-             .Pulls,
-             .Issues,
-             .Commits:
-            return .requestPlain
-        case .RepoSearch(let query,let page):
-            return .requestParameters(parameters: [
-                "q": query.urlEscaped, "page":page
-                ], encoding: URLEncoding.default)
-        case .TrendingReposSinceLastWeek(let language,let page):
-            let lastWeek = Calendar.current.date(byAdding: .weekOfYear, value: -1, to: Date())
-            let formatter = DateFormatter()
-            formatter.dateFormat = "yyyy-MM-dd"
-            return .requestParameters(parameters: [
-                "q" :"language:\(language) " + "created:>" + formatter.string(from: lastWeek!), "sort" : "stars", "order" : "desc", "page":page
-                ], encoding: URLEncoding.default)
-        }
-    }
-    //Whether or not to perform Alamofire validation. Defaults to `false`.
-    public var validate: Bool {
-        return false
-    }
-}
-let githubRequestClosure = { (endpoint: Endpoint<GitHubApi>, done: MoyaProvider.RequestResultClosure) in
-    var request: URLRequest
-    do {
-        try request = endpoint.urlRequest()
-        //request.httpShouldHandleCookies = false
-        
-        done(.success(request))
-    } catch {
-        done(.failure(MoyaError.requestMapping(endpoint.url)))
-    }
-}
-let githubEndpointClosure = { (target: GitHubApi) -> Endpoint<GitHubApi> in
-    let url = target.baseURL.appendingPathComponent(target.path).absoluteString
-    let defaultEndpoint = MoyaProvider.defaultEndpointMapping(for: target)
-    
-    switch target {
-    case .Token(let userString, let passwordString):
-        let credentialData = "\(userString):\(passwordString)".data(using: String.Encoding.utf8)
-        let base64Credentials = credentialData?.base64EncodedString()
-        return defaultEndpoint.adding(newHTTPHeaderFields: ["Authorization": "Basic \(base64Credentials!)"])
-    default:
-        if !Environment.tokenExists {
-            return defaultEndpoint
-        }
-        
-        return defaultEndpoint.adding(newHTTPHeaderFields: ["Authorization": "token \(Environment.token!)"])
-    }
-}
-

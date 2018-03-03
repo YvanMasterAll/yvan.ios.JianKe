@@ -34,8 +34,8 @@
                                                         <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="3Ab-rp-E9F">
                                                             <rect key="frame" x="137.5" y="0.0" width="100" height="60"/>
                                                             <subviews>
-                                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="255" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="hUX-lr-P2o">
-                                                                    <rect key="frame" x="36.5" y="8" width="27" height="18"/>
+                                                                <label opaque="NO" userInteractionEnabled="NO" tag="10002" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="88" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="hUX-lr-P2o">
+                                                                    <rect key="frame" x="40.5" y="8" width="19" height="18"/>
                                                                     <fontDescription key="fontDescription" type="system" pointSize="15"/>
                                                                     <color key="textColor" red="0.12941176469999999" green="0.12941176469999999" blue="0.12941176469999999" alpha="1" colorSpace="calibratedRGB"/>
                                                                     <nil key="highlightedColor"/>
@@ -81,13 +81,13 @@
                                                         <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="vBa-rE-7at">
                                                             <rect key="frame" x="37.5" y="0.0" width="100" height="60"/>
                                                             <subviews>
-                                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="12" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Coj-ce-e7Q">
-                                                                    <rect key="frame" x="41.5" y="8" width="16" height="18"/>
+                                                                <label opaque="NO" userInteractionEnabled="NO" tag="10001" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="88" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Coj-ce-e7Q">
+                                                                    <rect key="frame" x="40" y="8" width="19" height="18"/>
                                                                     <fontDescription key="fontDescription" type="system" pointSize="15"/>
                                                                     <color key="textColor" red="0.12941176469999999" green="0.12941176469999999" blue="0.12941176469999999" alpha="1" colorSpace="calibratedRGB"/>
                                                                     <nil key="highlightedColor"/>
                                                                 </label>
-                                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="参与话题" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="2jz-AW-tQH">
+                                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="关注话题" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="2jz-AW-tQH">
                                                                     <rect key="frame" x="29.5" y="34" width="41" height="12"/>
                                                                     <fontDescription key="fontDescription" type="system" pointSize="10"/>
                                                                     <color key="textColor" red="0.45882352939999999" green="0.45882352939999999" blue="0.45882352939999999" alpha="1" colorSpace="calibratedRGB"/>
@@ -106,8 +106,8 @@
                                                         <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="nST-jm-28e">
                                                             <rect key="frame" x="237.5" y="0.0" width="100" height="60"/>
                                                             <subviews>
-                                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="12" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Uam-3y-hF5">
-                                                                    <rect key="frame" x="42" y="8" width="16" height="18"/>
+                                                                <label opaque="NO" userInteractionEnabled="NO" tag="10003" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="88" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Uam-3y-hF5">
+                                                                    <rect key="frame" x="40.5" y="8" width="19" height="18"/>
                                                                     <fontDescription key="fontDescription" type="system" pointSize="15"/>
                                                                     <color key="textColor" red="0.12941176469999999" green="0.12941176469999999" blue="0.12941176469999999" alpha="1" colorSpace="calibratedRGB"/>
                                                                     <nil key="highlightedColor"/>
@@ -253,6 +253,9 @@
                     </view>
                     <navigationItem key="navigationItem" id="hLt-gk-c4p"/>
                     <connections>
+                        <outlet property="fans" destination="nST-jm-28e" id="68l-kM-764"/>
+                        <outlet property="followPerson" destination="3Ab-rp-E9F" id="4Ra-GQ-dj5"/>
+                        <outlet property="followTopic" destination="vBa-rE-7at" id="4Nw-vl-EbR"/>
                         <outlet property="headerView" destination="KHc-gW-2QM" id="WK9-Ig-dCe"/>
                         <outlet property="tableView" destination="haO-Jp-mlW" id="EcB-Sf-bmj"/>
                         <outlet property="tableViewHeader" destination="bTH-dG-XeY" id="fhW-4t-Z4z"/>
@@ -653,6 +656,36 @@
                 <placeholder placeholderIdentifier="IBFirstResponder" id="R2f-sr-rVd" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="2549.5999999999999" y="122.78860569715144"/>
+        </scene>
+        <!--Me Join View Controller-->
+        <scene sceneID="bxj-bH-kow">
+            <objects>
+                <viewController storyboardIdentifier="MeJoin" id="mnj-5G-ISC" customClass="MeJoinViewController" customModule="ShuTu" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="FYQ-iv-9jz">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="b7I-4B-iWF">
+                                <rect key="frame" x="0.0" y="20" width="375" height="647"/>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                            </tableView>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <constraints>
+                            <constraint firstItem="b7I-4B-iWF" firstAttribute="leading" secondItem="FYQ-iv-9jz" secondAttribute="leading" id="266-8y-9pM"/>
+                            <constraint firstItem="b7I-4B-iWF" firstAttribute="top" secondItem="Fcw-Qt-3QP" secondAttribute="top" id="Irk-zg-8Rx"/>
+                            <constraint firstItem="Fcw-Qt-3QP" firstAttribute="trailing" secondItem="b7I-4B-iWF" secondAttribute="trailing" id="RLI-IX-9sj"/>
+                            <constraint firstItem="Fcw-Qt-3QP" firstAttribute="bottom" secondItem="b7I-4B-iWF" secondAttribute="bottom" id="fL3-ZF-bGR"/>
+                        </constraints>
+                        <viewLayoutGuide key="safeArea" id="Fcw-Qt-3QP"/>
+                    </view>
+                    <connections>
+                        <outlet property="tableView" destination="b7I-4B-iWF" id="b2I-H5-DQn"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="eeh-nN-1eE" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="3263" y="123"/>
         </scene>
         <!--Navigation Controller-->
         <scene sceneID="Z4Z-Ue-LIJ">

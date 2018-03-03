@@ -275,7 +275,7 @@
                     <navigationItem key="navigationItem" id="yEq-ic-SxX"/>
                     <connections>
                         <outlet property="collectionView" destination="geI-eZ-xS6" id="32D-wA-HMH"/>
-                        <outlet property="collectionViewHeightConstraint" destination="nhA-GA-Noz" id="yf4-ig-MUB"/>
+                        <outlet property="collectionViewHeightConstraint" destination="nhA-GA-Noz" id="h5h-aV-D6j"/>
                         <outlet property="pagerView1" destination="wDH-wN-laJ" id="QYi-YJ-oy3"/>
                         <outlet property="pagerView2" destination="WRs-Tq-3lW" id="TD5-wt-LeB"/>
                         <outlet property="pin1" destination="kA5-xZ-wnN" id="WPf-ek-6C9"/>

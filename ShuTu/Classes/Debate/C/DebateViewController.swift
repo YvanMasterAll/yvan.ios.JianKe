@@ -12,7 +12,7 @@ import RxSwift
 import RxDataSources
 import Kingfisher
 
-class DebateViewController: UIViewController {
+class DebateViewController: BaseViewController {
 
     @IBOutlet weak var searchView: UIView! {
         didSet {
@@ -52,7 +52,6 @@ class DebateViewController: UIViewController {
     fileprivate let disposeBag = DisposeBag()
     fileprivate var viewModel: DebateViewModel!
     fileprivate var dataSource: RxTableViewSectionedReloadDataSource<DebateSectionModel>!
-    fileprivate var emptyView: EmptyView!
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -60,30 +59,10 @@ class DebateViewController: UIViewController {
         
         setupUI()
         bindRx()
-        
-        //测试
-        let alertBox = TestAlertBox.init()
-        let alertModal = AlertModal.init(alertBox: alertBox)
-        alertModal.show(.fade)
-    }
-
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        
-        //隐藏导航栏
-        self.navigationItem.backBarButtonItem = UIBarButtonItem.init(title: "", style: .plain, target: self, action: nil)
-        self.navigationController?.setNavigationBarHidden(true, animated: false)
-        //阴影
-        GeneralFactory.generateRectShadow(layer: self.searchBar.layer, rect: CGRect.init(x: 0, y: self.searchBar.frame.height, width: SW, height: 0.5), color: GMColor.grey800Color().cgColor)
-        self.view.bringSubview(toFront: self.searchBar)
-    }
-
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
     }
     
-    deinit {
-        print("deinit: \(type(of: self))")
+    override func reload() {
+        self.tableView.switchRefreshHeader(to: .refreshing)
     }
 
 }
@@ -91,16 +70,14 @@ class DebateViewController: UIViewController {
 extension DebateViewController {
     //初始化
     fileprivate func setupUI() {
-        //EmptyView
-        self.emptyView = EmptyView(target: self.view)
         //TableView
         self.tableView.tableFooterView = UIView() //消除底部视图
         self.tableView.separatorStyle = .none //消除分割线
         self.tableView.showsVerticalScrollIndicator = false
         self.tableView.showsHorizontalScrollIndicator = false
         //PullToRefreshKit
-        let firstHeader = FirstRefreshHeader()
-        self.tableView.configRefreshHeader(with: firstHeader, action: {
+        let thirdHeader = ThirdRefreshHeader()
+        self.tableView.configRefreshHeader(with: thirdHeader, action: {
             self.viewModel.inputs.refreshNewData.onNext(true)
         })
         self.tableView.configRefreshFooter(with: FirstRefreshFooter(), action: {
@@ -110,11 +87,14 @@ extension DebateViewController {
         let tapGes = UITapGestureRecognizer.init(target: self, action: #selector(self.gotoAddDebate))
         self.addDebate.addGestureRecognizer(tapGes)
         self.addDebate.isUserInteractionEnabled = true
+        //阴影
+        GeneralFactory.generateRectShadow(layer: self.searchBar.layer, rect: CGRect.init(x: 0, y: self.searchBar.frame.height, width: SW, height: 0.5), color: GMColor.grey800Color().cgColor)
+        self.view.bringSubview(toFront: self.searchBar)
     }
     //绑定 Rx
     fileprivate func bindRx() {
         //ViewModel
-        viewModel =  DebateViewModel(disposeBag: self.disposeBag, tableView: self.tableView, emptyView: emptyView, pagerView: pagerView)
+        viewModel =  DebateViewModel(disposeBag: self.disposeBag, tableView: self.tableView, pagerView: pagerView)
         //TableView
         tableView.rx.setDelegate(self)
             .disposed(by: disposeBag)
@@ -122,8 +102,8 @@ extension DebateViewController {
             configureCell: { ds, tv, ip, item in
                 let cell = tv.dequeueReusableCell(withIdentifier: "cell", for: ip) as! DebateTableViewCell
                 cell.title.text = item.title
-                cell.desc.text = item.desc
-                cell.thumbnail.kf.setImage(with: URL(string: item.thumbnail!))
+                cell.desc.text = item.puredesc
+                cell.thumbnail.kf.setImage(with: URL(string: item.portrait!))
                 //计算 desc label 高度
                 cell.setupConstraint()
                 return cell
@@ -131,30 +111,52 @@ extension DebateViewController {
         )
         self.tableView.rx
             .modelSelected(Debate.self)
-            .subscribe(onNext: { data in
+            .subscribe(onNext: { [weak self] data in
                 //跳转至详情
-                let debateStoryBoard = UIStoryboard(name: "Debate", bundle: nil)
-                let debateDetailVC = debateStoryBoard.instantiateViewController(withIdentifier: "DebateDetail") as! DebateDetailViewController
+                let debateDetailVC = GeneralFactory.getVCfromSb("Debate", "DebateDetail") as! DebateDetailViewController
                 debateDetailVC.section = data
                 
                 //隐藏 Tabbar
-                self.hidesBottomBarWhenPushed = true
-                self.slideMenuController()?.removeLeftGestures()
-                self.navigationController?.pushViewController(debateDetailVC, animated: true)
-                self.slideMenuController()?.addLeftGestures()
-                self.hidesBottomBarWhenPushed = false
+                self?.hidesBottomBarWhenPushed = true
+                self?.slideMenuController()?.removeLeftGestures()
+                self?.navigationController?.pushViewController(debateDetailVC, animated: true)
+                self?.slideMenuController()?.addLeftGestures()
+                self?.hidesBottomBarWhenPushed = false
             })
             .disposed(by: disposeBag)
         viewModel.outputs.sections.asDriver()
             .drive(tableView.rx.items(dataSource: dataSource))
+            .disposed(by: disposeBag)
+        viewModel.refreshStateObserver.asObservable()
+            .subscribe(onNext: { state in
+                switch state {
+                case .noData:
+                    self.showBaseEmptyView()
+                    break
+                case .beginHeaderRefresh:
+                    break
+                case .endHeaderRefresh:
+                    self.tableView.switchRefreshHeader(to: .normal(.success, 0))
+                    break
+                case .beginFooterRefresh:
+                    break
+                case .endFooterRefresh:
+                    self.tableView.switchRefreshFooter(to: .normal)
+                    break
+                case .endRefreshWithoutData:
+                    self.tableView.switchRefreshFooter(to: .noMoreData)
+                    break
+                default:
+                    break
+                }
+            })
             .disposed(by: disposeBag)
         //刷新
         self.tableView.switchRefreshHeader(to: .refreshing)
     }
     //跳转到添加辩题页
     @objc fileprivate func gotoAddDebate() {
-        let debateStoryBoard = UIStoryboard(name: "Debate", bundle: nil)
-        let debateAddNewVC = debateStoryBoard.instantiateViewController(withIdentifier: "DebateAddNew") as! DebateAddNewViewController
+        let debateAddNewVC = GeneralFactory.getVCfromSb("Debate", "DebateAddNew") as! DebateAddNewViewController
         
         //隐藏 Tabbar
         self.hidesBottomBarWhenPushed = true
@@ -163,8 +165,7 @@ extension DebateViewController {
     }
     //跳转到搜索页
     @objc fileprivate func gotoSearchPage() {
-        let debateStoryBoard = UIStoryboard(name: "Debate", bundle: nil)
-        let debateSearchVC = debateStoryBoard.instantiateViewController(withIdentifier: "DebateSearch") as! DebateSearchViewController
+        let debateSearchVC = GeneralFactory.getVCfromSb("Debate", "DebateSearch") as! DebateSearchViewController
         
         //隐藏 Tabbar
         self.hidesBottomBarWhenPushed = true

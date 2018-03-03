@@ -89,33 +89,36 @@ extension FriendCollectionViewCell {
         dataSource = RxTableViewSectionedReloadDataSource<FriendSectionModel>(
             configureCell: { ds, tv, ip, item in
                 let cell = tv.dequeueReusableCell(withIdentifier: "friendCell", for: ip) as! FriendTableViewCell
+                cell.thumbnail.kf.setImage(with: URL.init(string: item.portrait!)!)
+                cell.name.text = item.nickname
+                cell.sign.text = item.signature
                 
                 return cell
         })
         self.tableView.rx
-            .modelSelected(Friend.self)
+            .modelSelected(User.self)
             .subscribe(onNext: { data in
                 //跳转
             })
             .disposed(by: disposeBag)
         self.viewModel.outputs.refreshStateObserver.asObservable()
-            .subscribe(onNext: { state in
+            .subscribe(onNext: { [weak self] state in
                 switch state {
                 case .noData:
-                    self.showEmptyView(type: .empty)
+                    self?.showEmptyView(type: .empty(size: nil))
                     break
                 case .beginHeaderRefresh:
                     break
                 case .endHeaderRefresh:
-                    self.tableView.switchRefreshHeader(to: .normal(.success, 0))
+                    self?.tableView.switchRefreshHeader(to: .normal(.success, 0))
                     break
                 case .beginFooterRefresh:
                     break
                 case .endFooterRefresh:
-                    self.tableView.switchRefreshFooter(to: .normal)
+                    self?.tableView.switchRefreshFooter(to: .normal)
                     break
                 case .endRefreshWithoutData:
-                    self.tableView.switchRefreshFooter(to: .noMoreData)
+                    self?.tableView.switchRefreshFooter(to: .noMoreData)
                     break
                 default:
                     break

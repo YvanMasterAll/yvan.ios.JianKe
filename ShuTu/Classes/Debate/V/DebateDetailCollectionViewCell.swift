@@ -15,7 +15,7 @@ class DebateDetailCollectionViewCell: FSPagerViewCell {
 
     @IBOutlet weak var tableView: UITableView! {
         didSet {
-            self.tableView.register(UINib(nibName: "DebateDetailAnswerTableViewCell", bundle: nil), forCellReuseIdentifier: "answerCell")
+            self.tableView.register(UINib(nibName: "DebateAnswerTableViewCell", bundle: nil), forCellReuseIdentifier: "answerCell")
             self.tableView.showsVerticalScrollIndicator = false
         }
     }
@@ -89,11 +89,11 @@ extension DebateDetailCollectionViewCell {
             .disposed(by: disposeBag)
         dataSource = RxTableViewSectionedReloadDataSource<DebateDetailSectionModel>(
             configureCell: { ds, tv, ip, item in
-                let cell = tv.dequeueReusableCell(withIdentifier: "answerCell", for: ip) as! DebateDetailAnswerTableViewCell
-                cell.thumbnail.kf.setImage(with: URL(string: item.thumbnail!))
-                cell.name.text = item.username
-                cell.answer.text = item.answer
-                cell.score.text = "\(item.ac ?? 0 ) 赞同 · \(item.cc ?? 0) 评论"
+                let cell = tv.dequeueReusableCell(withIdentifier: "answerCell", for: ip) as! DebateAnswerTableViewCell
+                cell.thumbnail.kf.setImage(with: URL(string: item.portrait!))
+                cell.name.text = item.nickname
+                cell.answer.text = item.pureanswer
+                cell.score.text = "\(item.supports ?? 0 ) 赞同 · \(item.comments ?? 0) 评论"
                 //计算 answer label 高度
                 cell.setupConstraint()
                 
@@ -102,10 +102,9 @@ extension DebateDetailCollectionViewCell {
         )
         self.tableView.rx
             .modelSelected(Answer.self)
-            .subscribe(onNext: { data in
+            .subscribe(onNext: { [unowned self] data in
                 //跳转至详情
-                let debateStoryBoard = UIStoryboard(name: "Debate", bundle: nil)
-                let debateAnswerVC = debateStoryBoard.instantiateViewController(withIdentifier: "DebateAnswerDetail") as! DebateAnswerDetailViewController
+                let debateAnswerVC = GeneralFactory.getVCfromSb("Debate", "DebateAnswerDetail") as! DebateAnswerDetailViewController
                 debateAnswerVC.section = data
                 debateAnswerVC.section.title = self.section.title
                 
@@ -120,10 +119,10 @@ extension DebateDetailCollectionViewCell {
                 .drive(tableView.rx.items(dataSource: dataSource))
                 .disposed(by: disposeBag)
             self.viewModel.outputsY.emptyStateObserver.asObservable()
-                .subscribe(onNext: { state in
+                .subscribe(onNext: { [weak self] state in
                     switch state {
                     case .empty:
-                        self.showEmptyView(type: .empty)
+                        self?.showEmptyView(type: .empty(size: nil))
                         break
                     default:
                         break
@@ -137,10 +136,10 @@ extension DebateDetailCollectionViewCell {
                 .drive(tableView.rx.items(dataSource: dataSource))
                 .disposed(by: disposeBag)
             self.viewModel.outputsS.emptyStateObserver.asObservable()
-                .subscribe(onNext: { state in
+                .subscribe(onNext: { [weak self] state in
                     switch state {
                     case .empty:
-                        self.showEmptyView(type: .empty)
+                        self?.showEmptyView(type: .empty(size: nil))
                         break
                     default:
                         break
@@ -158,7 +157,9 @@ extension DebateDetailCollectionViewCell {
     fileprivate func showEmptyView(type: EmptyViewType) {
         self.tableView.switchRefreshHeader(to: .normal(.none, 0))
         tableView.isHidden = true
-        self.emptyView.show(type: type, frame: self.tableView.frame)
+        var frame = self.tableView.frame
+        frame.size.height = SH*2/3
+        self.emptyView.show(type: type, frame: frame)
     }
     fileprivate func hideEmptyView() {
         self.emptyView.hide()

@@ -39,25 +39,23 @@ public class DebateViewModel: DebateViewModelInput, DebateViewModelOutput, Debat
     fileprivate let models = Variable<[Debate]>([])
     fileprivate let disposeBag: DisposeBag!
     fileprivate let tableView: UITableView!
-    fileprivate var refreshStateObserver = Variable<RefreshStatus>(.none)
-    fileprivate var emptyView: EmptyView!
     fileprivate var pagerView: FSPagerView!
     //inputs
     public var refreshNewData = PublishSubject<Bool>()
     //outputs
     public var sections: Driver<[DebateSectionModel]>
     public var carsouselData = [DebateImage]()
+    public var refreshStateObserver = Variable<RefreshStatus>(.none)
     //get
     public var inputs: DebateViewModelInput { return self }
     public var outputs: DebateViewModelOutput { return self }
     
-    init(disposeBag: DisposeBag, tableView: UITableView, emptyView: EmptyView, pagerView: FSPagerView) {
+    init(disposeBag: DisposeBag, tableView: UITableView, pagerView: FSPagerView) {
         //服务
         let service = DebateService.instance
         //初始化
         self.disposeBag = disposeBag
         self.tableView = tableView
-        self.emptyView = emptyView
         self.pagerView = pagerView
         //Rx
         sections = models.asObservable()
@@ -70,9 +68,9 @@ public class DebateViewModel: DebateViewModelInput, DebateViewModelOutput, Debat
                 if full {//头部刷新
                     self.refreshStateObserver.value = .endFooterRefresh
                     //初始化
-                    self.pageIndex = 0
+                    self.pageIndex = 1
                     //拉取数据
-                    service.getDebate(pageIndex: self.pageIndex)
+                    service.getTopics(pageIndex: self.pageIndex)
                         .subscribe(onNext: { response in
                             let data = response.0
                             if data.count > 0 {
@@ -98,7 +96,7 @@ public class DebateViewModel: DebateViewModelInput, DebateViewModelOutput, Debat
                 } else {//加载更多
                     self.pageIndex += 1
                     //拉取数据
-                    service.getDebate(pageIndex: self.pageIndex)
+                    service.getTopics(pageIndex: self.pageIndex)
                         .subscribe(onNext: { response in
                             let data = response.0
                             if data.count > 0 {
@@ -114,51 +112,6 @@ public class DebateViewModel: DebateViewModelInput, DebateViewModelOutput, Debat
                 }
             })
             .disposed(by: disposeBag)
-        refreshStateObserver.asObservable()
-            .subscribe(onNext: { state in
-                switch state {
-                case .noData:
-                    self.showEmptyView(type: .empty)
-                    break
-                case .beginHeaderRefresh:
-                    break
-                case .endHeaderRefresh:
-                    self.tableView.switchRefreshHeader(to: .normal(.success, 0))
-                    break
-                case .beginFooterRefresh:
-                    break
-                case .endFooterRefresh:
-                    self.tableView.switchRefreshFooter(to: .normal)
-                    break
-                case .endRefreshWithoutData:
-                    self.tableView.switchRefreshFooter(to: .noMoreData)
-                    break
-                default:
-                    break
-                }
-            })
-            .disposed(by: disposeBag)
-        self.emptyView.delegate = self
-    }
-}
-
-extension DebateViewModel {
-    //显示 & 隐藏 Empty Zone
-    fileprivate func showEmptyView(type: EmptyViewType) {
-        self.tableView.switchRefreshHeader(to: .normal(.none, 0))
-        tableView.isHidden = true
-        self.emptyView.show(type: type, frame: self.tableView.frame)
-    }
-    fileprivate func hideEmptyView() {
-        self.emptyView.hide()
-        tableView.isHidden = false
-        self.tableView.switchRefreshHeader(to: .refreshing)
-    }
-}
-
-extension DebateViewModel: EmptyViewDelegate {
-    func emptyViewClicked() {
-        self.hideEmptyView()
     }
 }
 

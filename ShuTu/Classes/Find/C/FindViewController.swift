@@ -7,8 +7,10 @@
 //
 
 import UIKit
+import RxCocoa
+import RxSwift
 
-class FindViewController: UIViewController {
+class FindViewController: BaseViewController {
 
     @IBOutlet weak var collectionViewHeightConstraint: NSLayoutConstraint!
     @IBOutlet weak var collectionView: UICollectionView! {
@@ -31,10 +33,9 @@ class FindViewController: UIViewController {
             self.pin2.layer.masksToBounds = true
         }
     }
-    
     @IBOutlet weak var pagerView1: FSPagerView! {
         didSet {
-            self.pagerView1.tag = 10001
+            self.pagerView1.tag = 10003
             self.pagerView1.register(UINib(nibName: "FindHotCollectionViewCell", bundle: nil), forCellWithReuseIdentifier: "findHotPagerCell")
             self.pagerView1.itemSize = CGSize.init(width: SW - 40, height: 100)
             self.pagerView1.interitemSpacing = 4
@@ -42,7 +43,7 @@ class FindViewController: UIViewController {
     }
     @IBOutlet weak var pagerView2: FSPagerView! {
         didSet {
-            self.pagerView2.tag = 10002
+            self.pagerView2.tag = 10004
             self.pagerView2.register(UINib(nibName: "FindYetCollectionViewCell", bundle: nil), forCellWithReuseIdentifier: "findYetPagerCell")
             self.pagerView2.itemSize = CGSize.init(width: SW - 40, height: 100)
             self.pagerView2.interitemSpacing = 4
@@ -66,18 +67,21 @@ class FindViewController: UIViewController {
         super.didReceiveMemoryWarning()
     }
     
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        
-        //NavigationBar
-        self.navigationController?.setNavigationBarHidden(true, animated: false)
-        self.navigationItem.backBarButtonItem = UIBarButtonItem.init(title: "", style: .plain, target: self, action: nil)
-        self.navigationController?.navigationBar.barTintColor = GMColor.grey50Color()
-    }
-    
-    deinit {
-        print("deinit: \(type(of: self))")
-    }
+    //私有成员
+    fileprivate var disposeBag = DisposeBag()
+    fileprivate var viewModel: FindViewModel!
+    fileprivate lazy var emptyView1: EmptyView = {
+        return EmptyView.init(target: self.pagerView1)
+    }()
+    fileprivate lazy var emptyView2: EmptyView = {
+        return EmptyView.init(target: self.pagerView2)
+    }()
+    fileprivate lazy var emptyView3: EmptyView = {
+        return EmptyView.init(target: self.collectionView)
+    }()
+    fileprivate var models1: [Debate] = []
+    fileprivate var models2: [DebateCollect] = []
+    fileprivate var models3: [User] = []
 
 }
 
@@ -85,29 +89,101 @@ extension FindViewController {
     //初始化
     fileprivate func setupUI() {
         //CollectionView
-        self.collectionViewHeightConstraint.constant = 62 * 4
+        self.collectionViewHeightConstraint.constant = 62 * 3
     }
     fileprivate func bindRx() {
-        
+        //ViewModel
+        self.viewModel = FindViewModel.init(disposeBag: disposeBag)
+        viewModel.outputs.models1.asObservable()
+            .subscribe(onNext: { [weak self] response in
+                let data = response.0
+                let result = response.1
+                switch result {
+                case .failed:
+                    self?.emptyView1.show(type: .empty2, frame: CGRect.init(origin: CGPoint.init(x: 0, y: 0), size: CGSize.init(width: SW, height: (self?.pagerView1.frame.height)!)))
+                    break
+                case .ok:
+                    self?.models1 = data
+                    self?.emptyView1.hide()
+                    self?.pagerView1.reloadData()
+                    break
+                default:
+                    break
+                }
+            })
+            .disposed(by: disposeBag)
+        viewModel.outputs.models2.asObservable()
+            .subscribe(onNext: { [weak self] response in
+                let data = response.0
+                let result = response.1
+                switch result {
+                case .failed:
+                    guard let _ = self else { return }
+                    self!.emptyView2.show(type: .empty2, frame: CGRect.init(origin: CGPoint.init(x: 0, y: 0), size: CGSize.init(width: SW, height: self!.pagerView2.frame.height)))
+                    break
+                case .ok:
+                    self?.models2 = data
+                    self?.emptyView2.hide()
+                    self?.pagerView2.reloadData()
+                    break
+                default:
+                    break
+                }
+            })
+            .disposed(by: disposeBag)
+        viewModel.outputs.models3.asObservable()
+            .subscribe(onNext: { [weak self] response in
+                let data = response.0
+                let result = response.1
+                switch result {
+                case .failed:
+                    guard let _ = self else { return }
+                    self!.emptyView3.show(type: .empty2, frame: CGRect.init(origin: CGPoint.init(x: 0, y: 0), size: CGSize.init(width: SW, height: self!.collectionView.frame.height)))
+                    break
+                case .ok:
+                    self?.models3 = data
+                    self?.emptyView3.hide()
+                    self?.collectionView.reloadData()
+                    break
+                default:
+                    break
+                }
+            })
+            .disposed(by: disposeBag)
+        //加载数据
+        viewModel.inputs.refreshNewData1.onNext(true)
+        self.emptyView1.show(type: .loading(type: .indicator1), frame: CGRect.init(origin: CGPoint.init(x: 0, y: 0), size: CGSize.init(width: SW, height: self.pagerView1.frame.height)))
+        viewModel.inputs.refreshNewData2.onNext(true)
+        self.emptyView2.show(type: .loading(type: .indicator1), frame: CGRect.init(origin: CGPoint.init(x: 0, y: 0), size: CGSize.init(width: SW, height: self.pagerView2.frame.height)))
+        viewModel.inputs.refreshNewData3.onNext(true)
+        self.emptyView3.show(type: .loading(type: .indicator1), frame: CGRect.init(origin: CGPoint.init(x: 0, y: 0), size: CGSize.init(width: SW, height: self.collectionView.frame.height)))
     }
 }
 
 extension FindViewController: FSPagerViewDelegate, FSPagerViewDataSource, UICollectionViewDelegate, UICollectionViewDataSource {
     //FSPagerView Delegate && DataSource
     public func numberOfItems(in pagerView: FSPagerView) -> Int {
-        if pagerView.tag == 10001 {
-            return 10
+        if pagerView.tag == 10003 {
+            return self.models1.count
         } else {
-            return 10
+            return self.models2.count
         }
     }
     public func pagerView(_ pagerView: FSPagerView, cellForItemAt index: Int) -> FSPagerViewCell {
-        if pagerView.tag == 10001 {
+        if pagerView.tag == 10003 {
             let cell = pagerView.dequeueReusableCell(withReuseIdentifier: "findHotPagerCell", at: index) as! FindHotCollectionViewCell
+            cell.title.text = self.models1[index].title
+            cell.score.text = "\(self.models1[index].supports ?? 0)声援 \(self.models1[index].opposes ?? 0)殊途"
             
             return cell
         } else {
             let cell = pagerView.dequeueReusableCell(withReuseIdentifier: "findYetPagerCell", at: index) as! FindYetCollectionViewCell
+            cell.title.text = self.models2[index].title
+            cell.id = self.models2[index].topicid
+            cell.disposeBag = self.disposeBag
+            if cell.viewModel == nil {
+                cell.viewModel = self.viewModel
+            }
             
             return cell
         }
@@ -127,10 +203,18 @@ extension FindViewController: FSPagerViewDelegate, FSPagerViewDataSource, UIColl
         return 1
     }
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return 4
+        return self.models3.count
     }
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "cell", for: indexPath) as! FindGayCollectionViewCell
+        cell.thumbnail.kf.setImage(with: URL.init(string: self.models3[indexPath.row].portrait!)!)
+        cell.name.text = self.models3[indexPath.row].nickname
+        cell.sign.text = self.models3[indexPath.row].signature
+        cell.id = self.models3[indexPath.row].id
+        cell.disposeBag = self.disposeBag
+        if cell.viewModel == nil {
+            cell.viewModel = self.viewModel
+        }
         
         return cell
     }

@@ -10,15 +10,24 @@ import UIKit
 import RxCocoa
 import RxSwift
 
-class LoginViewController: UIViewController {
+class LoginViewController: BaseViewController {
 
     @IBOutlet weak var usernameTextField: UITextField!
     @IBOutlet weak var passwordTextField: UITextField!
     @IBOutlet weak var loginButton: UIButton!
     
     @IBAction func gotoRegister(_ sender: Any) {
-        let storyBoard = UIStoryboard.init(name: "Login", bundle: nil)
-        let registerVC = storyBoard.instantiateViewController(withIdentifier: "Register")
+        let registerVC = GeneralFactory.getVCfromSb("Login", "Register") as! RegisterViewController
+        registerVC.block = { status in
+            if status == "ok" {
+                //注册成功
+                if self.isPushed {
+                    self.navigationController?.popViewController(animated: true)
+                } else {
+                    self.dismiss(animated: true, completion: nil)
+                }
+            }
+        }
         self.present(registerVC, animated: true, completion: nil)
     }
     @IBAction func goBackAction(_ sender: Any) {
@@ -35,7 +44,7 @@ class LoginViewController: UIViewController {
     }
     
     //声明区域
-    open var isPushed: Bool = false
+    open var isPushed: Bool = false //true, 表示登录页在其它页面被打开
     
     //私有成员
     fileprivate let viewModel = LoginViewModel()
@@ -48,21 +57,11 @@ class LoginViewController: UIViewController {
         setupUI()
         bindRx()
     }
-    
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        
-        //隐藏导航栏
-        self.navigationController?.setNavigationBarHidden(true, animated: false)
-    }
 
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
     }
     
-    deinit {
-        print("deinit: \(type(of: self))")
-    }
 }
 
 extension LoginViewController {
@@ -71,18 +70,6 @@ extension LoginViewController {
         self.loginButton.backgroundColor = ColorPrimary
         applyLoginButton(enabled: false)
     }
-    
-    //登录按钮状态
-    fileprivate func applyLoginButton(enabled: Bool) {
-        self.loginButton.isEnabled = enabled
-        if enabled {
-            self.loginButton.backgroundColor = ColorPrimary
-        } else {
-            self.loginButton.backgroundColor = ColorPrimary.lighterByHSL(amount: 0.3)
-        }
-    }
-    
-    //Rx 绑定
     fileprivate func bindRx() {
         //inputs
         usernameTextField.rx.text.orEmpty
@@ -107,22 +94,36 @@ extension LoginViewController {
             })
             .disposed(by: disposeBag)
         viewModel.outputs.loginResult
-            .drive(onNext: { result in
+            .drive(onNext: { [weak self] result in
                 //关闭等待
                 HUD.hide()
+                guard let _ = self else { return }
                 switch result {
                 case .ok:
-                    if self.isPushed {
-                        self.navigationController?.popViewController(animated: true)
+                    if self!.isPushed {
+                        self?.navigationController?.popViewController(animated: true)
                     } else {
-                        self.dismiss(animated: true, completion: nil)
+                        self!.dismiss(animated: true, completion: nil)
                     }
                 case .empty:
                     break;
                 case let .failed(message):
-                    HUD.flash(HUDContentType.labeledError(title: message, subtitle: nil))
+                    HUD.flash(HUDContentType.label(message))
+                default:
+                    break
                 }
             })
             .disposed(by: disposeBag)
     }
+    
+    //按钮状态变更
+    fileprivate func applyLoginButton(enabled: Bool) {
+        self.loginButton.isEnabled = enabled
+        if enabled {
+            self.loginButton.backgroundColor = ColorPrimary
+        } else {
+            self.loginButton.backgroundColor = ColorPrimary.lighterByHSL(amount: 0.3)
+        }
+    }
+    
 }

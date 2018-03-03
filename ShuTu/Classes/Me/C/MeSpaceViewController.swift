@@ -12,7 +12,7 @@ import RxSwift
 import RxCocoa
 import RxGesture
 
-class MeSpaceViewController: UIViewController {
+class MeSpaceViewController: BaseViewController {
     
     @IBOutlet weak var thumbnail: UIImageView! {
         didSet {
@@ -37,29 +37,14 @@ class MeSpaceViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
+        showNavbar = true
+        hideNavbar = true
+        navBarTitle = ""
         setupUI()
     }
 
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
-    }
-    
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        
-        //显示导航栏
-        self.navigationController?.setNavigationBarHidden(false, animated: false)
-    }
-    
-    override func viewWillDisappear(_ animated: Bool) {
-        super.viewWillDisappear(animated)
-        
-        //隐藏导航栏
-        self.navigationController?.setNavigationBarHidden(true, animated: false)
-    }
-    
-    deinit {
-        print("deinit: \(type(of: self))")
     }
     
     //私有成员

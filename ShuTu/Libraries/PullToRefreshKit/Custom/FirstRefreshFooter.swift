@@ -18,13 +18,13 @@ class FirstRefreshFooter: UIView, RefreshableFooter {
         textlabel.font = UIFont.systemFont(ofSize: 13)
         textlabel.textColor = UIColor.darkGray
         containerView.addSubview(textlabel)
-        containerView.layer.cornerRadius = 4.0;
-        containerView.layer.masksToBounds = true
-        containerView.layer.shadowOffset = CGSize(width: 2.0, height: 2.0)
-        containerView.layer.shadowRadius = 10.0;
-        containerView.layer.shadowColor = UIColor.black.cgColor;
-        containerView.layer.shadowOpacity = 0.20;
-        containerView.layer.addSublayer(shapeLayer)
+//        containerView.layer.cornerRadius = 4.0;
+//        containerView.layer.masksToBounds = true
+//        containerView.layer.shadowOffset = CGSize(width: 2.0, height: 2.0)
+//        containerView.layer.shadowRadius = 10.0;
+//        containerView.layer.shadowColor = UIColor.black.cgColor;
+//        containerView.layer.shadowOpacity = 0.20;
+//        containerView.layer.addSublayer(shapeLayer)
 //        containerView.layer.borderColor = UIColor.black.withAlphaComponent(0.2).cgColor
 //        containerView.layer.borderWidth = 0.5
         setUpCircleLayer()
@@ -70,7 +70,7 @@ class FirstRefreshFooter: UIView, RefreshableFooter {
     }
     
     func didUpdateToNoMoreData() {
-        textlabel.text = "到底了..."
+        textlabel.text = "~到底了~"
         shapeLayer.isHidden = true
         shapeLayer.removeAnimation(forKey: "rotate")
         setNeedsLayout()

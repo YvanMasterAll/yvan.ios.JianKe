@@ -10,7 +10,7 @@ import UIKit
 import RxSwift
 import RxCocoa
 
-class FriendViewController: UIViewController {
+class FriendViewController: BaseViewController {
 
     @IBOutlet weak var segmentControl: UISegmentedControl!
     @IBOutlet weak var pagerView: FSPagerView! {
@@ -24,25 +24,14 @@ class FriendViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        showNavbar = true
+        navBarTitle = "消息"
         setupUI()
         bindRx()
     }
 
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
-    }
-    
-    deinit {
-        print("deinit: \(type(of: self))")
-    }
-    
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        
-        //NavigationBar
-        self.navigationItem.backBarButtonItem = UIBarButtonItem.init(title: "", style: .plain, target: self, action: nil)
-        self.navigationController?.navigationBar.barTintColor = GMColor.grey50Color()
-        //GeneralFactory.generateRectShadow(layer: self.navigationController!.navigationBar.layer, rect: CGRect.init(x: 0, y: self.navigationController!.navigationBar.frame.height, width: SW, height: 0.5), color: GMColor.grey800Color().cgColor)
     }
     
     //私有成员
@@ -60,8 +49,8 @@ extension FriendViewController {
     }
     fileprivate func bindRx() {
         //View Model
-        self.friendViewModel = FriendViewModel(disposeBag: disposeBag, section: Auth())
-        self.dynamicViewModel = FriendDynamicViewModel(disposeBag: disposeBag, section: Auth())
+        self.friendViewModel = FriendViewModel(disposeBag: disposeBag)
+        self.dynamicViewModel = FriendDynamicViewModel(disposeBag: disposeBag)
     }
     //SegmengControl Changed
     @objc fileprivate func segmentControlChanged(sender: UISegmentedControl) {

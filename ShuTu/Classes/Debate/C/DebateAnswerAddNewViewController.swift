@@ -10,9 +10,31 @@ import UIKit
 import PMSuperButton
 import Photos
 import RichEditorView
+import RxCocoa
+import RxSwift
 
-class DebateAnswerAddNewViewController: UIViewController {
+class DebateAnswerAddNewViewController: BaseViewController {
     
+    @IBOutlet weak var stSide: PMSuperButton! {
+        didSet {
+            let imageView = UIImageView.init(image: UIImage.init(icon: .fontAwesome(.check), size: CGSize.init(width: 14, height: 14), textColor: UIColor.white, backgroundColor: UIColor.clear))
+            imageView.frame.origin = CGPoint.init(x: self.stSide.width - 14, y: 0)
+            imageView.tag = 10001
+            imageView.isHidden = true
+            self.stSide.addSubview(imageView)
+            self.stSide.addTarget(self, action: #selector(self.stSideClicked), for: .touchUpInside)
+        }
+    }
+    @IBOutlet weak var sySide: PMSuperButton! {
+        didSet {
+            let imageView = UIImageView.init(image: UIImage.init(icon: .fontAwesome(.check), size: CGSize.init(width: 14, height: 14), textColor: UIColor.white, backgroundColor: UIColor.clear))
+            imageView.frame.origin = CGPoint.init(x: self.sySide.width - 14, y: 0)
+            imageView.tag = 10001
+            imageView.isHidden = true
+            self.sySide.addSubview(imageView)
+            self.sySide.addTarget(self, action: #selector(self.sySideClicked), for: .touchUpInside)
+        }
+    }
     @IBOutlet weak var richEditorView: RichEditorView! {
         didSet {
             self.richEditorView.delegate = self
@@ -20,20 +42,25 @@ class DebateAnswerAddNewViewController: UIViewController {
     }
     @IBOutlet weak var navigationBar: UIView!
     @IBOutlet weak var navigationBarLeftImage: UIImageView!
-    @IBOutlet weak var stepButton: PMSuperButton!
+    @IBOutlet weak var stepButton: PMSuperButton! {
+        didSet {
+            self.enableButton(false)
+            self.stepButton.addTarget(self, action: #selector(self.send), for: .touchUpInside)
+        }
+    }
     @IBOutlet weak var actionView: UIView!
     @IBOutlet weak var actionAddImage: UIImageView!
     @IBOutlet weak var actionAddAt: UIImageView!
-    @IBOutlet weak var actionSet: UIImageView!
     @IBOutlet weak var actionViewBottomConstraint: NSLayoutConstraint!
     
     //声明区
-    open var section: Answer!
+    open var section: Debate!
 
     override func viewDidLoad() {
         super.viewDidLoad()
 
         setupUI()
+        bindRx()
         
         //键盘监听
         NotificationCenter.default.addObserver(self, selector: #selector(keyBoardWillShow(_:)), name:NSNotification.Name.UIKeyboardWillShow, object: nil)
@@ -44,22 +71,14 @@ class DebateAnswerAddNewViewController: UIViewController {
         super.didReceiveMemoryWarning()
     }
     
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        
-        //隐藏导航栏
-        self.navigationController?.setNavigationBarHidden(true, animated: false)
-        //添加 ActionView 的阴影
-        GeneralFactory.generateRectShadow(layer: self.actionView.layer, rect: CGRect(x: 0, y: -1, width: SW, height: 1), color: GMColor.grey800Color().cgColor)
-    }
-    
     deinit {
         //移除通知
         NotificationCenter.default.removeObserver(self)
-        print("deinit: \(type(of: self))")
     }
     
     //私有成员
+    fileprivate var disposeBag = DisposeBag()
+    fileprivate var viewModel: DebateAnswerAddNewViewModel!
     fileprivate var isKeyboardShow: Bool = false
     fileprivate var keyboardHeight: CGFloat = 0
     fileprivate lazy var photoPicker: TLPhotosPickerViewController = {
@@ -78,6 +97,23 @@ class DebateAnswerAddNewViewController: UIViewController {
         return photoPicker
     }()
     fileprivate var selectedAssets = [TLPHAsset]()
+    fileprivate var sy: Bool = true //立场
+    //表情键盘
+    fileprivate lazy var emojiView: EmojiView = {
+        let emojiView = EmojiView.init(frame: CGRect.init(x: 0, y: SH, width: SW, height: 200))
+        emojiView.isHidden = false
+        self.view.addSubview(emojiView)
+        emojiView.snp.makeConstraints{ make in
+            make.left.equalTo(self.view)
+            make.right.equalTo(self.view)
+            make.top.equalTo(self.actionView.snp.bottom)
+            make.height.equalTo(200)
+        }
+        emojiView.delegate = self
+        self.view.bringSubview(toFront: emojiView)
+        
+        return emojiView
+    }()
     
 }
 
@@ -96,10 +132,53 @@ extension DebateAnswerAddNewViewController {
         self.actionAddImage.isUserInteractionEnabled = true
         let addImageTapGes = UITapGestureRecognizer(target: self, action: #selector(self.gotoPhotoPicker))
         self.actionAddImage.addGestureRecognizer(addImageTapGes)
-        self.actionAddAt.setIcon(icon: .fontAwesome(.at), textColor: GMColor.grey600Color(), backgroundColor: UIColor.clear, size: nil)
+        self.actionAddAt.setIcon(icon: .fontAwesome(.smileO), textColor: GMColor.grey600Color(), backgroundColor: UIColor.clear, size: nil)
         self.actionAddAt.isUserInteractionEnabled = true
-        self.actionSet.setIcon(icon: .fontAwesome(.cog), textColor: GMColor.grey600Color(), backgroundColor: UIColor.clear, size: nil)
-        self.actionSet.isUserInteractionEnabled = true
+        let addEmojiTapGes = UITapGestureRecognizer(target: self, action: #selector(self.showEmoji))
+        self.actionAddAt.addGestureRecognizer(addEmojiTapGes)
+        //初始立场
+        self.setSide(true)
+        //阴影
+        GeneralFactory.generateRectShadow(layer: self.actionView.layer, rect: CGRect(x: 0, y: -1, width: SW, height: 1), color: GMColor.grey800Color().cgColor)
+    }
+    fileprivate func bindRx() {
+        //View Model
+        viewModel = DebateAnswerAddNewViewModel.init(disposeBag: self.disposeBag)
+        //Rx
+        viewModel.outputs.sendResult
+            .asObservable()
+            .subscribe(onNext: { result in
+                switch result {
+                case .ok:
+                    HUD.flash(.label("成功添加观点"))
+                    break
+                case .failed:
+                    HUD.flash(.label("添加观点失败"))
+                    break
+                default:
+                    HUD.hide()
+                    break
+                }
+            })
+            .disposed(by: self.disposeBag)
+    }
+    //选择立场
+    @objc fileprivate func sySideClicked() {
+        self.setSide(true)
+    }
+    @objc fileprivate func stSideClicked() {
+        self.setSide(false)
+    }
+    //更新立场
+    fileprivate func setSide(_ sy: Bool) {
+        self.sy = sy
+        if sy {
+            (sySide.viewWithTag(10001) as! UIImageView).isHidden = false
+            (stSide.viewWithTag(10001) as! UIImageView).isHidden = true
+        } else {
+            (sySide.viewWithTag(10001) as! UIImageView).isHidden = true
+            (stSide.viewWithTag(10001) as! UIImageView).isHidden = false
+        }
     }
     //NavigationBarItem Action
     @objc fileprivate func goBack() {
@@ -109,8 +188,19 @@ extension DebateAnswerAddNewViewController {
             dismiss(animated: true, completion: nil)
         }
     }
+    @objc fileprivate func showEmoji() {
+        //取消焦点
+        self.richEditorView.blur()
+        self.emojiView.isHidden = false
+        
+        UIView.animate(withDuration: 0.25, animations: { [weak self] () -> Void in
+            self?.actionViewBottomConstraint.constant = 200
+            self?.view.layoutIfNeeded()
+        })
+    }
     //Keyboard Notification
     @objc fileprivate func keyBoardWillShow(_ notification: Notification) {
+        self.emojiView.isHidden = true
         //获取键盘高度
         let kbInfo = notification.userInfo
         let kbRect = (kbInfo?[UIKeyboardFrameEndUserInfoKey] as! NSValue).cgRectValue
@@ -150,9 +240,27 @@ extension DebateAnswerAddNewViewController {
         self.present(self.photoPicker, animated: true, completion: nil)
         self.hidesBottomBarWhenPushed = false
     }
+    //按钮状态
+    fileprivate func enableButton(_ enable: Bool) {
+        self.stepButton.isEnabled = enable
+        if enable {
+            self.stepButton.setTitleColor(ColorPrimary, for: .normal)
+        } else {
+            self.stepButton.setTitleColor(ColorPrimary.lighter(by: 0.2), for: .normal)
+        }
+    }
+    @objc fileprivate func send() {
+        let side = self.sy ? AnswerSide.SY:AnswerSide.ST
+        HUD.show(.progress)
+        self.viewModel.inputs.sendTap.onNext((self.section.id!, self.richEditorView.contentHTML, side))
+    }
 }
 
-extension DebateAnswerAddNewViewController: TLPhotosPickerViewControllerDelegate, RichEditorDelegate {
+extension DebateAnswerAddNewViewController: TLPhotosPickerViewControllerDelegate, RichEditorDelegate, EmojiViewDelegate {
+    //表情选择事件
+    func emojiClicked(_ imageUrl: String) {
+        self.richEditorView.insertImage(imageUrl, alt: "emoji")
+    }
     //TLPhotosPickerViewControllerDelegate
     func dismissPhotoPicker(withTLPHAssets: [TLPHAsset]) {
         //获取选中图片
@@ -172,9 +280,12 @@ extension DebateAnswerAddNewViewController: TLPhotosPickerViewControllerDelegate
     //RichEditorDelegate
     func richEditorDidLoad(_ editor: RichEditorView) {
         self.richEditorView.setTextColor(GMColor.grey900Color())
-        self.richEditorView.placeholder = "请输入问题描述"
+        self.richEditorView.placeholder = "请输入观点详情"
         self.richEditorView.setFontSize(13)
         self.richEditorView.lineHeight = 15
+    }
+    func richEditor(_ editor: RichEditorView, contentDidChange content: String) {
+        self.enableButton(content.count>10 ? true:false)
     }
     
 }

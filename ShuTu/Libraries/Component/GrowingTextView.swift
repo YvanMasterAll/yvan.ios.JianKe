@@ -8,6 +8,8 @@
 import Foundation
 import UIKit
 
+///可换行输入框
+
 @objc public protocol GrowingTextViewDelegate: UITextViewDelegate {
     @objc optional func textViewDidChangeHeight(_ textView: GrowingTextView, height: CGFloat)
 }

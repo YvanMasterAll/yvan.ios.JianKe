@@ -10,15 +10,19 @@ import Foundation
 import UIKit
 import SnapKit
 import NVActivityIndicatorView
+import Lottie
+
+///为空控件
+///加载时, 空数据, 请求错误
 
 @objc protocol EmptyViewDelegate {
     @objc optional func emptyViewClicked()
-    @objc optional func emptyViewImage() -> String
 }
 
 public enum EmptyViewType {
     case none
-    case empty
+    case empty(size: CGFloat?)
+    case empty2
     case loading(type: EmptyViewLoadingType)
 }
 
@@ -45,7 +49,9 @@ class EmptyView {
 }
 
 extension EmptyView {
-    //显示 & 隐藏
+    ///显示
+    /// - parameter type: 显示类型
+    /// - parameter frame: 显示区域
     func show(type: EmptyViewType, frame: CGRect) {
         setupEmptyViewContent(type: type, frame: frame)
         self.view.isHidden = false
@@ -61,21 +67,25 @@ extension EmptyView {
         self.view.backgroundColor = UIColor.white
         self.view.isHidden = true
     }
-    //渲染
+    //显示
     fileprivate func setupEmptyViewContent(type: EmptyViewType, frame: CGRect) {
-        //清空
+        //清空视图
         for view in self.view.subviews {
             view.removeFromSuperview()
         }
-        //填充 View
+        //填充视图
         self.view.frame = frame
         switch type {
-        case .empty:
-            if let imageName = self.delegate?.emptyViewImage?() {
-                self.imageView = UIImageView(image: UIImage(named: imageName))
+        case .empty(let size):
+            let imageSize = CGSize.init(width: 120, height: 120)
+            self.imageView = UIImageView.init(frame: CGRect.zero)
+            var image = UIImage.init(named: "image_empty")
+            if size != nil {
+                image = image?.reSizeImage(CGSize.init(width: imageSize.width * size!, height: imageSize.height * size!))
             } else {
-                self.imageView = UIImageView(image: UIImage(named: "image_empty"))
+                image = image?.reSizeImage(imageSize)
             }
+            self.imageView.image = image
             self.view.addSubview(self.imageView)
             self.imageView.snp.makeConstraints { make in
                 make.center.equalTo(self.view)
@@ -86,6 +96,13 @@ extension EmptyView {
             self.view.addGestureRecognizer(tapGes)
             
             break
+        case .empty2:
+            let w = self.view.width
+            let h = self.view.height
+            let animateView = LOTAnimationView.init(name: "crying_emoji")
+            animateView.frame = CGRect.init(x: (w - 200)/2, y: (h - 150)/2, width: 200, height: 150)
+            self.view.addSubview(animateView)
+            animateView.play()
         case .loading(let type):
             setupLoading(type: type)
             break
@@ -96,11 +113,7 @@ extension EmptyView {
     fileprivate func setupLoading(type: EmptyViewLoadingType) {
         switch type {
         case .rotate:
-            if let imageName = self.delegate?.emptyViewImage?() {
-                self.imageView = UIImageView(image: UIImage(named: imageName))
-            } else {
-                self.imageView = UIImageView(image: UIImage(named: "loading"))
-            }
+            self.imageView = UIImageView(image: UIImage(named: "loading"))
             self.view.addSubview(self.imageView)
             self.imageView.snp.makeConstraints { make in
                 make.center.equalTo(self.view)

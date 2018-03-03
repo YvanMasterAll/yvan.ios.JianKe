@@ -12,9 +12,11 @@ import RxSwift
 
 public struct DebateAddNewViewModelInput {
     var title: PublishSubject<String>
+    var sendTap: PublishSubject<(String, String)>
 }
 public struct DebateAddNewViewModelOutput {
     var titleUsable: Observable<Bool>?
+     var sendResult: Variable<Result2>
 }
 public class DebateAddNewViewModel {
     fileprivate struct DebateAddNewModel {
@@ -22,11 +24,12 @@ public class DebateAddNewViewModel {
     }
     
     fileprivate let debateAddNew: DebateAddNewModel!
+    fileprivate let service = DebateService.instance
     open var inputs: DebateAddNewViewModelInput! = {
-        return DebateAddNewViewModelInput(title: PublishSubject<String>())
+        return DebateAddNewViewModelInput(title: PublishSubject<String>(), sendTap: PublishSubject<(String, String)>())
     }()
     open var outputs: DebateAddNewViewModelOutput! = {
-        return DebateAddNewViewModelOutput(titleUsable: nil)
+        return DebateAddNewViewModelOutput(titleUsable: nil, sendResult: Variable<Result2>(.none))
     }()
     
     init(disposeBag: DisposeBag) {
@@ -40,6 +43,17 @@ public class DebateAddNewViewModel {
                     return false
                 }
             }
+        self.inputs.sendTap
+            .asObserver()
+            .subscribe(onNext: { (title, content) in
+                self.service.topicAdd(title, content)
+                    .asObservable()
+                    .subscribe(onNext: { result in
+                        self.outputs.sendResult.value = result
+                    })
+                    .disposed(by: self.debateAddNew.disposeBag)
+            })
+            .disposed(by: self.debateAddNew.disposeBag)
     }
 }
 

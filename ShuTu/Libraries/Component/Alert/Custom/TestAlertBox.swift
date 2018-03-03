@@ -8,6 +8,14 @@
 
 import UIKit
 
+/**
+ // AlertBox 测试
+ let alertBox = TestAlertBox.init()
+ let alertModal = AlertModal.init(alertBox: alertBox)
+ alertModal.show(.fade)
+
+ */
+
 class TestAlertBox: AlertBox {
     
     //私有成员

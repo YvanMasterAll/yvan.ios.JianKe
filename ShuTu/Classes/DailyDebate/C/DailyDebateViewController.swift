@@ -10,9 +10,8 @@ import UIKit
 import RxCocoa
 import RxSwift
 import RxDataSources
-import NVActivityIndicatorView
 
-class DailyDebateViewController: UIViewController {
+class DailyDebateViewController: BaseViewController {
     
     @IBOutlet weak var date: UILabel! {
         didSet {
@@ -34,12 +33,16 @@ class DailyDebateViewController: UIViewController {
             self.thumbnail.isUserInteractionEnabled = true
             let tapGes = UITapGestureRecognizer.init(target: self, action: #selector(self.openLeft))
             self.thumbnail.addGestureRecognizer(tapGes)
+            if let t = Environment.protrait {
+                self.thumbnail.kf.setImage(with: URL.init(string: t))
+            }
         }
     }
     
     override func viewDidLoad() {
         super.viewDidLoad()
 
+        showNavbar = false
         setupUI()
         bindRx()
     }
@@ -47,18 +50,6 @@ class DailyDebateViewController: UIViewController {
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         
-    }
-    
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        
-        //隐藏导航栏
-        self.navigationController?.setNavigationBarHidden(true, animated: false)
-        self.navigationItem.backBarButtonItem = UIBarButtonItem.init(title: "", style: .plain, target: self, action: nil)
-    }
-    
-    deinit {
-        print("deinit: \(type(of: self))")
     }
     
     //私有成员
@@ -75,8 +66,8 @@ extension DailyDebateViewController {
         self.emptyView = EmptyView(target: self.view)
         self.emptyView.delegate = self
         //PullToRefreshKit
-        let secondHeader = SecondRefreshHeader()
-        self.tableView.configRefreshHeader(with: secondHeader, action: { [weak self] () -> Void in
+        let thirdHeader = ThirdRefreshHeader()
+        self.tableView.configRefreshHeader(with: thirdHeader, action: { [weak self] () -> Void in
             self?.viewModel.inputs.refreshNewData.onNext(true)
         })
         self.tableView.configRefreshFooter(with: FirstRefreshFooter(), action: { [weak self] () -> Void in
@@ -85,7 +76,7 @@ extension DailyDebateViewController {
     }
     fileprivate func bindRx() {
         //ViewModel
-        viewModel =  DailyDebateViewModel(disposeBag: self.disposeBag, section: Auth.init())
+        viewModel =  DailyDebateViewModel(disposeBag: self.disposeBag)
         //TableView
         tableView.rx.setDelegate(self)
             .disposed(by: disposeBag)
@@ -93,44 +84,58 @@ extension DailyDebateViewController {
             configureCell: { ds, tv, ip, item in
                 let cell = tv.dequeueReusableCell(withIdentifier: "cell", for: ip) as! DailyDebateTableViewCell
                 cell.selectionStyle = .none //取消高亮
+                cell.title.text = item.title
+                if var imageUrl = item.cover_image { //图片地址
+                    imageUrl = (imageUrl as NSString).replacingOccurrences(of: "./", with: "")
+                    imageUrl = (imageUrl as NSString).replacingOccurrences(of: " ", with: "%20")
+                    
+                    if let imageSource = URL.init(string: imageUrl) {
+                        cell.coverImage.kf.setImage(with: imageSource, placeholder: nil, options: nil, progressBlock: nil, completionHandler: { (image, _, _, _) in
+                            if image != nil {
+                                //cell.setImage()
+                            }
+                        })
+                    }
+                }
                 
                 return cell
             })
         self.tableView.rx
             .modelSelected(Debate.self)
-            .subscribe(onNext: { data in
+            .subscribe(onNext: { [weak self] data in
                 //跳转
-                let detailVC = UIStoryboard.init(name: "DailyDebate", bundle: nil).instantiateViewController(withIdentifier: "DailyDebateDetail") as! DailyDebateDetailViewController
+                let detailVC = GeneralFactory.getVCfromSb("DailyDebate", "DailyDebateDetail") as! DailyDebateDetailViewController
                 detailVC.section = data
                 
                 //隐藏 Tabbar
-                self.hidesBottomBarWhenPushed = true
-                self.navigationController?.pushViewController(detailVC, animated: true)
+                self?.hidesBottomBarWhenPushed = true
+                self?.navigationController?.pushViewController(detailVC, animated: true)
                 //显示 Tabbar
-                self.hidesBottomBarWhenPushed = false
+                self?.hidesBottomBarWhenPushed = false
             })
             .disposed(by: disposeBag)
         self.viewModel.outputs.sections?.asDriver()
             .drive(tableView.rx.items(dataSource: dataSource))
             .disposed(by: disposeBag)
         self.viewModel.outputs.refreshStateObserver.asObservable()
-            .subscribe(onNext: { state in
+            .subscribe(onNext: { [weak self] state in
                 switch state {
                 case .noData:
-                    self.showEmptyView(type: .empty)
+                    self?.tableView.switchRefreshHeader(to: .normal(.none, 0))
+                    self?.tableView.switchRefreshFooter(to: FooterRefresherState.removed)
                     break
                 case .beginHeaderRefresh:
                     break
                 case .endHeaderRefresh:
-                    self.tableView.switchRefreshHeader(to: .normal(.success, 0))
+                    self?.tableView.switchRefreshHeader(to: .normal(.success, 0))
                     break
                 case .beginFooterRefresh:
                     break
                 case .endFooterRefresh:
-                    self.tableView.switchRefreshFooter(to: .normal)
+                    self?.tableView.switchRefreshFooter(to: .normal)
                     break
                 case .endRefreshWithoutData:
-                    self.tableView.switchRefreshFooter(to: .noMoreData)
+                    self?.tableView.switchRefreshFooter(to: .noMoreData)
                     break
                 default:
                     break
@@ -153,7 +158,7 @@ extension DailyDebateViewController {
     }
 }
 
-extension DailyDebateViewController: UITableViewDelegate, EmptyViewDelegate {
+extension DailyDebateViewController: UITableViewDelegate {
     //TableViewDelegate
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         //取消cell选中状态
@@ -166,7 +171,7 @@ extension DailyDebateViewController: UITableViewDelegate, EmptyViewDelegate {
         return true
     }
     //EmptyView Delegate
-    func emptyViewClicked() {
+    override func emptyViewClicked() {
         self.hideEmptyView()
     }
 }

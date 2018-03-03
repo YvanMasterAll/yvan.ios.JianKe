@@ -21,7 +21,6 @@ public struct DailyDebateViewModelOutput {
 public class DailyDebateViewModel {
     fileprivate struct DailyDebateModel {
         var pageIndex: Int
-        var section: Auth
         var disposeBag: DisposeBag
         var models: Variable<[Debate]>
     }
@@ -37,8 +36,8 @@ public class DailyDebateViewModel {
         return DailyDebateViewModelOutput(sections: nil, refreshStateObserver: Variable<RefreshStatus>(.none))
     }()
     
-    init(disposeBag: DisposeBag, section: Auth) {
-        self.debateModel = DailyDebateModel(pageIndex: 0, section: section, disposeBag: disposeBag, models: Variable<[Debate]>([]))
+    init(disposeBag: DisposeBag) {
+        self.debateModel = DailyDebateModel(pageIndex: 0, disposeBag: disposeBag, models: Variable<[Debate]>([]))
         //Rx
         self.outputs.sections = self.debateModel.models.asObservable()
             .map{ models in
@@ -50,9 +49,9 @@ public class DailyDebateViewModel {
                 if full {//头部刷新
                     self.outputs.refreshStateObserver.value = .endFooterRefresh
                     //初始化
-                    self.debateModel.pageIndex = 0
+                    self.debateModel.pageIndex = 1
                     //拉取数据
-                    self.service.getDebate(pageIndex: self.debateModel.pageIndex)
+                    self.service.getDailyTopics(pageIndex: self.debateModel.pageIndex)
                         .subscribe(onNext: { response in
                             let data = response.0
                             let result = response.1
@@ -73,7 +72,7 @@ public class DailyDebateViewModel {
                 } else {//加载更多
                     self.debateModel.pageIndex += 1
                     //拉取数据
-                    self.service.getDebate(pageIndex: self.debateModel.pageIndex)
+                    self.service.getDailyTopics(pageIndex: self.debateModel.pageIndex)
                         .subscribe(onNext: { response in
                             let data = response.0
                             let result = response.1

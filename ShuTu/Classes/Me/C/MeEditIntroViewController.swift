@@ -10,7 +10,7 @@ import UIKit
 
 typealias MeEditIntroViewControllerBlock = (_ text: String) -> Void
 
-class MeEditIntroViewController: UIViewController {
+class MeEditIntroViewController: BaseViewController {
 
     @IBOutlet weak var textView: GrowingTextView!
     
@@ -33,10 +33,8 @@ class MeEditIntroViewController: UIViewController {
         
         //显示导航栏
         self.navigationController?.setNavigationBarHidden(false, animated: false)
-    }
-    
-    deinit {
-        print("deinit: \(type(of: self))")
+        self.navigationItem.title = "个人简介"
+        self.navigationItem.rightBarButtonItem = UIBarButtonItem.init(title: "保存", style: .plain, target: self, action: #selector(self.saveIntro))
     }
     
 }
@@ -44,9 +42,6 @@ class MeEditIntroViewController: UIViewController {
 extension MeEditIntroViewController {
     //初始化
     fileprivate func setupUI() {
-        //Navigation
-        self.navigationItem.title = "个人简介"
-        self.navigationItem.rightBarButtonItem = UIBarButtonItem.init(title: "保存", style: .plain, target: self, action: #selector(self.saveIntro))
         //TextView
         self.textView.text = intro
     }

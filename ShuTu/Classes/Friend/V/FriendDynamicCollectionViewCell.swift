@@ -88,27 +88,45 @@ extension FriendDynamicCollectionViewCell {
         dataSource = RxTableViewSectionedReloadDataSource<FriendDynamicSectionModel>(
             configureCell: { ds, tv, ip, item in
                 let cell = tv.dequeueReusableCell(withIdentifier: "dynamicCell", for: ip) as! FriendDynamicTableViewCell
+                if let type = item.category {
+                    switch type {
+                    case TrendType.answer_topic.rawValue:
+                        cell.label1.text = "关注好友动态"
+                        cell.label2.text = item.title
+                        cell.label3.text = "发表了新的观点"
+                    case TrendType.new_topic.rawValue:
+                        cell.label1.text = "关注好友动态"
+                        cell.label2.text = item.title
+                        cell.label3.text = "发表了新的话题"
+                    case TrendType.new_answer.rawValue:
+                        cell.label1.text = "话题动态"
+                        cell.label2.text = item.title
+                        cell.label3.text = "有了新的观点"
+                    default:
+                        break
+                    }
+                }
                 
                 return cell
         })
         self.viewModel.outputs.refreshStateObserver.asObservable()
-            .subscribe(onNext: { state in
+            .subscribe(onNext: { [weak self] state in
                 switch state {
                 case .noData:
-                    self.showEmptyView(type: .empty)
+                    self?.showEmptyView(type: .empty(size: nil))
                     break
                 case .beginHeaderRefresh:
                     break
                 case .endHeaderRefresh:
-                    self.tableView.switchRefreshHeader(to: .normal(.success, 0))
+                    self?.tableView.switchRefreshHeader(to: .normal(.success, 0))
                     break
                 case .beginFooterRefresh:
                     break
                 case .endFooterRefresh:
-                    self.tableView.switchRefreshFooter(to: .normal)
+                    self?.tableView.switchRefreshFooter(to: .normal)
                     break
                 case .endRefreshWithoutData:
-                    self.tableView.switchRefreshFooter(to: .noMoreData)
+                    self?.tableView.switchRefreshFooter(to: .noMoreData)
                     break
                 default:
                     break
@@ -135,8 +153,7 @@ extension FriendDynamicCollectionViewCell {
     //转到私信
     @objc fileprivate func gotoSixin() {
         //跳转至详情
-        let friendStoryBoard = UIStoryboard(name: "Friend", bundle: nil)
-        let friendSixinVC = friendStoryBoard.instantiateViewController(withIdentifier: "FriendSixin") as! FriendSixinViewController
+        let friendSixinVC = GeneralFactory.getVCfromSb("Friend", "FriendSixin") as! FriendSixinViewController
         
         //隐藏 Tabbar
         self.navigationController.hidesBottomBarWhenPushed = true

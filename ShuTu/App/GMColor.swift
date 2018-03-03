@@ -27,10 +27,13 @@ extension UIColor {
         self.init(rgb: rgb, a:1.0)
     }
     
-    //颜色变亮 - 0.0~1.0
+    ///颜色变亮, HSL
+    /// - parameter amount: 深度, 0.0~1.0
     public final func lighterByHSL(amount: CGFloat = 0.2) -> UIColor {
         return HSL(color: self).lighter(amount: amount).toUIColor()
     }
+    ///颜色变亮
+    /// - parameter percentage: 深度, 0.0~1.0
     public final func lighter(by percentage: CGFloat = 0.3) -> UIColor {
         var r: CGFloat = 0, g: CGFloat = 0, b: CGFloat = 0, a: CGFloat = 0
         self.getRed(&r, green: &g, blue: &b, alpha: &a)
@@ -39,10 +42,13 @@ extension UIColor {
                      blue: min(b + percentage, 1.0),
                      alpha: a)
     }
-    //颜色变暗 - 0.0~1.0
+    ///颜色变暗
+    /// - parameter amount: 深度, 0.0~1.0
     public final func darkenByHSL(amount: CGFloat = 0.2) -> UIColor {
         return HSL(color: self).darker(amount: amount).toUIColor()
     }
+    ///颜色变暗
+    /// - parameter percentage: 深度, 0.0~1.0
     public final func darken(by percentage: CGFloat = 0.2) -> UIColor {
         var r: CGFloat = 0, g: CGFloat = 0, b: CGFloat = 0, a: CGFloat = 0
         self.getRed(&r, green: &g, blue: &b, alpha: &a)
@@ -51,15 +57,17 @@ extension UIColor {
                        blue: max(b - percentage, 0),
                        alpha: a)
     }
-    //调整色相 - -360~360
+    ///调整色相
+    /// - parameter amount: 深度, -360~360
     public final func hued(amount: CGFloat) -> UIColor {
         return HSL(color: self).adjustedHue(amount: amount).toUIColor()
     }
-    //调整饱和度 - 0.0~1.0
+    ///调整饱和度
+    /// - parameter amount: 深度, 0.0~1.0
     public final func saturated(amount: CGFloat = 0.2) -> UIColor {
         return HSL(color: self).saturated(amount: amount).toUIColor()
     }
-    //返回 RGBA
+    ///返回 RGBA
     public final func toRGBAComponents() -> (r: CGFloat, g: CGFloat, b: CGFloat, a: CGFloat) {
         var r: CGFloat = 0, g: CGFloat = 0, b: CGFloat = 0, a: CGFloat = 0
         

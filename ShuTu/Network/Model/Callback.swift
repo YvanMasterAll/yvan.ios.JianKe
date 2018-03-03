@@ -12,14 +12,35 @@ import ObjectMapper
 public struct Callback: Mappable {
     
     var code: Int!
-    var result: [String: Any]?
+    var msg: String?
+    var data: [[String: Any]]?
+    var token: String?
     
     public init(){}
     public init?(map: Map) {}
     
     public mutating func mapping(map: Map) {
         code <- map["code"]
-        result <- map["result"]
+        msg <- map["msg"]
+        data <- map["data"]
+        token <- map["token"]
     }
 }
 
+public struct Callback2: Mappable {
+    
+    var code: Int!
+    var msg: String?
+    var data: [String: Any]?
+    var token: String?
+    
+    public init(){}
+    public init?(map: Map) {}
+    
+    public mutating func mapping(map: Map) {
+        code <- map["code"]
+        msg <- map["msg"]
+        data <- map["data"]
+        token <- map["token"]
+    }
+}

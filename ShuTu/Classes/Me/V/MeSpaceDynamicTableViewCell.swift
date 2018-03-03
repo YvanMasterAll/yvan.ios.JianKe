@@ -10,6 +10,8 @@ import UIKit
 
 class MeSpaceDynamicTableViewCell: UITableViewCell {
 
+    @IBOutlet weak var title: UILabel!
+    @IBOutlet weak var label1: UILabel!
     @IBOutlet weak var thumbnail: UIImageView! {
         didSet {
             self.thumbnail.layer.cornerRadius = self.thumbnail.frame.height/2
