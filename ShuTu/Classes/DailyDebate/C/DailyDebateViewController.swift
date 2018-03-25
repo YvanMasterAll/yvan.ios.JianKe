@@ -33,7 +33,7 @@ class DailyDebateViewController: BaseViewController {
             self.thumbnail.isUserInteractionEnabled = true
             let tapGes = UITapGestureRecognizer.init(target: self, action: #selector(self.openLeft))
             self.thumbnail.addGestureRecognizer(tapGes)
-            if let t = Environment.protrait {
+            if let t = Environment.portrait {
                 self.thumbnail.kf.setImage(with: URL.init(string: t))
             }
         }
@@ -46,25 +46,32 @@ class DailyDebateViewController: BaseViewController {
         setupUI()
         bindRx()
     }
+    
+    override func userinfoUpdated() {
+        if let t = Environment.userinfo?.portrait {
+            self.thumbnail.kf.setImage(with: URL.init(string: t))
+        }
+    }
+    
+    override func reload() {
+         self.tableView.switchRefreshHeader(to: .refreshing)
+    }
 
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         
     }
     
-    //私有成员
+    //MARK: - 私有成员
     fileprivate var dataSource: RxTableViewSectionedReloadDataSource<DailyDebateSectionModel>!
     fileprivate var disposeBag = DisposeBag()
     fileprivate var viewModel: DailyDebateViewModel!
-    fileprivate var emptyView: EmptyView!
 }
 
 extension DailyDebateViewController {
-    //初始化
+
+    //MARK: - 初始化
     fileprivate func setupUI() {
-        //EmptyView
-        self.emptyView = EmptyView(target: self.view)
-        self.emptyView.delegate = self
         //PullToRefreshKit
         let thirdHeader = ThirdRefreshHeader()
         self.tableView.configRefreshHeader(with: thirdHeader, action: { [weak self] () -> Void in
@@ -85,10 +92,7 @@ extension DailyDebateViewController {
                 let cell = tv.dequeueReusableCell(withIdentifier: "cell", for: ip) as! DailyDebateTableViewCell
                 cell.selectionStyle = .none //取消高亮
                 cell.title.text = item.title
-                if var imageUrl = item.cover_image { //图片地址
-                    imageUrl = (imageUrl as NSString).replacingOccurrences(of: "./", with: "")
-                    imageUrl = (imageUrl as NSString).replacingOccurrences(of: " ", with: "%20")
-                    
+                if let imageUrl = item.cover_image { //图片地址
                     if let imageSource = URL.init(string: imageUrl) {
                         cell.coverImage.kf.setImage(with: imageSource, placeholder: nil, options: nil, progressBlock: nil, completionHandler: { (image, _, _, _) in
                             if image != nil {
@@ -118,24 +122,33 @@ extension DailyDebateViewController {
             .drive(tableView.rx.items(dataSource: dataSource))
             .disposed(by: disposeBag)
         self.viewModel.outputs.refreshStateObserver.asObservable()
-            .subscribe(onNext: { [weak self] state in
+            .subscribe(onNext: { [unowned self] state in
                 switch state {
+                case .noNet:
+                    self.tableView.switchRefreshHeader(to: .normal(.none, 0))
+                    if self.hasRequested {
+                        HUD.flash(.label("网络走失了"))
+                    } else {
+                        self.showBaseEmptyView()
+                    }
+                    break
                 case .noData:
-                    self?.tableView.switchRefreshHeader(to: .normal(.none, 0))
-                    self?.tableView.switchRefreshFooter(to: FooterRefresherState.removed)
+                    self.tableView.switchRefreshHeader(to: .normal(.none, 0))
+                    self.tableView.switchRefreshFooter(to: FooterRefresherState.removed)
                     break
                 case .beginHeaderRefresh:
                     break
                 case .endHeaderRefresh:
-                    self?.tableView.switchRefreshHeader(to: .normal(.success, 0))
+                    self.hasRequested = true
+                    self.tableView.switchRefreshHeader(to: .normal(.success, 0))
                     break
                 case .beginFooterRefresh:
                     break
                 case .endFooterRefresh:
-                    self?.tableView.switchRefreshFooter(to: .normal)
+                    self.tableView.switchRefreshFooter(to: .normal)
                     break
                 case .endRefreshWithoutData:
-                    self?.tableView.switchRefreshFooter(to: .noMoreData)
+                    self.tableView.switchRefreshFooter(to: .noMoreData)
                     break
                 default:
                     break
@@ -145,21 +158,11 @@ extension DailyDebateViewController {
         //刷新
         self.tableView.switchRefreshHeader(to: .refreshing)
     }
-    //显示 & 隐藏 Empty Zone
-    fileprivate func showEmptyView(type: EmptyViewType) {
-        self.tableView.switchRefreshHeader(to: .normal(.none, 0))
-        tableView.isHidden = true
-        self.emptyView.show(type: type, frame: self.tableView.frame)
-    }
-    fileprivate func hideEmptyView() {
-        self.emptyView.hide()
-        tableView.isHidden = false
-        self.tableView.switchRefreshHeader(to: .refreshing)
-    }
 }
 
 extension DailyDebateViewController: UITableViewDelegate {
-    //TableViewDelegate
+    
+    //MARK: - TableViewDelegate
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         //取消cell选中状态
         tableView.deselectRow(at: indexPath, animated: true)
@@ -169,9 +172,5 @@ extension DailyDebateViewController: UITableViewDelegate {
     }
     func tableView(_ tableView: UITableView, shouldHighlightRowAt indexPath: IndexPath) -> Bool {
         return true
-    }
-    //EmptyView Delegate
-    override func emptyViewClicked() {
-        self.hideEmptyView()
     }
 }

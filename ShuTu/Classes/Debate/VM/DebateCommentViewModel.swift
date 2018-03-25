@@ -18,35 +18,35 @@ public struct DebateCommentViewModelInput {
 }
 public struct DebateCommentViewModelOutput {
     var sections: Driver<[CommentSectionModel]>?
-    var emptyStateObserver: Variable<EmptyViewType>
-    var supportResult: Variable<Result2>
-    var sendResult: Variable<Result2>
+    var refreshStateObserver: Variable<RefreshStatus>
+    var supportResult: Variable<ResultType>
+    var sendResult: Variable<ResultType>
 }
 class DebateCommentViewModel {
+
+    //MARK: - 私有成员
     fileprivate struct CommentModel {
         var pageIndex: Int
         var disposeBag: DisposeBag
         var models: Variable<[AnswerComment]>
         var section: Answer
-        var refreshStateObserver: Variable<RefreshStatus>
-        var tableView: UITableView
     }
-    //私有成员
     fileprivate var commentModel: CommentModel!
     fileprivate var service = DebateService.instance
-    //inputs
+
+    //MARK: - inputs
     public var inputs: DebateCommentViewModelInput! = {
         return DebateCommentViewModelInput(refreshNewData: PublishSubject(), supportTap: PublishSubject(), sendTap: PublishSubject())
     }()
-    //outputs
+    
+    //MARK: - outputs
     public var outputs: DebateCommentViewModelOutput! = {
-        return DebateCommentViewModelOutput(sections: nil, emptyStateObserver: Variable<EmptyViewType>(.none), supportResult: Variable<Result2>(.none), sendResult: Variable<Result2>(.none))
+        return DebateCommentViewModelOutput(sections: nil, refreshStateObserver: Variable<RefreshStatus>(.none), supportResult: Variable<ResultType>(.none), sendResult: Variable<ResultType>(.none))
     }()
     
-    init(disposeBag: DisposeBag, section: Answer, tableView: UITableView) {
+    init(disposeBag: DisposeBag, section: Answer) {
         //初始化
-        self.commentModel = CommentModel(pageIndex: 0, disposeBag: disposeBag, models: Variable<[AnswerComment]>([]), section: section, refreshStateObserver: Variable<RefreshStatus>(.none), tableView: tableView)
-        self.outputs.emptyStateObserver = Variable<EmptyViewType>(.none)
+        self.commentModel = CommentModel(pageIndex: 0, disposeBag: disposeBag, models: Variable<[AnswerComment]>([]), section: section)
         //Rx
         self.outputs.sections = self.commentModel.models.asObservable()
             .map{ models in
@@ -55,8 +55,8 @@ class DebateCommentViewModel {
             .asDriver(onErrorJustReturn: [])
         self.inputs.refreshNewData.asObserver()
             .subscribe(onNext: { full in
-                if full {//头部刷新
-                    self.commentModel.refreshStateObserver.value = .endFooterRefresh
+                if full { //头部刷新
+                    self.outputs.refreshStateObserver.value = .endFooterRefresh
                     //初始化
                     self.commentModel.pageIndex = 1
                     //拉取数据
@@ -66,19 +66,23 @@ class DebateCommentViewModel {
                             let result = response.1
                             switch result {
                             case .ok:
-                                self.commentModel.models.value.removeAll()
-                                self.commentModel.models.value = data
-                                //结束刷新
-                                self.commentModel.refreshStateObserver.value = .endHeaderRefresh
+                                if data.count > 0 {
+                                    self.commentModel.models.value.removeAll()
+                                    self.commentModel.models.value = data
+                                    //结束刷新
+                                    self.outputs.refreshStateObserver.value = .endHeaderRefresh
+                                } else { //没有数据
+                                    self.outputs.refreshStateObserver.value = .noData
+                                }
                                 break
                             default:
                                 //请求错误
-                                self.commentModel.refreshStateObserver.value = .noData
+                                self.outputs.refreshStateObserver.value = .noNet
                                 break
                             }
                         })
                         .disposed(by: self.commentModel.disposeBag)
-                } else {//加载更多
+                } else { //加载更多
                     self.commentModel.pageIndex += 1
                     //拉取数据
                     self.service.getAnswerComment(id: self.commentModel.section.id!, pageIndex: self.commentModel.pageIndex)
@@ -90,15 +94,15 @@ class DebateCommentViewModel {
                                 if data.count > 0 {
                                     self.commentModel.models.value += data
                                     //结束刷新
-                                    self.commentModel.refreshStateObserver.value = .endFooterRefresh
+                                    self.outputs.refreshStateObserver.value = .endFooterRefresh
                                 } else {
                                     //没有更多数据
-                                    self.commentModel.refreshStateObserver.value = .endRefreshWithoutData
+                                    self.outputs.refreshStateObserver.value = .endRefreshWithoutData
                                 }
                                 break
                             default:
                                 //没有更多数据
-                                self.commentModel.refreshStateObserver.value = .endRefreshWithoutData
+                                self.outputs.refreshStateObserver.value = .endRefreshWithoutData
                                 break
                             }
                         })
@@ -148,30 +152,6 @@ class DebateCommentViewModel {
                 }
             })
             .disposed(by: disposeBag)
-        self.commentModel.refreshStateObserver.asObservable()
-            .subscribe(onNext: { state in
-                switch state {
-                case .noData:
-                    self.outputs.emptyStateObserver.value = .empty(size: nil)
-                    break
-                case .beginHeaderRefresh:
-                    break
-                case .endHeaderRefresh:
-                    self.commentModel.tableView.switchRefreshHeader(to: .normal(.success, 0))
-                    break
-                case .beginFooterRefresh:
-                    break
-                case .endFooterRefresh:
-                    self.commentModel.tableView.switchRefreshFooter(to: .normal)
-                    break
-                case .endRefreshWithoutData:
-                    self.commentModel.tableView.switchRefreshFooter(to: .noMoreData)
-                    break
-                default:
-                    break
-                }
-            })
-            .disposed(by: disposeBag)
     }
     
 }
@@ -195,34 +175,34 @@ public struct DebateComment2ViewModelInput {
 }
 public struct DebateComment2ViewModelOutput {
     var sections: Driver<[Comment2SectionModel]>?
-    var emptyStateObserver: Variable<EmptyViewType>
-    var sendResult: Variable<Result2>
+    var refreshStateObserver: Variable<RefreshStatus>
+    var sendResult: Variable<ResultType>
 }
 class DebateComment2ViewModel {
+
+    //MARK: - 私有成员
     fileprivate struct CommentModel {
         var pageIndex: Int
         var disposeBag: DisposeBag
         var models: Variable<[AnswerComment]>
         var section: AnswerComment
-        var refreshStateObserver: Variable<RefreshStatus>
-        var tableView: UITableView
     }
-    //私有成员
     fileprivate var commentModel: CommentModel!
     fileprivate var service = DebateService.instance
-    //inputs
+    
+    //MARK: - inputs
     public var inputs: DebateComment2ViewModelInput! = {
         return DebateComment2ViewModelInput(refreshNewData: PublishSubject(), sendTap: PublishSubject<String>())
     }()
-    //outputs
+
+    //MARK: - outputs
     public var outputs: DebateComment2ViewModelOutput! = {
-        return DebateComment2ViewModelOutput(sections: nil, emptyStateObserver: Variable<EmptyViewType>(.none), sendResult: Variable<Result2>(.none))
+        return DebateComment2ViewModelOutput(sections: nil, refreshStateObserver: Variable<RefreshStatus>(.none), sendResult: Variable<ResultType>(.none))
     }()
     
-    init(disposeBag: DisposeBag, section: AnswerComment, tableView: UITableView) {
+    init(disposeBag: DisposeBag, section: AnswerComment) {
         //初始化
-        self.commentModel = CommentModel(pageIndex: 0, disposeBag: disposeBag, models: Variable<[AnswerComment]>([]), section: section, refreshStateObserver: Variable<RefreshStatus>(.none), tableView: tableView)
-        self.outputs.emptyStateObserver = Variable<EmptyViewType>(.none)
+        self.commentModel = CommentModel(pageIndex: 0, disposeBag: disposeBag, models: Variable<[AnswerComment]>([]), section: section)
         //Rx
         self.outputs.sections = self.commentModel.models.asObservable()
             .map{ models in
@@ -231,8 +211,8 @@ class DebateComment2ViewModel {
             .asDriver(onErrorJustReturn: [])
         self.inputs.refreshNewData.asObserver()
             .subscribe(onNext: { full in
-                if full {//头部刷新
-                    self.commentModel.refreshStateObserver.value = .endFooterRefresh
+                if full { //头部刷新
+                    self.outputs.refreshStateObserver.value = .endFooterRefresh
                     //初始化
                     self.commentModel.pageIndex = 1
                     //拉取数据
@@ -242,19 +222,23 @@ class DebateComment2ViewModel {
                             let result = response.1
                             switch result {
                             case .ok:
-                                self.commentModel.models.value.removeAll()
-                                self.commentModel.models.value = data
-                                //结束刷新
-                                self.commentModel.refreshStateObserver.value = .endHeaderRefresh
+                                if data.count > 0 {
+                                    self.commentModel.models.value.removeAll()
+                                    self.commentModel.models.value = data
+                                    //结束刷新
+                                    self.outputs.refreshStateObserver.value = .endHeaderRefresh
+                                } else { //没有数据
+                                    self.outputs.refreshStateObserver.value = .noData
+                                }
                                 break
                             default:
                                 //请求错误
-                                self.commentModel.refreshStateObserver.value = .noData
+                                self.outputs.refreshStateObserver.value = .noNet
                                 break
                             }
                         })
                         .disposed(by: self.commentModel.disposeBag)
-                } else {//加载更多
+                } else { //加载更多
                     self.commentModel.pageIndex += 1
                     //拉取数据
                     self.service.getAnswerComment(id: self.commentModel.section.id!, pageIndex: self.commentModel.pageIndex)
@@ -266,15 +250,15 @@ class DebateComment2ViewModel {
                                 if data.count > 0 {
                                     self.commentModel.models.value += data
                                     //结束刷新
-                                    self.commentModel.refreshStateObserver.value = .endFooterRefresh
+                                    self.outputs.refreshStateObserver.value = .endFooterRefresh
                                 } else {
                                     //没有更多数据
-                                    self.commentModel.refreshStateObserver.value = .endRefreshWithoutData
+                                    self.outputs.refreshStateObserver.value = .endRefreshWithoutData
                                 }
                                 break
                             default:
                                 //没有更多数据
-                                self.commentModel.refreshStateObserver.value = .endRefreshWithoutData
+                                self.outputs.refreshStateObserver.value = .endRefreshWithoutData
                                 break
                             }
                         })
@@ -295,30 +279,6 @@ class DebateComment2ViewModel {
                         self.outputs.sendResult.value = result
                     })
                     .disposed(by: self.commentModel.disposeBag)
-            })
-            .disposed(by: self.commentModel.disposeBag)
-        self.commentModel.refreshStateObserver.asObservable()
-            .subscribe(onNext: { state in
-                switch state {
-                case .noData:
-                    self.outputs.emptyStateObserver.value = .empty(size: nil)
-                    break
-                case .beginHeaderRefresh:
-                    break
-                case .endHeaderRefresh:
-                    self.commentModel.tableView.switchRefreshHeader(to: .normal(.success, 0))
-                    break
-                case .beginFooterRefresh:
-                    break
-                case .endFooterRefresh:
-                    self.commentModel.tableView.switchRefreshFooter(to: .normal)
-                    break
-                case .endRefreshWithoutData:
-                    self.commentModel.tableView.switchRefreshFooter(to: .noMoreData)
-                    break
-                default:
-                    break
-                }
             })
             .disposed(by: self.commentModel.disposeBag)
     }

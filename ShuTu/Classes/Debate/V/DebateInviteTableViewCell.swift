@@ -7,11 +7,10 @@
 //
 
 import UIKit
-import PMSuperButton
 
 class DebateInviteTableViewCell: UITableViewCell {
 
-    @IBOutlet weak var inviteButton: PMSuperButton!
+    @IBOutlet weak var inviteButton: STButton!
     @IBOutlet weak var sign: UILabel!
     @IBOutlet weak var name: UILabel!
     @IBOutlet weak var thumbnail: UIImageView! {

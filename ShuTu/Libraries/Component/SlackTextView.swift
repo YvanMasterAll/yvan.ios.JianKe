@@ -12,16 +12,17 @@ import SnapKit
 @IBDesignable
 class SlackTextView: UIView {
     
-    //声明区域
+    //MARK: - 声明区域
     @IBInspectable
     open var placeHolder: String?
-    //私有成员
-    fileprivate var textView: GrowingTextView!
+    
+    //MARK: - 私有成员
+    fileprivate var textView: STGrowingTextView!
     fileprivate var sendButton: UIButton!
     fileprivate var MR: CGFloat = 8
     fileprivate var BT_W: CGFloat = 50 //按钮宽度
     fileprivate var TV_H: CGFloat = 40 //textView 高度
-    fileprivate var V_H: CGFloat {//view 高度
+    fileprivate var V_H: CGFloat { //view 高度
         get {
             return TV_H + MR
         }
@@ -74,7 +75,7 @@ class SlackTextView: UIView {
             make.bottom.equalTo(-MR/2)
             make.right.equalTo(-MR)
         }
-        self.textView = GrowingTextView()
+        self.textView = STGrowingTextView()
         textView.delegate = self
         textView.backgroundColor = UIColor.red
         textView.maxLength = 140
@@ -99,9 +100,9 @@ class SlackTextView: UIView {
     }
 }
 
-extension SlackTextView: GrowingTextViewDelegate {
-    //GrowingTextViewDelegate
-    func textViewDidChangeHeight(_ textView: GrowingTextView, height: CGFloat) {
+extension SlackTextView: STGrowingTextViewDelegate {
+    //STGrowingTextViewDelegate
+    func textViewDidChangeHeight(_ textView: STGrowingTextView, height: CGFloat) {
         UIView.animate(withDuration: 0.3, delay: 0.0, usingSpringWithDamping: 0.7, initialSpringVelocity: 0.7, options: [.curveLinear], animations: { () -> Void in
             self.viewHeightC.constant = height + self.MR
         }, completion: nil)

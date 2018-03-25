@@ -21,7 +21,7 @@ class DebateCommentTableViewCell: UITableViewCell {
     @IBOutlet weak var name: UILabel!
     @IBOutlet weak var thumbnail: UIImageView!
     
-    //声明区
+    //MARK: - 声明区域
     open var id: Int!
     open var supported: Bool = false
     open var disposeBag: DisposeBag!
@@ -46,7 +46,7 @@ class DebateCommentTableViewCell: UITableViewCell {
         self.thumbnail.layer.cornerRadius = self.thumbnail.frame.width/2
         self.thumbnail.layer.masksToBounds = true
         //Zan
-        self.zanIcon.setIcon(icon: .fontAwesome(.thumbsUp), textColor: GMColor.grey600Color(), backgroundColor: UIColor.clear, size: nil)
+        self.zanIcon.setIcon(icon: .fontAwesome(.thumbsUp), textColor: STColor.grey600Color(), backgroundColor: UIColor.clear, size: nil)
         self.zanIcon.isUserInteractionEnabled = true
         self.zanIcon.addGestureRecognizer(UITapGestureRecognizer.init(target: self, action: #selector(self.support)))
         self.applySupportButton(self.supported, false)
@@ -54,17 +54,18 @@ class DebateCommentTableViewCell: UITableViewCell {
         let x: CGFloat = 0, y: CGFloat = self.bottomView.frame.height - 0.5, width: CGFloat = self.bottomView.frame.width, height: CGFloat = 0.5
         let bottomLayer = CALayer()
         bottomLayer.frame = CGRect(x: x, y: y, width: width, height: height)
-        bottomLayer.backgroundColor = GMColor.grey300Color().cgColor
+        bottomLayer.backgroundColor = STColor.grey300Color().cgColor
         self.bottomView.layer.addSublayer(bottomLayer)
     }
     
-    //私有
+    //MARK: - 私有成员
     fileprivate var supporting: Bool = false
     
 }
 
 extension DebateCommentTableViewCell {
-    //初始化
+
+    //MARK: - 初始化
     fileprivate func setupUI() {
         
     }
@@ -89,26 +90,27 @@ extension DebateCommentTableViewCell {
             })
             .disposed(by: self.disposeBag)
     }
-    //添加约束
     public func setupConstraint() {
         //评论区不设置 label 的高度限制
     }
-    //按钮事件
+    
+    //MAKR: - 按钮事件
     @objc fileprivate func support() {
         self.supporting = true
         self.viewModel.inputs.supportTap.onNext((!self.supported, self.id))
     }
-    //支持按钮变更
+    
+    //MAKR: - 按钮状态变更
     fileprivate func applySupportButton(_ supported: Bool, _ flag: Bool) {
         self.supported = supported
         if supported {
-            self.zanIcon.setIcon(icon: .fontAwesome(.thumbsUp), textColor: GMColor.red600Color(), backgroundColor: UIColor.clear, size: nil)
+            self.zanIcon.setIcon(icon: .fontAwesome(.thumbsUp), textColor: STColor.red600Color(), backgroundColor: UIColor.clear, size: nil)
             if flag, var supports = (Int)(self.zan.text!) {
                 supports += 1
                 self.zan.text = "\(supports)"
             }
         } else {
-            self.zanIcon.setIcon(icon: .fontAwesome(.thumbsUp), textColor: GMColor.grey600Color(), backgroundColor: UIColor.clear, size: nil)
+            self.zanIcon.setIcon(icon: .fontAwesome(.thumbsUp), textColor: STColor.grey600Color(), backgroundColor: UIColor.clear, size: nil)
             if flag, var supports = (Int)(self.zan.text!), supports > 0 {
                 supports -= 1
                 self.zan.text = "\(supports)"

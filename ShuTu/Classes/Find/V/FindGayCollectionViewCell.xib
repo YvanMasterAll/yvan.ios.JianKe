@@ -50,7 +50,7 @@
                                     <constraint firstAttribute="height" constant="0.5" id="imx-km-4N4"/>
                                 </constraints>
                             </view>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="2lE-eO-D5k" customClass="PMSuperButton" customModule="PMSuperButton">
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="2lE-eO-D5k" customClass="STButton" customModule="ShuTu">
                                 <rect key="frame" x="357" y="16" width="30" height="28"/>
                                 <color key="backgroundColor" red="0.058823529409999999" green="0.53333333329999999" blue="0.92156862750000001" alpha="1" colorSpace="calibratedRGB"/>
                                 <constraints>

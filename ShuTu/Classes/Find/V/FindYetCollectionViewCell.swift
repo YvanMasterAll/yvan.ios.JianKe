@@ -30,7 +30,7 @@ class FindYetCollectionViewCell: FSPagerViewCell {
         }
     }
     
-    //声明区域
+    //MARK: - 声明区域
     open var id: Int!
     open var viewModel: FindViewModel! {
         didSet {
@@ -51,19 +51,20 @@ class FindYetCollectionViewCell: FSPagerViewCell {
         //内阴影
         view.layer.shadowRadius = 8
         view.layer.shadowOpacity = 0.8
-        view.layer.shadowColor = GMColor.grey500Color().cgColor
+        view.layer.shadowColor = STColor.grey500Color().cgColor
         view.layer.shadowOffset = CGSize.zero
         view.generateInnerShadow()
     }
     
-    //私有
+    //MARK: - 私有成员
     fileprivate var supported: Int = 0
     fileprivate var voting: Bool = false
     
 }
 
 extension FindYetCollectionViewCell {
-    //初始化
+
+    //MARK: - 初始化
     fileprivate func commonInit() {
         self.backgroundColor = UIColor.white
         self.needShadow = false
@@ -87,7 +88,8 @@ extension FindYetCollectionViewCell {
             })
             .disposed(by: self.disposeBag)
     }
-    //按钮事件
+    
+    //MAKR: - 按钮事件
     @objc fileprivate func support() {
         guard self.supported == 0 else { HUD.flash(.label("已投票")); return }
         self.viewModel.inputs.voteTap.onNext((id, AttitudeStand.support))
@@ -100,14 +102,15 @@ extension FindYetCollectionViewCell {
         self.supported = 2
         self.voting = true
     }
-    //按钮变更
+    
+    //MARK: - 按钮状态变更
     fileprivate func setVoteButtons() {
         if self.supported == 1 {
-            self.supportButton.setTitleColor(GMColor.red600Color(), for: .normal)
+            self.supportButton.setTitleColor(STColor.red600Color(), for: .normal)
             self.opposeButton.setTitleColor(ColorPrimary, for: .normal)
         } else if self.supported == 2 {
             self.supportButton.setTitleColor(ColorPrimary, for: .normal)
-            self.opposeButton.setTitleColor(GMColor.red600Color(), for: .normal)
+            self.opposeButton.setTitleColor(STColor.red600Color(), for: .normal)
         }
     }
 }

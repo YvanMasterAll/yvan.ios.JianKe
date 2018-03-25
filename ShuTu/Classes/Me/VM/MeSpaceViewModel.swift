@@ -19,19 +19,22 @@ public struct MeSpaceDynamicViewModelOutput {
     var refreshStateObserver: Variable<RefreshStatus>
 }
 public class MeSpaceDynamicViewModel {
+
+    //MARK: - 私有成员
     fileprivate struct MeSpaceDynamicModel {
         var pageIndex: Int
         var disposeBag: DisposeBag
         var models: Variable<[Dynamic]>
     }
-    //私有成员
     fileprivate var dynamicModel: MeSpaceDynamicModel!
     fileprivate var service = MeService.instance
-    //Inputs
+
+    //MARK: - Inputs
     open var inputs: MeSpaceDynamicViewModelInput = {
         return MeSpaceDynamicViewModelInput(refreshNewData: PublishSubject<Bool>())
     }()
-    //Outputs
+
+    //MARK: - Outputs
     open var outputs: MeSpaceDynamicViewModelOutput = {
         return MeSpaceDynamicViewModelOutput(sections: nil, refreshStateObserver: Variable<RefreshStatus>(.none))
     }()
@@ -46,10 +49,10 @@ public class MeSpaceDynamicViewModel {
             .asDriver(onErrorJustReturn: [])
         self.inputs.refreshNewData.asObserver()
             .subscribe(onNext: { full in
-                if full {//头部刷新
+                if full { //头部刷新
                     self.outputs.refreshStateObserver.value = .endFooterRefresh
                     //初始化
-                    self.dynamicModel.pageIndex = 0
+                    self.dynamicModel.pageIndex = 1
                     //拉取数据
                     self.service.trend(self.dynamicModel.pageIndex)
                         .subscribe(onNext: { response in
@@ -57,19 +60,23 @@ public class MeSpaceDynamicViewModel {
                             let result = response.1
                             switch result {
                             case .ok:
-                                self.dynamicModel.models.value.removeAll()
-                                self.dynamicModel.models.value = data
-                                //结束刷新
-                                self.outputs.refreshStateObserver.value = .endHeaderRefresh
+                                if data.count > 0 {
+                                    self.dynamicModel.models.value.removeAll()
+                                    self.dynamicModel.models.value = data
+                                    //结束刷新
+                                    self.outputs.refreshStateObserver.value = .endHeaderRefresh
+                                } else {
+                                    self.outputs.refreshStateObserver.value = .noData
+                                }
                                 break
                             default:
                                 //请求错误
-                                self.outputs.refreshStateObserver.value = .noData
+                                self.outputs.refreshStateObserver.value = .noNet
                                 break
                             }
                         })
                         .disposed(by: self.dynamicModel.disposeBag)
-                } else {//加载更多
+                } else { //加载更多
                     self.dynamicModel.pageIndex += 1
                     //拉取数据
                     self.service.trend(self.dynamicModel.pageIndex)
@@ -121,19 +128,22 @@ public struct MeSpaceTopicViewModelOutput {
     var refreshStateObserver: Variable<RefreshStatus>
 }
 public class MeSpaceTopicViewModel {
+
+    //MARK: - 私有成员
     fileprivate struct MeSpaceTopicModel {
         var pageIndex: Int
         var disposeBag: DisposeBag
         var models: Variable<[Debate]>
     }
-    //私有成员
     fileprivate var topicModel: MeSpaceTopicModel!
     fileprivate var service = DebateService.instance
-    //Inputs
+
+    //MARK: - Inputs
     open var inputs: MeSpaceTopicViewModelInput = {
         return MeSpaceTopicViewModelInput(refreshNewData: PublishSubject<Bool>())
     }()
-    //Outputs
+    
+    //MAKR: - Outputs
     open var outputs: MeSpaceTopicViewModelOutput = {
         return MeSpaceTopicViewModelOutput(sections: nil, refreshStateObserver: Variable<RefreshStatus>(.none))
     }()
@@ -175,19 +185,22 @@ public struct MeSpaceAnswerViewModelOutput {
     var refreshStateObserver: Variable<RefreshStatus>
 }
 public class MeSpaceAnswerViewModel {
+
+    //MARK: - 私有成员
     fileprivate struct MeSpaceAnswerModel {
         var pageIndex: Int
         var disposeBag: DisposeBag
         var models: Variable<[Debate]>
     }
-    //私有成员
     fileprivate var answerModel: MeSpaceAnswerModel!
     fileprivate var service = DebateService.instance
-    //Inputs
+
+    //MARK: - Inputs
     open var inputs: MeSpaceAnswerViewModelInput = {
         return MeSpaceAnswerViewModelInput(refreshNewData: PublishSubject<Bool>())
     }()
-    //Outputs
+
+    //MARK: - Outputs
     open var outputs: MeSpaceAnswerViewModelOutput = {
         return MeSpaceAnswerViewModelOutput(sections: nil, refreshStateObserver: Variable<RefreshStatus>(.none))
     }()
@@ -231,6 +244,8 @@ public struct MeJoinViewModelOutput {
     var refreshStateObserver: Variable<RefreshStatus>
 }
 public class MeJoinViewModel {
+
+    //MARK: - 私有成员
     fileprivate struct MeJoinModel {
         var pageIndex: Int
         var disposeBag: DisposeBag
@@ -238,14 +253,15 @@ public class MeJoinViewModel {
         var topicModels: Variable<[Debate]>
         var userModels: Variable<[User]>
     }
-    //私有成员
     fileprivate var joinModel: MeJoinModel!
     fileprivate var service = MeService.instance
-    //Inputs
+
+    //MARK - Inputs
     open var inputs: MeJoinViewModelInput = {
         return MeJoinViewModelInput(refreshNewData: PublishSubject<(MeJoinType, Bool)>())
     }()
-    //Outputs
+
+    //MARK: - Outputs
     open var outputs: MeJoinViewModelOutput = {
         return MeJoinViewModelOutput(collectSections: nil, topicSections: nil, userSections: nil, refreshStateObserver: Variable<RefreshStatus>(.none))
     }()
@@ -272,7 +288,7 @@ public class MeJoinViewModel {
             .subscribe(onNext: { (type, full) in
                 switch type {
                 case .collect:
-                    if full {//头部刷新
+                    if full { //头部刷新
                         self.outputs.refreshStateObserver.value = .endFooterRefresh
                         //初始化
                         self.joinModel.pageIndex = 1
@@ -283,19 +299,23 @@ public class MeJoinViewModel {
                                 let result = response.1
                                 switch result {
                                 case .ok:
-                                    self.joinModel.collectModels.value.removeAll()
-                                    self.joinModel.collectModels.value = data
-                                    //结束刷新
-                                    self.outputs.refreshStateObserver.value = .endHeaderRefresh
+                                    if data.count > 0 {
+                                        self.joinModel.collectModels.value.removeAll()
+                                        self.joinModel.collectModels.value = data
+                                        //结束刷新
+                                        self.outputs.refreshStateObserver.value = .endHeaderRefresh
+                                    } else {
+                                        self.outputs.refreshStateObserver.value = .noData
+                                    }
                                     break
                                 default:
                                     //请求错误
-                                    self.outputs.refreshStateObserver.value = .noData
+                                    self.outputs.refreshStateObserver.value = .noNet
                                     break
                                 }
                             })
                             .disposed(by: self.joinModel.disposeBag)
-                    } else {//加载更多
+                    } else { //加载更多
                         self.joinModel.pageIndex += 1
                         //拉取数据
                         self.service.collects(self.joinModel.pageIndex)
@@ -322,7 +342,7 @@ public class MeJoinViewModel {
                             .disposed(by: self.joinModel.disposeBag)
                     }
                 case .support:
-                    if full {//头部刷新
+                    if full { //头部刷新
                         self.outputs.refreshStateObserver.value = .endFooterRefresh
                         //初始化
                         self.joinModel.pageIndex = 1
@@ -333,19 +353,23 @@ public class MeJoinViewModel {
                                 let result = response.1
                                 switch result {
                                 case .ok:
-                                    self.joinModel.collectModels.value.removeAll()
-                                    self.joinModel.collectModels.value = data
-                                    //结束刷新
-                                    self.outputs.refreshStateObserver.value = .endHeaderRefresh
+                                    if data.count > 0 {
+                                        self.joinModel.collectModels.value.removeAll()
+                                        self.joinModel.collectModels.value = data
+                                        //结束刷新
+                                        self.outputs.refreshStateObserver.value = .endHeaderRefresh
+                                    } else {
+                                        self.outputs.refreshStateObserver.value = .noData
+                                    }
                                     break
                                 default:
                                     //请求错误
-                                    self.outputs.refreshStateObserver.value = .noData
+                                    self.outputs.refreshStateObserver.value = .noNet
                                     break
                                 }
                             })
                             .disposed(by: self.joinModel.disposeBag)
-                    } else {//加载更多
+                    } else { //加载更多
                         self.joinModel.pageIndex += 1
                         //拉取数据
                         self.service.supports(self.joinModel.pageIndex)
@@ -372,7 +396,7 @@ public class MeJoinViewModel {
                             .disposed(by: self.joinModel.disposeBag)
                     }
                 case .viewpoint:
-                    if full {//头部刷新
+                    if full { //头部刷新
                         self.outputs.refreshStateObserver.value = .endFooterRefresh
                         //初始化
                         self.joinModel.pageIndex = 1
@@ -383,19 +407,23 @@ public class MeJoinViewModel {
                                 let result = response.1
                                 switch result {
                                 case .ok:
-                                    self.joinModel.collectModels.value.removeAll()
-                                    self.joinModel.collectModels.value = data
-                                    //结束刷新
-                                    self.outputs.refreshStateObserver.value = .endHeaderRefresh
+                                    if data.count > 0 {
+                                        self.joinModel.collectModels.value.removeAll()
+                                        self.joinModel.collectModels.value = data
+                                        //结束刷新
+                                        self.outputs.refreshStateObserver.value = .endHeaderRefresh
+                                    } else {
+                                        self.outputs.refreshStateObserver.value = .noData
+                                    }
                                     break
                                 default:
                                     //请求错误
-                                    self.outputs.refreshStateObserver.value = .noData
+                                    self.outputs.refreshStateObserver.value = .noNet
                                     break
                                 }
                             })
                             .disposed(by: self.joinModel.disposeBag)
-                    } else {//加载更多
+                    } else { //加载更多
                         self.joinModel.pageIndex += 1
                         //拉取数据
                         self.service.viewpoints(self.joinModel.pageIndex)
@@ -422,7 +450,7 @@ public class MeJoinViewModel {
                             .disposed(by: self.joinModel.disposeBag)
                     }
                 case .topic:
-                    if full {//头部刷新
+                    if full { //头部刷新
                         self.outputs.refreshStateObserver.value = .endFooterRefresh
                         //初始化
                         self.joinModel.pageIndex = 1
@@ -433,19 +461,23 @@ public class MeJoinViewModel {
                                 let result = response.1
                                 switch result {
                                 case .ok:
-                                    self.joinModel.topicModels.value.removeAll()
-                                    self.joinModel.topicModels.value = data
-                                    //结束刷新
-                                    self.outputs.refreshStateObserver.value = .endHeaderRefresh
+                                    if data.count > 0 {
+                                        self.joinModel.topicModels.value.removeAll()
+                                        self.joinModel.topicModels.value = data
+                                        //结束刷新
+                                        self.outputs.refreshStateObserver.value = .endHeaderRefresh
+                                    } else {
+                                        self.outputs.refreshStateObserver.value = .noData
+                                    }
                                     break
                                 default:
                                     //请求错误
-                                    self.outputs.refreshStateObserver.value = .noData
+                                    self.outputs.refreshStateObserver.value = .noNet
                                     break
                                 }
                             })
                             .disposed(by: self.joinModel.disposeBag)
-                    } else {//加载更多
+                    } else { //加载更多
                         self.joinModel.pageIndex += 1
                         //拉取数据
                         self.service.topics(self.joinModel.pageIndex)
@@ -472,7 +504,7 @@ public class MeJoinViewModel {
                             .disposed(by: self.joinModel.disposeBag)
                     }
                 case .followtopic:
-                    if full {//头部刷新
+                    if full { //头部刷新
                         self.outputs.refreshStateObserver.value = .endFooterRefresh
                         //初始化
                         self.joinModel.pageIndex = 1
@@ -483,19 +515,23 @@ public class MeJoinViewModel {
                                 let result = response.1
                                 switch result {
                                 case .ok:
-                                    self.joinModel.topicModels.value.removeAll()
-                                    self.joinModel.topicModels.value = data
-                                    //结束刷新
-                                    self.outputs.refreshStateObserver.value = .endHeaderRefresh
+                                    if data.count > 0 {
+                                        self.joinModel.topicModels.value.removeAll()
+                                        self.joinModel.topicModels.value = data
+                                        //结束刷新
+                                        self.outputs.refreshStateObserver.value = .endHeaderRefresh
+                                    } else {
+                                        self.outputs.refreshStateObserver.value = .noData
+                                    }
                                     break
                                 default:
                                     //请求错误
-                                    self.outputs.refreshStateObserver.value = .noData
+                                    self.outputs.refreshStateObserver.value = .noNet
                                     break
                                 }
                             })
                             .disposed(by: self.joinModel.disposeBag)
-                    } else {//加载更多
+                    } else { //加载更多
                         self.joinModel.pageIndex += 1
                         //拉取数据
                         self.service.followtopics(self.joinModel.pageIndex)
@@ -522,7 +558,7 @@ public class MeJoinViewModel {
                             .disposed(by: self.joinModel.disposeBag)
                     }
                 case .followperson:
-                    if full {//头部刷新
+                    if full { //头部刷新
                         self.outputs.refreshStateObserver.value = .endFooterRefresh
                         //初始化
                         self.joinModel.pageIndex = 1
@@ -533,19 +569,23 @@ public class MeJoinViewModel {
                                 let result = response.1
                                 switch result {
                                 case .ok:
-                                    self.joinModel.userModels.value.removeAll()
-                                    self.joinModel.userModels.value = data
-                                    //结束刷新
-                                    self.outputs.refreshStateObserver.value = .endHeaderRefresh
+                                    if data.count > 0 {
+                                        self.joinModel.userModels.value.removeAll()
+                                        self.joinModel.userModels.value = data
+                                        //结束刷新
+                                        self.outputs.refreshStateObserver.value = .endHeaderRefresh
+                                    } else {
+                                        self.outputs.refreshStateObserver.value = .noData
+                                    }
                                     break
                                 default:
                                     //请求错误
-                                    self.outputs.refreshStateObserver.value = .noData
+                                    self.outputs.refreshStateObserver.value = .noNet
                                     break
                                 }
                             })
                             .disposed(by: self.joinModel.disposeBag)
-                    } else {//加载更多
+                    } else { //加载更多
                         self.joinModel.pageIndex += 1
                         //拉取数据
                         self.service.follows(self.joinModel.pageIndex)
@@ -572,7 +612,7 @@ public class MeJoinViewModel {
                             .disposed(by: self.joinModel.disposeBag)
                     }
                 case .fan:
-                    if full {//头部刷新
+                    if full { //头部刷新
                         self.outputs.refreshStateObserver.value = .endFooterRefresh
                         //初始化
                         self.joinModel.pageIndex = 1
@@ -583,19 +623,23 @@ public class MeJoinViewModel {
                                 let result = response.1
                                 switch result {
                                 case .ok:
-                                    self.joinModel.userModels.value.removeAll()
-                                    self.joinModel.userModels.value = data
-                                    //结束刷新
-                                    self.outputs.refreshStateObserver.value = .endHeaderRefresh
+                                    if data.count > 0 {
+                                        self.joinModel.userModels.value.removeAll()
+                                        self.joinModel.userModels.value = data
+                                        //结束刷新
+                                        self.outputs.refreshStateObserver.value = .endHeaderRefresh
+                                    } else {
+                                        self.outputs.refreshStateObserver.value = .noData
+                                    }
                                     break
                                 default:
                                     //请求错误
-                                    self.outputs.refreshStateObserver.value = .noData
+                                    self.outputs.refreshStateObserver.value = .noNet
                                     break
                                 }
                             })
                             .disposed(by: self.joinModel.disposeBag)
-                    } else {//加载更多
+                    } else { //加载更多
                         self.joinModel.pageIndex += 1
                         //拉取数据
                         self.service.fans(self.joinModel.pageIndex)

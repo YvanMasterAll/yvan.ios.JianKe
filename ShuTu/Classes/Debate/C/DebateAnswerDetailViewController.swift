@@ -7,7 +7,6 @@
 //
 
 import UIKit
-import PMSuperButton
 import RxSwift
 import RxCocoa
 import WebKit
@@ -25,10 +24,10 @@ class DebateAnswerDetailViewController: BaseViewController {
             self.userBarFollowButton.addTarget(self, action: #selector(self.follow), for: .touchUpInside)
         }
     }
-    @IBOutlet weak var webView: WKWebView!
+    @IBOutlet weak var webView: BaseWKWebView!
     @IBOutlet weak var actionBar: UIView!
     
-    //声明区
+    //MARK: - 声明区域
     public var section: Answer!
 
     override func viewDidLoad() {
@@ -52,21 +51,21 @@ class DebateAnswerDetailViewController: BaseViewController {
         //UserBar 添加下边框
         let bottomBorderLayer = CALayer()
         bottomBorderLayer.frame = CGRect(x: 0, y: userBar.frame.height - 1, width: SW, height: 1)
-        bottomBorderLayer.backgroundColor = GMColor.grey300Color().cgColor
+        bottomBorderLayer.backgroundColor = STColor.grey300Color().cgColor
         self.userBar.layer.addSublayer(bottomBorderLayer)
         //DebateTitleBar 添加下边框
         let bottomBorderLayer2 = CALayer()
         bottomBorderLayer2.frame = CGRect(x: 0, y: debateTitleBar.frame.height - 1, width: SW, height: 1)
-        bottomBorderLayer2.backgroundColor = GMColor.grey300Color().cgColor
+        bottomBorderLayer2.backgroundColor = STColor.grey300Color().cgColor
         self.debateTitleBar.layer.addSublayer(bottomBorderLayer2)
         //ActionBar 添加上边框
         let topBorderLayer = CALayer()
         topBorderLayer.frame = CGRect(x: 0, y: 0, width: SW, height: 1)
-        topBorderLayer.backgroundColor = GMColor.grey300Color().cgColor
+        topBorderLayer.backgroundColor = STColor.grey300Color().cgColor
         self.actionBar.layer.addSublayer(topBorderLayer)
     }
     
-    //私有成员
+    //MARK: - 私有成员
     fileprivate var supported: Bool = false
     fileprivate var opposed: Bool = false
     fileprivate var bravoed: Bool = false
@@ -74,21 +73,15 @@ class DebateAnswerDetailViewController: BaseViewController {
     fileprivate var followed: Bool = false
     fileprivate weak var viewModel: DebateAnswerDetailViewModel!
     fileprivate var disposeBag = DisposeBag()
-    fileprivate lazy var emptyView: EmptyView = {
-        let emptyView = EmptyView(target: self.view)
-        emptyView.delegate = self
-        return emptyView
-    }()
-    //Action Bar
     fileprivate lazy var actionButtonSY: UIButton = { //赞同按钮
         let w = SW/5
         let h = self.actionBar.frame.height
         let imageSize: CGFloat = 30
         let imageBottom: CGFloat = 12
         let labelTop = (h + imageSize - imageBottom)/2
-        let button = PMSuperButton(frame: CGRect(x: 0, y: 0, width: w, height: h))
+        let button = STButton(frame: CGRect(x: 0, y: 0, width: w, height: h))
         button.ripple = true
-        let imageView = UIImageView.init(image: UIImage.init(icon: .fontAwesome(.thumbsOUp), size: CGSize(width: 30, height: 30), textColor: GMColor.grey600Color(), backgroundColor: UIColor.clear))
+        let imageView = UIImageView.init(image: UIImage.init(icon: .fontAwesome(.thumbsOUp), size: CGSize(width: 30, height: 30), textColor: STColor.grey600Color(), backgroundColor: UIColor.clear))
         imageView.frame.origin = CGPoint.init(x: (w-30)/2, y: 4)
         imageView.tag = 10001
         button.addSubview(imageView)
@@ -96,26 +89,26 @@ class DebateAnswerDetailViewController: BaseViewController {
         label.text = "赞"
         label.font = UIFont.systemFont(ofSize: 11)
         label.frame.size.height = label.heightOfLine
-        label.textColor = GMColor.grey600Color()
+        label.textColor = STColor.grey600Color()
         label.textAlignment = .center
         button.addSubview(label)
         return button
     }()
-    fileprivate lazy var actionButtonST: UIButton = { //踩按钮
+    fileprivate lazy var actionButtonST: UIButton = { //反对按钮
         let w = SW/5
         let h = self.actionBar.frame.height
         let imageSize: CGFloat = 30
         let imageBottom: CGFloat = 12
         let labelTop = (h + imageSize - imageBottom)/2
-        let button = PMSuperButton(frame: CGRect(x: w, y: 0, width: w, height: h))
+        let button = STButton(frame: CGRect(x: w, y: 0, width: w, height: h))
         button.ripple = true
-        button.setImage(UIImage.init(icon: .fontAwesome(.thumbsODown), size: CGSize(width: 30, height: 30), textColor: GMColor.grey600Color(), backgroundColor: UIColor.clear), for: .normal)
+        button.setImage(UIImage.init(icon: .fontAwesome(.thumbsODown), size: CGSize(width: 30, height: 30), textColor: STColor.grey600Color(), backgroundColor: UIColor.clear), for: .normal)
         button.imageEdgeInsets.bottom = imageBottom
         let label = UILabel(frame: CGRect(x: 0, y: labelTop, width: w, height: 0))
         label.text = "踩"
         label.font = UIFont.systemFont(ofSize: 11)
         label.frame.size.height = label.heightOfLine
-        label.textColor = GMColor.grey600Color()
+        label.textColor = STColor.grey600Color()
         label.textAlignment = .center
         button.addSubview(label)
         return button
@@ -126,15 +119,15 @@ class DebateAnswerDetailViewController: BaseViewController {
         let imageSize: CGFloat = 30
         let imageBottom: CGFloat = 12
         let labelTop = (h + imageSize - imageBottom)/2
-        let button = PMSuperButton(frame: CGRect(x: w*2, y: 0, width: w, height: h))
+        let button = STButton(frame: CGRect(x: w*2, y: 0, width: w, height: h))
         button.ripple = true
-        button.setImage(UIImage.init(icon: .fontAwesome(.gg), size: CGSize(width: 30, height: 30), textColor: GMColor.grey600Color(), backgroundColor: UIColor.clear), for: .normal)
+        button.setImage(UIImage.init(icon: .fontAwesome(.gg), size: CGSize(width: 30, height: 30), textColor: STColor.grey600Color(), backgroundColor: UIColor.clear), for: .normal)
         button.imageEdgeInsets.bottom = imageBottom
         let label = UILabel(frame: CGRect(x: 0, y: labelTop, width: w, height: 0))
         label.text = "同归"
         label.font = UIFont.systemFont(ofSize: 11)
         label.frame.size.height = label.heightOfLine
-        label.textColor = GMColor.grey600Color()
+        label.textColor = STColor.grey600Color()
         label.textAlignment = .center
         button.addSubview(label)
         return button
@@ -145,15 +138,15 @@ class DebateAnswerDetailViewController: BaseViewController {
         let imageSize: CGFloat = 30
         let imageBottom: CGFloat = 12
         let labelTop = (h + imageSize - imageBottom)/2
-        let button = PMSuperButton(frame: CGRect(x: w*3, y: 0, width: w, height: h))
+        let button = STButton(frame: CGRect(x: w*3, y: 0, width: w, height: h))
         button.ripple = true
-        button.setImage(UIImage.init(icon: .fontAwesome(.starO), size: CGSize(width: 30, height: 30), textColor: GMColor.grey600Color(), backgroundColor: UIColor.clear), for: .normal)
+        button.setImage(UIImage.init(icon: .fontAwesome(.starO), size: CGSize(width: 30, height: 30), textColor: STColor.grey600Color(), backgroundColor: UIColor.clear), for: .normal)
         button.imageEdgeInsets.bottom = imageBottom
         let label = UILabel(frame: CGRect(x: 0, y: labelTop, width: w, height: 0))
         label.text = "收藏"
         label.font = UIFont.systemFont(ofSize: 11)
         label.frame.size.height = label.heightOfLine
-        label.textColor = GMColor.grey600Color()
+        label.textColor = STColor.grey600Color()
         label.textAlignment = .center
         button.addSubview(label)
         return button
@@ -164,15 +157,15 @@ class DebateAnswerDetailViewController: BaseViewController {
         let imageSize: CGFloat = 30
         let imageBottom: CGFloat = 12
         let labelTop = (h + imageSize - imageBottom)/2
-        let button = PMSuperButton(frame: CGRect(x: w*4, y: 0, width: w, height: h))
+        let button = STButton(frame: CGRect(x: w*4, y: 0, width: w, height: h))
         button.ripple = true
-        button.setImage(UIImage.init(icon: .fontAwesome(.commentO), size: CGSize(width: 30, height: 30), textColor: GMColor.grey600Color(), backgroundColor: UIColor.clear), for: .normal)
+        button.setImage(UIImage.init(icon: .fontAwesome(.commentO), size: CGSize(width: 30, height: 30), textColor: STColor.grey600Color(), backgroundColor: UIColor.clear), for: .normal)
         button.imageEdgeInsets.bottom = imageBottom
         let label = UILabel(frame: CGRect(x: 0, y: labelTop, width: w, height: 0))
         label.text = "179"
         label.font = UIFont.systemFont(ofSize: 11)
         label.frame.size.height = label.heightOfLine
-        label.textColor = GMColor.grey600Color()
+        label.textColor = STColor.grey600Color()
         label.textAlignment = .center
         button.addSubview(label)
         //Ges
@@ -184,7 +177,8 @@ class DebateAnswerDetailViewController: BaseViewController {
 }
 
 extension DebateAnswerDetailViewController {
-    //初始化
+
+    //MARK: - 初始化
     fileprivate func setupUI() {
         //WebView
         self.webView.scrollView.showsVerticalScrollIndicator = false
@@ -195,13 +189,16 @@ extension DebateAnswerDetailViewController {
         self.userBarName.text = section.nickname
         self.userBarThumbnail.layer.cornerRadius = self.userBarThumbnail.frame.width/2
         self.userBarThumbnail.layer.masksToBounds = true
-        self.userBarThumbnail.kf.setImage(with: URL(string: section.portrait!))
+        if !section.isanonymous {
+            self.userBarThumbnail.kf.setImage(with: URL(string: section.portrait!))
+            self.userBarFollowButton.isHidden = false
+        }
         //Buttons
         self.userBarFollowButton.setImage(UIImage.init(icon: .fontAwesome(.plus), size: CGSize(width: 20, height: 20), textColor: ColorPrimary, backgroundColor: UIColor.clear), for: .normal)
         self.userBarFollowButton.contentEdgeInsets.left = 8
         self.userBarFollowButton.contentEdgeInsets.right = 8
         //ActionBar
-        self.actionBar.backgroundColor = GMColor.grey50Color()
+        self.actionBar.backgroundColor = STColor.grey50Color()
         self.actionBar.addSubview(self.actionButtonSY)
         self.actionButtonSY.addTarget(self, action: #selector(self.zanClicked), for: .touchUpInside)
         self.actionButtonST.addTarget(self, action: #selector(self.caiClicked), for: .touchUpInside)
@@ -226,6 +223,7 @@ extension DebateAnswerDetailViewController {
                         break
                     case .ok:
                         self.applyFollowButton(false)
+                        ServiceUtil.userinfoPartRefresh(false, nil)
                         break
                     default:
                         break
@@ -237,6 +235,7 @@ extension DebateAnswerDetailViewController {
                         break
                     case .ok:
                         self.applyFollowButton(true)
+                        ServiceUtil.userinfoPartRefresh(true, nil)
                         break
                     case .exist:
                         self.applyFollowButton(true)
@@ -276,30 +275,22 @@ extension DebateAnswerDetailViewController {
         self.viewModel.inputs.attitudeCheck.onNext(())
         //加载详情
         viewModel.outputs.emptyStateObserver.value = .loading(type: .indicator1)
-        self.webView.loadHTMLString(self.section.answer!, baseURL: nil)
-        self.emptyView.show(type: .loading(type: .indicator1), frame: CGRect(x: self.webView.frame.origin.x, y: self.webView.frame.origin.y, width: SW, height: SH - self.webView.frame.origin.y - self.actionBar.frame.size.height))
+        self.webViewLoad(data: section.content!)
     }
-    //关注按钮点击事件
+    
+    //MARK: - 加载内容
+    fileprivate func webViewLoad(data: String){
+        webView.loadHTMLString(ServiceUtil.updateHtmlStyle(data, 20, 15), baseURL: nil)
+    }
+    
+    //MARK: - 按钮事件
     @objc fileprivate func follow() {
-        if self.followed {// 取消关注
+        if self.followed { //取消关注
             viewModel.inputs.followTap.onNext(false)
-        } else {// 关注
+        } else { //关注
             viewModel.inputs.followTap.onNext(true)
         }
     }
-    //关注按钮状态更新
-    fileprivate func applyFollowButton(_ followed: Bool) {
-        self.followed = followed
-        self.userBarFollowButton.isHidden = false
-        if followed {
-            self.userBarFollowButton.setTitle("已关注", for: .normal)
-            self.userBarFollowButton.setImage(nil, for: .normal)
-        } else {
-            self.userBarFollowButton.setTitle("关注", for: .normal)
-            self.userBarFollowButton.setImage(UIImage.init(icon: .fontAwesome(.plus), size: CGSize(width: 20, height: 20), textColor: ColorPrimary, backgroundColor: UIColor.clear), for: .normal)
-        }
-    }
-    //NavigationBarItem Action
     @objc fileprivate func goBack() {
         if (navigationController != nil) {
             navigationController?.popViewController(animated: true)
@@ -307,7 +298,6 @@ extension DebateAnswerDetailViewController {
             dismiss(animated: true, completion: nil)
         }
     }
-    //ActionBar Event
     @objc fileprivate func commentButtonClicked() {
         let debateAnswerCommentVC = GeneralFactory.getVCfromSb("Debate", "DebateComment") as! DebateCommentViewController
         debateAnswerCommentVC.section = self.section
@@ -320,7 +310,7 @@ extension DebateAnswerDetailViewController {
         self.actionButtonSY.isEnabled = false
         imageView.scaleXY(1.2, 1.2).then().rotate(0.4).then().rotate(-0.8).then().rotate(0.4).then().scaleXY(1/1.2, 1/1.2).completion { [weak self] in
             self?.actionButtonSY.isEnabled = true
-        }.animate()
+            }.animate()
     }
     @objc fileprivate func caiClicked() {
         self.applyAttitude(attitude: AttitudeStand.oppose, toggle: !self.opposed)
@@ -331,42 +321,54 @@ extension DebateAnswerDetailViewController {
     @objc fileprivate func keepClicked() {
         self.applyAttitude(attitude: AttitudeStand.collect, toggle: !self.collected)
     }
-    //发起态度
     fileprivate func applyAttitude(attitude: AttitudeStand, toggle: Bool) {
         self.viewModel.inputs.attitudeTap.onNext((attitude, toggle))
+    }
+    
+    //MARK: - 按钮状态变更
+    fileprivate func applyFollowButton(_ followed: Bool) {
+        self.followed = followed
+        self.userBarFollowButton.isHidden = false
+        if followed {
+            self.userBarFollowButton.setTitle("已关注", for: .normal)
+            self.userBarFollowButton.setImage(nil, for: .normal)
+        } else {
+            self.userBarFollowButton.setTitle("关注", for: .normal)
+            self.userBarFollowButton.setImage(UIImage.init(icon: .fontAwesome(.plus), size: CGSize(width: 20, height: 20), textColor: ColorPrimary, backgroundColor: UIColor.clear), for: .normal)
+        }
     }
     fileprivate func applyAttitudeButtons(_ attitude: AnswerAttitude) {
         if let support = attitude.support {
             if support == 1 {
                 let imageView = actionButtonSY.viewWithTag(10001) as! UIImageView
-                imageView.image = UIImage.init(icon: .fontAwesome(.thumbsOUp), size: CGSize(width: 30, height: 30), textColor: GMColor.red600Color(), backgroundColor: UIColor.clear)
+                imageView.image = UIImage.init(icon: .fontAwesome(.thumbsOUp), size: CGSize(width: 30, height: 30), textColor: STColor.red600Color(), backgroundColor: UIColor.clear)
             } else {
                 let imageView = actionButtonSY.viewWithTag(10001) as! UIImageView
-                imageView.image = UIImage.init(icon: .fontAwesome(.thumbsOUp), size: CGSize(width: 30, height: 30), textColor: GMColor.grey600Color(), backgroundColor: UIColor.clear)
+                imageView.image = UIImage.init(icon: .fontAwesome(.thumbsOUp), size: CGSize(width: 30, height: 30), textColor: STColor.grey600Color(), backgroundColor: UIColor.clear)
             }
             self.supported = support == 1 ? true:false
         }
         if let oppose = attitude.oppose {
             if oppose == 1 {
-                actionButtonST.setImage(UIImage.init(icon: .fontAwesome(.thumbsODown), size: CGSize(width: 30, height: 30), textColor: GMColor.red600Color(), backgroundColor: UIColor.clear), for: .normal)
+                actionButtonST.setImage(UIImage.init(icon: .fontAwesome(.thumbsODown), size: CGSize(width: 30, height: 30), textColor: STColor.red600Color(), backgroundColor: UIColor.clear), for: .normal)
             } else {
-                actionButtonST.setImage(UIImage.init(icon: .fontAwesome(.thumbsODown), size: CGSize(width: 30, height: 30), textColor: GMColor.grey600Color(), backgroundColor: UIColor.clear), for: .normal)
+                actionButtonST.setImage(UIImage.init(icon: .fontAwesome(.thumbsODown), size: CGSize(width: 30, height: 30), textColor: STColor.grey600Color(), backgroundColor: UIColor.clear), for: .normal)
             }
             self.opposed = oppose == 1 ? true:false
         }
         if let bravo = attitude.bravo {
             if bravo == 1 {
-                actionButtonTG.setImage(UIImage.init(icon: .fontAwesome(.gg), size: CGSize(width: 30, height: 30), textColor: GMColor.red600Color(), backgroundColor: UIColor.clear), for: .normal)
+                actionButtonTG.setImage(UIImage.init(icon: .fontAwesome(.gg), size: CGSize(width: 30, height: 30), textColor: STColor.red600Color(), backgroundColor: UIColor.clear), for: .normal)
             } else {
-                actionButtonTG.setImage(UIImage.init(icon: .fontAwesome(.gg), size: CGSize(width: 30, height: 30), textColor: GMColor.grey600Color(), backgroundColor: UIColor.clear), for: .normal)
+                actionButtonTG.setImage(UIImage.init(icon: .fontAwesome(.gg), size: CGSize(width: 30, height: 30), textColor: STColor.grey600Color(), backgroundColor: UIColor.clear), for: .normal)
             }
             self.bravoed = bravo == 1 ? true:false
         }
         if let collect = attitude.collect {
             if collect == 1 {
-                actionButtonKeep.setImage(UIImage.init(icon: .fontAwesome(.starO), size: CGSize(width: 30, height: 30), textColor: GMColor.red600Color(), backgroundColor: UIColor.clear), for: .normal)
+                actionButtonKeep.setImage(UIImage.init(icon: .fontAwesome(.starO), size: CGSize(width: 30, height: 30), textColor: STColor.red600Color(), backgroundColor: UIColor.clear), for: .normal)
             } else {
-                actionButtonKeep.setImage(UIImage.init(icon: .fontAwesome(.starO), size: CGSize(width: 30, height: 30), textColor: GMColor.grey600Color(), backgroundColor: UIColor.clear), for: .normal)
+                actionButtonKeep.setImage(UIImage.init(icon: .fontAwesome(.starO), size: CGSize(width: 30, height: 30), textColor: STColor.grey600Color(), backgroundColor: UIColor.clear), for: .normal)
             }
             self.collected = collect == 1 ? true:false
         }
@@ -374,22 +376,18 @@ extension DebateAnswerDetailViewController {
 }
 
 extension DebateAnswerDetailViewController: WKNavigationDelegate {
-    // WKNavigationDelegate
-    // --------------------
-    //页面开始加载
-    func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
+    
+    //MARK: - WKNavigationDelegate
+    func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) { //页面开始加载
+        self.webView.showBaseEmptyView()
+    }
+    func webView(_ webView: WKWebView, didCommit navigation: WKNavigation!) { //内容开始返回
         
     }
-    //内容开始返回
-    func webView(_ webView: WKWebView, didCommit navigation: WKNavigation!) {
-        
+    func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) { //页面加载完
+        self.webView.hideEmptyView()
     }
-    //页面加载完
-    func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
-        self.emptyView.hide()
-    }
-    //页面加载失败
-    func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
-        self.emptyView.show(type: .empty(size: nil), frame: CGRect(x: self.webView.frame.origin.x, y: self.webView.frame.origin.y, width: SW, height: SH - self.webView.frame.origin.y - self.actionBar.frame.size.height))
+    func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) { //页面加载失败
+        self.webView.hideEmptyView()
     }
 }

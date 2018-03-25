@@ -9,12 +9,13 @@
 import Foundation
 import RxCocoa
 import RxSwift
+import ObjectMapper
 
 /// 本地环境
 
 struct Environment {
     
-    ///短信模块: 短信发送时间
+    //MARK: - 短信模块: 短信发送时间
     static var vtime = Variable<Int>(0)
     static func setVtime(_ time: Int = 60) {
         //init
@@ -32,7 +33,7 @@ struct Environment {
         timer.resume()
     }
     
-    ///搜索模块: 搜索历史纪录
+    //MARK: - 搜索模块: 搜索历史纪录
     static var searchHistory: [String]? {
         get {
             return self.userDefaults.value(forKey: UserDefaultsKeys.History.rawValue) as! [String]?
@@ -58,7 +59,8 @@ struct Environment {
         histoies.remove(at: index)
         self.searchHistory = histoies
     }
-    ///搜索模块: 热门搜索记录
+    
+    //MARK: - 搜索模块: 热门搜索记录
     static var searchHot: [String]? {
         get {
             return self.userDefaults.value(forKey: UserDefaultsKeys.Hot.rawValue) as! [String]?
@@ -80,7 +82,7 @@ struct Environment {
         }
     }
     
-    ///认证模块
+    //MARK: - 认证模块
     static var token: String? {
         get {
             return self.userDefaults.value(forKey: UserDefaultsKeys.Token.rawValue) as! String?
@@ -95,12 +97,28 @@ struct Environment {
         }
         return true
     }
-    static var protrait: String? {
+    static var portrait: String? {
         get {
-            return self.userDefaults.value(forKey: UserDefaultsKeys.Protrait.rawValue) as! String?
+            return self.userDefaults.value(forKey: UserDefaultsKeys.Portrait.rawValue) as! String?
         }
         set {
-            self.userDefaults.setValue(newValue, forKey: UserDefaultsKeys.Protrait.rawValue)
+            self.userDefaults.setValue(newValue, forKey: UserDefaultsKeys.Portrait.rawValue)
+        }
+    }
+    static var nickname: String? {
+        get {
+            return self.userDefaults.value(forKey: UserDefaultsKeys.Nickname.rawValue) as! String?
+        }
+        set {
+            self.userDefaults.setValue(newValue, forKey: UserDefaultsKeys.Nickname.rawValue)
+        }
+    }
+    static var follows: Int? {
+        get {
+            return self.userDefaults.value(forKey: UserDefaultsKeys.Follows.rawValue) as! Int?
+        }
+        set {
+            self.userDefaults.setValue(newValue, forKey: UserDefaultsKeys.Follows.rawValue)
         }
     }
     static var followtopics: Int? {
@@ -111,24 +129,21 @@ struct Environment {
             self.userDefaults.setValue(newValue, forKey: UserDefaultsKeys.FollowTopics.rawValue)
         }
     }
-    static var followpersons: Int? {
+    static var userinfo: UserInfo? {
         get {
-            return self.userDefaults.value(forKey: UserDefaultsKeys.FollowPersons.rawValue) as! Int?
+            if let data = self.userDefaults.value(forKey: UserDefaultsKeys.UserInfo.rawValue) as? [String: Any] {
+                return UserInfo.init(map: Map.init(mappingType: .fromJSON, JSON: data))
+            }
+            return nil
         }
         set {
-            self.userDefaults.setValue(newValue, forKey: UserDefaultsKeys.FollowPersons.rawValue)
-        }
-    }
-    static var fans: Int? {
-        get {
-            return self.userDefaults.value(forKey: UserDefaultsKeys.Fans.rawValue) as! Int?
-        }
-        set {
-            self.userDefaults.setValue(newValue, forKey: UserDefaultsKeys.Fans.rawValue)
+            if let data = newValue?.toJSON() {
+                self.userDefaults.setValue(data, forKey: UserDefaultsKeys.UserInfo.rawValue)
+            }
         }
     }
     
-    ///版本模块
+    //MARK: - 版本模块
     static var firstLaunch: String? {
         get {
             return self.userDefaults.value(forKey: UserDefaultsKeys.Launch.rawValue) as! String?
@@ -168,26 +183,23 @@ struct Environment {
         return false
     }
     
-    ///清空环境
-    static func clear() {
-        self.userDefaults.removeObject(forKey: UserDefaultsKeys.Token.rawValue)
-    }
+    //MARK: - 清空环境
     static func clearUserInfo() {
         self.userDefaults.removeObject(forKey: UserDefaultsKeys.Token.rawValue)
-        self.userDefaults.removeObject(forKey: UserDefaultsKeys.Protrait.rawValue)
-        self.userDefaults.removeObject(forKey: UserDefaultsKeys.FollowTopics.rawValue)
-        self.userDefaults.removeObject(forKey: UserDefaultsKeys.FollowPersons.rawValue)
-        self.userDefaults.removeObject(forKey: UserDefaultsKeys.Fans.rawValue)
+        self.userDefaults.removeObject(forKey: UserDefaultsKeys.Portrait.rawValue)
+        self.userDefaults.removeObject(forKey: UserDefaultsKeys.Nickname.rawValue)
+        self.userDefaults.removeObject(forKey: UserDefaultsKeys.UserInfo.rawValue)
     }
     
     private static let userDefaults: UserDefaults = UserDefaults.standard
     
     private enum UserDefaultsKeys: String {
         case Token          =   "user_auth_token"
-        case Protrait       =   "user_info_protrait"
+        case Nickname       =   "user_info_nickname"
+        case Portrait       =   "user_info_portrait"
+        case Follows        =   "user_info_follows"
         case FollowTopics   =   "user_info_followtopics"
-        case FollowPersons  =   "user_info_followpersons"
-        case Fans           =   "user_info_fans"
+        case UserInfo       =   "user_info_common"
         case Launch         =   "app_launch"
         case Version        =   "app_version"
         case History        =   "search_history"

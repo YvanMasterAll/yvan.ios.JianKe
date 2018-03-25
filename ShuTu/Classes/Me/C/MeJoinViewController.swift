@@ -34,7 +34,7 @@ class MeJoinViewController: BaseViewController {
         }
     }
     
-    //声明区域
+    //MARK: - 声明区域
     open var type: MeJoinType!
     open var navTitle: String!
 
@@ -47,28 +47,29 @@ class MeJoinViewController: BaseViewController {
         setupUI()
         bindRx()
     }
+    
+    override func reload() {
+        self.tableView.switchRefreshHeader(to: .refreshing)
+    }
 
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
     }
     
-    //私有
+    //MARK: - 私有成员
     fileprivate var viewModel: MeJoinViewModel!
     fileprivate var disposeBag = DisposeBag()
     fileprivate var collectDataSource: RxTableViewSectionedReloadDataSource<MeJoinCollectSectionModel>!
     fileprivate var topicDataSource: RxTableViewSectionedReloadDataSource<MeJoinTopicSectionModel>!
     fileprivate var userDataSource: RxTableViewSectionedReloadDataSource<MeJoinUserSectionModel>!
-    fileprivate var emptyView: EmptyView!
 
 }
 
 extension MeJoinViewController {
-    //初始化
+
+    //MARK: - 初始化
     fileprivate func setupUI() {
-        //EmptyView
-        self.emptyView = EmptyView(target: self.view)
-        self.emptyView.delegate = self
         //PullToRefreshKit
         let secondHeader = SecondRefreshHeader()
         self.tableView.configRefreshHeader(with: secondHeader, action: { [weak self] () -> Void in
@@ -148,15 +149,25 @@ extension MeJoinViewController {
             break
         }
         self.viewModel.outputs.refreshStateObserver.asObservable()
-            .subscribe(onNext: { state in
+            .subscribe(onNext: { [unowned self] state in
                 switch state {
+                case .noNet:
+                    self.tableView.switchRefreshHeader(to: .normal(.none, 0))
+                    if self.hasRequested {
+                        HUD.flash(.label("网络走失了"))
+                    } else {
+                        self.showBaseEmptyView()
+                    }
+                    break
                 case .noData:
                     self.tableView.switchRefreshHeader(to: .normal(.none, 0))
-                    self.showEmptyView(type: .empty(size: nil))
+                    self.tableView.switchRefreshFooter(to: FooterRefresherState.removed)
+                    self.showBaseEmptyView("还没有数据")
                     break
                 case .beginHeaderRefresh:
                     break
                 case .endHeaderRefresh:
+                    self.hasRequested = true
                     self.tableView.switchRefreshHeader(to: .normal(.success, 0))
                     break
                 case .beginFooterRefresh:
@@ -175,29 +186,16 @@ extension MeJoinViewController {
         //刷新
         self.tableView.switchRefreshHeader(to: .refreshing)
     }
-    //显示 & 隐藏 Empty Zone
-    fileprivate func showEmptyView(type: EmptyViewType) {
-        tableView.isHidden = true
-        self.emptyView.show(type: type, frame: self.tableView.frame)
-    }
-    fileprivate func hideEmptyView() {
-        self.emptyView.hide()
-        tableView.isHidden = false
-        self.tableView.switchRefreshHeader(to: .refreshing)
-    }
 }
 
 extension MeJoinViewController: UITableViewDelegate {
-    //TableViewDelegate && TableViewDataSource
+    
+    //MARK: - TableViewDelegate && TableViewDataSource
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return UITableViewAutomaticDimension
     }
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         //取消cell选中状态
         tableView.deselectRow(at: indexPath, animated: true)
-    }
-    //EmptyView Delegate
-    override func emptyViewClicked() {
-        self.hideEmptyView()
     }
 }

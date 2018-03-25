@@ -12,16 +12,18 @@ import RxSwift
 import Moya
 import ObjectMapper
 
-///将应用程序的运行状态变更绑定到Rx
+/// 应用程序状态
 fileprivate class RxUIApplicationDelegateProxy: DelegateProxy<AnyObject, AnyObject>, UIApplicationDelegate, DelegateProxyType {
-    //注册 UIApplication
+    
+    /// 注册 UIApplication
     init(parentObject: UIApplication) {
         super.init(parentObject: parentObject, delegateProxy: RxUIApplicationDelegateProxy.self)
     }
     static func registerKnownImplementations() {
         self.register { RxUIApplicationDelegateProxy(parentObject: $0) }
     }
-    //拷贝 appDelegate
+    
+    /// 拷贝 appDelegate
     static func setCurrentDelegate(_ delegate: AnyObject?, to object: AnyObject) {
         let app: UIApplication = object as! UIApplication
         app.delegate = delegate as? UIApplicationDelegate
@@ -30,18 +32,20 @@ fileprivate class RxUIApplicationDelegateProxy: DelegateProxy<AnyObject, AnyObje
         let app: UIApplication = object as! UIApplication
         return app.delegate
     }
-    //引用 appDelegate, 必须是强引用, 保证 appDelegate 不被释放
+    
+    /// 引用 appDelegate, 必须是强引用, 保证 appDelegate 不被释放
     override func setForwardToDelegate(_ delegate: AnyObject?, retainDelegate: Bool) {
         super.setForwardToDelegate(delegate, retainDelegate: true)
     }
 }
-//扩展 RxSwift - AppDelegate
 extension Reactive where Base: UIApplication {
-    //delegate
+    
+    /// delegate
     var delegate: DelegateProxy<AnyObject, AnyObject> {
         return RxUIApplicationDelegateProxy.proxy(for: base)
     }
-    //再次激活
+    
+    /// 再次激活
     var didBecomeActive: Observable<UIApplicationState> {
         return delegate
             .methodInvoked(#selector(UIApplicationDelegate.applicationDidBecomeActive(_:)))
@@ -49,7 +53,8 @@ extension Reactive where Base: UIApplication {
                 return .active
         }
     }
-    //回到后台
+    
+    /// 回到后台
     var didEnterBackground: Observable<UIApplicationState> {
         return delegate
             .methodInvoked(#selector(UIApplicationDelegate.applicationDidEnterBackground(_:)))
@@ -57,7 +62,8 @@ extension Reactive where Base: UIApplication {
                 return .background
         }
     }
-    //临时状态 - 按下 Home 建
+    
+    /// 临时状态 - 按下 Home 建
     var willResignActive: Observable<UIApplicationState> {
         
         return delegate
@@ -66,13 +72,15 @@ extension Reactive where Base: UIApplication {
                 return .inactive
         }
     }
-    //应用程序被终止 - 很少使用
+    
+    /// 应用程序被终止 - 很少使用
     var willTerminate: Observable<Void> {
         return delegate
             .methodInvoked(#selector(UIApplicationDelegate.applicationWillTerminate(_:)))
             .map{ _ in }
     }
-    //状态变更集
+    
+    ///状态变更集
     var state: Observable<UIApplicationState> {
         return Observable.of(
             didBecomeActive,
@@ -84,8 +92,9 @@ extension Reactive where Base: UIApplication {
     }
 }
 
-//服务端响应的数据处理
-class StubResponse { //Stub<存根>
+/// 服务端响应的数据处理
+class StubResponse {
+    
     static var stubJsonPath = ""
     static func fromJSONFile(filePath: String = stubJsonPath) -> Data {
         guard let data = try? Data(contentsOf: URL(fileURLWithPath: filePath)) else {
@@ -93,6 +102,7 @@ class StubResponse { //Stub<存根>
         }
         return data
     }
+    
     static func jsonResponseDataFormatter(_ data: Data) -> Data {
         do {
             let dataAsJSON = try JSONSerialization.jsonObject(with: data)
@@ -104,6 +114,7 @@ class StubResponse { //Stub<存根>
     }
 }
 public extension Response {
+    
     /// Maps data received from the signal into an object which implements the Mappable protocol.
     /// If the conversion fails, the signal errors.
     public func mapObject<T: BaseMappable>(_ type: T.Type, context: MapContext? = nil) throws -> T {
@@ -112,6 +123,7 @@ public extension Response {
         }
         return object
     }
+    
     /// Maps data received from the signal into an array of objects which implement the Mappable
     /// protocol.
     /// If the conversion fails, the signal errors.
@@ -125,12 +137,14 @@ public extension Response {
 }
 // MARK: - ImmutableMappable
 public extension Response {
+    
     /// Maps data received from the signal into an object which implements the ImmutableMappable
     /// protocol.
     /// If the conversion fails, the signal errors.
     public func mapObject<T: ImmutableMappable>(_ type: T.Type, context: MapContext? = nil) throws -> T {
         return try Mapper<T>(context: context).map(JSONObject: try mapJSON())
     }
+    
     /// Maps data received from the signal into an array of objects which implement the ImmutableMappable
     /// protocol.
     /// If the conversion fails, the signal errors.
@@ -143,6 +157,7 @@ public extension Response {
 }
 /// Extension for processing Responses into Mappable objects through ObjectMapper
 public extension PrimitiveSequence where TraitType == SingleTrait, ElementType == Response {
+    
     /// Maps data received from the signal into an object
     /// which implements the Mappable protocol and returns the result back
     /// If the conversion fails, the signal errors.
@@ -151,6 +166,7 @@ public extension PrimitiveSequence where TraitType == SingleTrait, ElementType =
             return Single.just(try response.mapObject(type, context: context))
         }
     }
+    
     /// Maps data received from the signal into an array of objects
     /// which implement the Mappable protocol and returns the result back
     /// If the conversion fails, the signal errors.
@@ -162,6 +178,7 @@ public extension PrimitiveSequence where TraitType == SingleTrait, ElementType =
 }
 // MARK: - ImmutableMappable
 public extension PrimitiveSequence where TraitType == SingleTrait, ElementType == Response {
+    
     /// Maps data received from the signal into an object
     /// which implements the ImmutableMappable protocol and returns the result back
     /// If the conversion fails, the signal errors.
@@ -170,6 +187,7 @@ public extension PrimitiveSequence where TraitType == SingleTrait, ElementType =
             return Single.just(try response.mapObject(type, context: context))
         }
     }
+    
     /// Maps data received from the signal into an array of objects
     /// which implement the ImmutableMappable protocol and returns the result back
     /// If the conversion fails, the signal errors.
@@ -181,6 +199,7 @@ public extension PrimitiveSequence where TraitType == SingleTrait, ElementType =
 }
 /// Extension for processing Responses into Mappable objects through ObjectMapper
 public extension ObservableType where E == Response {
+    
     /// Maps data received from the signal into an object
     /// which implements the Mappable protocol and returns the result back
     /// If the conversion fails, the signal errors.
@@ -189,6 +208,7 @@ public extension ObservableType where E == Response {
             return Observable.just(try response.mapObject(T.self, context: context))
         }
     }
+    
     /// Maps data received from the signal into an array of objects
     /// which implement the Mappable protocol and returns the result back
     /// If the conversion fails, the signal errors.
@@ -200,6 +220,7 @@ public extension ObservableType where E == Response {
 }
 // MARK: - ImmutableMappable
 public extension ObservableType where E == Response {
+    
     /// Maps data received from the signal into an object
     /// which implements the ImmutableMappable protocol and returns the result back
     /// If the conversion fails, the signal errors.
@@ -208,6 +229,7 @@ public extension ObservableType where E == Response {
             return Observable.just(try response.mapObject(T.self, context: context))
         }
     }
+    
     /// Maps data received from the signal into an array of objects
     /// which implement the ImmutableMappable protocol and returns the result back
     /// If the conversion fails, the signal errors.

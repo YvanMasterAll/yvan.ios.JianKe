@@ -32,15 +32,11 @@ import Foundation
 import UIKit
 
 /// 字体图标库
-/// 支持的字体库很多
-/// 使用
-/// @使用一 图片
-/// @使用二 图片颜色
-/// 在用的字体
-/// @字体一 fontAwesome
+/// 1.支持的字体
+///   a.fontawesome
 
 /**
-    UIImage.init(icon: .fontAwesome(.plus), size: CGSize.init(width: 14, height: 14), textColor: UIColor.white, backgroundColor: UIColor.clear)
+ UIImage.init(icon: .fontAwesome(.plus), size: CGSize.init(width: 14, height: 14), textColor: UIColor.white, backgroundColor: UIColor.clear)
  */
 
 public extension UIImage {

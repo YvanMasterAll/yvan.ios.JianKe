@@ -60,9 +60,9 @@ public final class HUD {
     }
 
     // MARK: Public methods, HUD based
-    public static func flash(_ content: HUDContentType, onView view: UIView? = nil) {
+    public static func flash(_ content: HUDContentType, onView view: UIView? = nil, delay: TimeInterval = 1.0) {
         HUD.show(content, onView: view)
-        HUD.hide(animated: true, completion: nil)
+        HUD.hide(afterDelay: delay)
     }
 
     public static func flash(_ content: HUDContentType, onView view: UIView? = nil, delay: TimeInterval, completion: ((Bool) -> Void)? = nil) {

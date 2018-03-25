@@ -9,8 +9,9 @@
 import Foundation
 import ObjectMapper
 
-public struct Debate: Mappable{
+public struct Debate: Mappable {
     
+    var id: Int?
     var portrait: String?
     var description: String?
     var puredesc: String?
@@ -18,7 +19,6 @@ public struct Debate: Mappable{
     var supports: Int?
     var opposes: Int?
     var follows: Int?
-    var id: Int?
     var title: String?
     var type: String?
     var status: String?
@@ -31,11 +31,11 @@ public struct Debate: Mappable{
     
     public mutating func mapping(map: Map)
     {
+        id <- map["id"]
         portrait <- map["portrait"]
         opposes <- map["opposes"]
         supports <- map["supports"]
         follows <- map["follows"]
-        id <- map["id"]
         title <- map["title"]
         type <- map["type"]
         status <- map["status"]
@@ -44,6 +44,10 @@ public struct Debate: Mappable{
         content <- map["content"]
         cover_image <- map["cover_image"]
         createtime <- map["createtime"]
+        
+        self.cover_image = ModelHelper.handleUrl(self.cover_image)
+        self.portrait = ModelHelper.handleUrl(self.portrait)
+        self.description = ModelHelper.handleContent(description)
     }
 }
 
@@ -63,14 +67,16 @@ public struct DebateCollect: Mappable {
     
     public mutating func mapping(map: Map)
     {
+        id <- map["id"]
+        topicid <- map["topicid"]
+        title <- map["title"]
+        description <- map["description"]
         opposes <- map["opposes"]
         supports <- map["supports"]
-        id <- map["id"]
-        title <- map["title"]
-        status <- map["status"]
-        topicid <- map["topicid"]
-        description <- map["description"]
         createtime <- map["createtime"]
+        status <- map["status"]
+        
+        self.description = ModelHelper.handleContent(description)
     }
 }
 

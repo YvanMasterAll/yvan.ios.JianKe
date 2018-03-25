@@ -20,33 +20,37 @@ public struct DebateAnswerDetailViewModelInput {
 }
 public struct DebateAnswerDetailViewModelOutput {
     var section: Observable<AnswerDetail>?
-    var emptyStateObserver: Variable<EmptyViewType>
-    var followResult: Variable<Result2>
-    var followCheck: Variable<Result2>
+    var emptyStateObserver: Variable<STEmptyViewType>
+    var followResult: Variable<ResultType>
+    var followCheck: Variable<ResultType>
     var attitudeResult: Variable<AnswerAttitude>
 }
 class DebateAnswerDetailViewModel {
+
+    //MARK: - 私有成员
     fileprivate struct AnswerDetailModel {
         var disposeBag: DisposeBag
         var model: Variable<AnswerDetail>
         var section: Answer
     }
-    //私有成员
     fileprivate var answerDetail: AnswerDetailModel!
     fileprivate var service = DebateService.instance
-    //inputs
+    fileprivate var fservice = FriendService.instance
+
+    //MARK: - inputs
     public var inputs: DebateAnswerDetailViewModelInput! = {
         return DebateAnswerDetailViewModelInput(refreshData: PublishSubject(), followTap: PublishSubject(), followCheck: PublishSubject(), attitudeCheck: PublishSubject(), attitudeTap: PublishSubject())
     }()
-    //outputs
+    
+    //MARK: - outputs
     public var outputs: DebateAnswerDetailViewModelOutput! = {
-        return DebateAnswerDetailViewModelOutput(section: nil, emptyStateObserver: Variable<EmptyViewType>(.none), followResult: Variable<Result2>(.empty), followCheck: Variable<Result2>(.none), attitudeResult: Variable<AnswerAttitude>(AnswerAttitude.init()))
+        return DebateAnswerDetailViewModelOutput(section: nil, emptyStateObserver: Variable<STEmptyViewType>(.none), followResult: Variable<ResultType>(.empty), followCheck: Variable<ResultType>(.none), attitudeResult: Variable<AnswerAttitude>(AnswerAttitude.init()))
     }()
     
     init(disposeBag: DisposeBag, section: Answer) {
         //初始化
         self.answerDetail = AnswerDetailModel(disposeBag: disposeBag, model: Variable<AnswerDetail>(AnswerDetail()), section: section)
-        self.outputs.emptyStateObserver = Variable<EmptyViewType>(.none)
+        self.outputs.emptyStateObserver = Variable<STEmptyViewType>(.none)
         //Rx
         self.outputs.section = self.answerDetail.model.asObservable()
             .map{ model -> AnswerDetail in
@@ -68,7 +72,7 @@ class DebateAnswerDetailViewModel {
                             self.answerDetail.model.value = data
                             break
                         default:
-                            self.outputs.emptyStateObserver.value = .empty(size: nil)
+                            self.outputs.emptyStateObserver.value = .empty(type: .box, options: nil)
                             break
                         }
                     })
@@ -77,7 +81,7 @@ class DebateAnswerDetailViewModel {
             .disposed(by: self.answerDetail.disposeBag)
         self.inputs.attitudeCheck.asObserver()
             .subscribe(onNext: {
-                guard Environment.tokenExists  else {
+                guard ServiceUtil.loginCheck()  else {
                     return
                 }
                 self.service.attitudeCheck(self.answerDetail.section.id!).asObservable()
@@ -96,8 +100,7 @@ class DebateAnswerDetailViewModel {
             .disposed(by: self.answerDetail.disposeBag)
         self.inputs.attitudeTap.asObserver()
             .subscribe(onNext: { (attitude, add) in
-                guard Environment.tokenExists  else {
-                    HUD.flash(.label("请先登录"))
+                guard ServiceUtil.loginCheck(true)  else {
                     return
                 }
                 HUD.show(.progress)
@@ -116,7 +119,7 @@ class DebateAnswerDetailViewModel {
                         })
                         .disposed(by: self.answerDetail.disposeBag)
                 } else {
-                    self.service.attitudeAdd(self.answerDetail.section.id!, attitude: attitude, type: AttitudeType.viewpoint, toggle: Toggle.on)
+                    self.service.attitudeAdd(self.answerDetail.section.id!, attitude: attitude, type: AttitudeType.viewpoint, toggle: Toggle.off)
                         .subscribe(onNext: { response in
                             HUD.hide()
                             let result = response.1
@@ -134,10 +137,10 @@ class DebateAnswerDetailViewModel {
             .disposed(by: self.answerDetail.disposeBag)
         self.inputs.followCheck.asObserver()
             .subscribe(onNext: {
-                guard Environment.tokenExists  else {
+                guard ServiceUtil.loginCheck(), let id = self.answerDetail.section.userid else {
                     return
                 }
-                self.service.followCheck(self.answerDetail.section.topicid!).asObservable()
+                self.fservice.followCheck(id).asObservable()
                     .subscribe(onNext: { result in
                         self.outputs.followCheck.value = result
                     })
@@ -146,20 +149,19 @@ class DebateAnswerDetailViewModel {
             .disposed(by: self.answerDetail.disposeBag)
         self.inputs.followTap.asObserver()
             .subscribe(onNext: { add in
-                guard Environment.tokenExists  else {
-                    HUD.flash(.label("请先登录"))
+                guard ServiceUtil.loginCheck(true), let id = self.answerDetail.section.userid  else {
                     return
                 }
                 HUD.show(.progress)
                 if add {
-                    self.service.followAdd(self.answerDetail.section.topicid!, Toggle.on)
+                    self.fservice.followAdd(id, Toggle.on)
                         .subscribe(onNext: { result in
                             HUD.hide()
                             self.outputs.followResult.value = result
                         })
                         .disposed(by: self.answerDetail.disposeBag)
                 } else {
-                    self.service.followAdd(self.answerDetail.section.topicid!, Toggle.off)
+                    self.fservice.followAdd(id, Toggle.off)
                         .subscribe(onNext: { result in
                             HUD.hide()
                             self.outputs.followResult.value = result

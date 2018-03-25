@@ -17,12 +17,13 @@ class ShuTuUITests: XCTestCase {
     func testFollow() {
         let app = XCUIApplication()
         
-        XCTAssertTrue(app.tables.element(boundBy: 1).cells.staticTexts["举报作弊我错了吗"].exists)
-        app.tables.element(boundBy: 1).cells.staticTexts["举报作弊我错了吗"].tap()
+        let firstCell = app.tables.element(boundBy: 1).cells.firstMatch
+        XCTAssertTrue(firstCell.exists)
+        firstCell.tap()
         app.buttons["关注"].tap()
         XCTAssertTrue(app.staticTexts["关注成功"].exists)
     }
-        
+
     override func setUp() {
         super.setUp()
         

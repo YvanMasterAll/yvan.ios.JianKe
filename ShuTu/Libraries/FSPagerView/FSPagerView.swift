@@ -12,6 +12,10 @@
 
 import UIKit
 
+/// https://github.com/WenchaoD/FSPagerView
+/// Collection + Page
+/// 图片轮播, 分页
+
 @objc
 public protocol FSPagerViewDataSource: NSObjectProtocol {
     

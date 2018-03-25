@@ -12,17 +12,13 @@ import RxSwift
 
 class BaseViewController: UIViewController {
     
-    //声明区域
-    open var hasMenu: Bool = false {
-        didSet {
-            
-        }
-    }
+    //MARK: - 声明区域
     open var isLogin: Bool = Environment.tokenExists
-    open var showNavbar: Bool = false
-    open var hideNavbar: Bool = false
-    open var hideTabbar: Bool = false
-    open var navBarTitle: String = ""
+    open var showNavbar: Bool = false //显示导航栏
+    open var hideNavbar: Bool = false //退出时隐藏导航栏
+    open var hideTabbar: Bool = false //隐藏底部菜单
+    open var navBarTitle: String = "" //导航栏标题
+    open var hasRequested: Bool = false //成功请求过数据
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -62,57 +58,104 @@ class BaseViewController: UIViewController {
         print("deinit: \(type(of: self))")
     }
     
-    //显示空页面
+    //MARK: - 显示空页面
     func showBaseEmptyView() {
-        self.baseEmptyView.show(type: .empty(size: nil), frame: self.view.bounds)
+        self.shouldReload = true
+        self.baseEmptyView.show(type: .empty(type: .box, options: nil), frame: self.view.bounds)
     }
-    func reload() { //重新加载该页面
-        
+    func showBaseEmptyView(_ description: String?, _ type: STEVEmptyType = .vase) {
+        self.shouldReload = false
+        var options = STEVEmptyOptions()
+        options.hasDescription = true
+        if let d = description {
+            options.description = d
+        }
+        self.baseEmptyView.show(type: .empty(type: type, options: options), frame: self.view.bounds)
     }
-    //跳转到登录页
+    func showBaseEmptyView(_ description: String?, _ deHeight: CGFloat, _ type: STEVEmptyType = .vase) {
+        self.shouldReload = false
+        var options = STEVEmptyOptions()
+        options.hasDescription = true
+        if let d = description {
+            options.description = d
+        }
+        let width = self.view.bounds.width
+        let height = self.view.bounds.height - deHeight
+        self.baseEmptyView.show(type: .empty(type: type, options: options), frame: CGRect.init(origin: self.view.bounds.origin, size: CGSize.init(width: width, height: height)))
+    }
+    
+    /// 跳转到登录页
     func gotoLoginPage() {
         NotificationCenter.default.post(name: NSNotification.Name(rawValue: NotificationName3), object: nil, userInfo: ["type": "push"])
     }
-    //成功登录
-    func loginIn() {
-        
-    }
-    //退出登录
-    func loginOut() {
-        
-    }
-    //应用程序状态
-    func appBeActive() {
-        
-    }
-    func appInActive() {
-        
-    }
-    func appInBackground() {
-        
+    
+    /// 更新用户信息
+    func userinfoRefresh(_ handler: ((_ userinfo: UserInfo) -> Void)?) {
+        if self.isLogin {
+            MeService.instance.userinfo().asObservable()
+                .subscribe(onNext: { response in
+                    let userinfo = response.0
+                    let result = response.1
+                    switch result {
+                    case .ok:
+                        if let u = userinfo {
+                            handler?(u)
+                            AppStatus.onNext(AppState.userinfo)
+                        }
+                        break
+                    default:
+                        break
+                    }
+                })
+                .disposed(by: self.disposeBag)
+        }
     }
     
-    //私有
-    fileprivate var baseEmptyView: EmptyView!
+    /// 重新加载该页面
+    func reload() { }
+    
+    /// 成功登录
+    func loginIn() { }
+    
+    /// 退出登录
+    func logOut() { }
+    
+    //MARK: - 用户信息发生更新
+    func userinfoUpdated() { }
+    func userinfoPartUpdated() { }
+    
+    //MARK: - 应用程序状态
+    func appBeActive() { }
+    func appInActive() { }
+    func appInBackground() { }
+    
+    //MARK: - 私有成员
+    fileprivate var baseEmptyView: STEmptyView!
+    fileprivate var shouldReload: Bool = true
     fileprivate var disposeBag = DisposeBag()
 
 }
 
 extension BaseViewController {
-    //初始化
+    
+    //MARK: - 初始化
     fileprivate func baseSetupUI() {
         //EmptyView
-        self.baseEmptyView = EmptyView.init(target: self.view)
+        self.baseEmptyView = STEmptyView.init(target: self.view)
         self.baseEmptyView.delegate = self
         //登录通知
-        LoginStatus.subscribe(onNext: { [unowned self] state in
+        AppStatus.subscribe(onNext: { [unowned self] state in
             switch state {
-            case .ok:
+            case .login:
                 self.isLogin = true
                 self.loginIn()
-            case .out:
+            case .logout:
                 self.isLogin = false
-                self.loginOut()
+                self.logOut()
+            case .userinfo:
+                self.userinfoUpdated()
+            case .userinfo_part:
+                self.userinfoPartUpdated()
             default:
                 break
             }
@@ -136,10 +179,13 @@ extension BaseViewController {
     }
 }
 
-extension BaseViewController: EmptyViewDelegate {
-    //EmptyViewDelegate
+extension BaseViewController: STEmptyViewDelegate {
+    
+    //MARK: - EmptyViewDelegate
     func emptyViewClicked() {
-        self.baseEmptyView.hide()
-        self.reload()
+        if self.shouldReload {
+            self.baseEmptyView.hide()
+            self.reload()
+        }
     }
 }

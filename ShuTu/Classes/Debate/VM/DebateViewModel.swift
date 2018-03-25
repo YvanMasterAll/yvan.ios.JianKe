@@ -15,6 +15,7 @@ import RxDataSources
 //刷新状态
 public enum RefreshStatus {
     case none
+    case noNet
     case noData
     case beginHeaderRefresh
     case endHeaderRefresh
@@ -34,19 +35,23 @@ public protocol DebateViewModelType {
     var outputs: DebateViewModelOutput { get }
 }
 public class DebateViewModel: DebateViewModelInput, DebateViewModelOutput, DebateViewModelType {
-    //声明区
-    fileprivate var pageIndex = 0
+
+    //MARK: - 声明区域
+    fileprivate var pageIndex = 1
     fileprivate let models = Variable<[Debate]>([])
     fileprivate let disposeBag: DisposeBag!
     fileprivate let tableView: UITableView!
     fileprivate var pagerView: FSPagerView!
-    //inputs
+
+    //MARK: - inputs
     public var refreshNewData = PublishSubject<Bool>()
-    //outputs
+
+    //MARK: - outputs
     public var sections: Driver<[DebateSectionModel]>
     public var carsouselData = [DebateImage]()
     public var refreshStateObserver = Variable<RefreshStatus>(.none)
-    //get
+    
+    //MARK: - gets
     public var inputs: DebateViewModelInput { return self }
     public var outputs: DebateViewModelOutput { return self }
     
@@ -65,7 +70,7 @@ public class DebateViewModel: DebateViewModelInput, DebateViewModelOutput, Debat
             .asDriver(onErrorJustReturn: [])
         refreshNewData.asObserver()
             .subscribe(onNext: { full in
-                if full {//头部刷新
+                if full { //头部刷新
                     self.refreshStateObserver.value = .endFooterRefresh
                     //初始化
                     self.pageIndex = 1
@@ -73,14 +78,23 @@ public class DebateViewModel: DebateViewModelInput, DebateViewModelOutput, Debat
                     service.getTopics(pageIndex: self.pageIndex)
                         .subscribe(onNext: { response in
                             let data = response.0
-                            if data.count > 0 {
-                                self.models.value.removeAll()
-                                self.models.value = data
-                                //结束刷新
-                                self.refreshStateObserver.value = .endHeaderRefresh
-                            } else {
+                            let result = response.1
+                            switch result {
+                            case .ok:
+                                if data.count > 0 {
+                                    self.models.value.removeAll()
+                                    self.models.value = data
+                                    //结束刷新
+                                    self.refreshStateObserver.value = .endHeaderRefresh
+                                } else {
+                                    //没有数据
+                                    self.refreshStateObserver.value = .noData
+                                }
+                                break
+                            default:
                                 //请求错误
-                                self.refreshStateObserver.value = .noData
+                                self.refreshStateObserver.value = .noNet
+                                break
                             }
                         })
                         .disposed(by: self.disposeBag)
@@ -93,19 +107,28 @@ public class DebateViewModel: DebateViewModelInput, DebateViewModelOutput, Debat
                             }
                         })
                         .disposed(by: self.disposeBag)
-                } else {//加载更多
+                } else { //加载更多
                     self.pageIndex += 1
                     //拉取数据
                     service.getTopics(pageIndex: self.pageIndex)
                         .subscribe(onNext: { response in
                             let data = response.0
-                            if data.count > 0 {
-                                self.models.value += data
-                                //结束刷新
-                                self.refreshStateObserver.value = .endFooterRefresh
-                            } else {//没有更多数据
-                                //结束刷新
+                            let result = response.1
+                            switch result {
+                            case .ok:
+                                if data.count > 0 {
+                                    self.models.value += data
+                                    //结束刷新
+                                    self.refreshStateObserver.value = .endFooterRefresh
+                                } else { //没有更多数据
+                                    //结束刷新
+                                    self.refreshStateObserver.value = .endRefreshWithoutData
+                                }
+                                break
+                            default:
+                                //请求失败
                                 self.refreshStateObserver.value = .endRefreshWithoutData
+                                break
                             }
                         })
                         .disposed(by: self.disposeBag)

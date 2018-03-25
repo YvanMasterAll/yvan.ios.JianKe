@@ -10,14 +10,14 @@ import UIKit
 import WebKit
 import RxCocoa
 import RxSwift
-import RxGesture
 
 class DebateDetailViewController: BaseViewController {
 
+    @IBOutlet weak var foldDescLabel: UILabel!
     @IBOutlet weak var titleHeightC: NSLayoutConstraint!
     @IBOutlet weak var webViewContainerHeightC: NSLayoutConstraint!
     @IBOutlet weak var webViewContainer: UIView!
-    @IBOutlet weak var webView: WKWebView! {
+    @IBOutlet weak var webView: BaseWKWebView! {
         didSet {
             //WebView
             self.webView.scrollView.showsVerticalScrollIndicator = false
@@ -26,7 +26,7 @@ class DebateDetailViewController: BaseViewController {
     }
     @IBOutlet weak var foldView: UIView! {
         didSet {
-            self.foldView.backgroundColor = GMColor.whiteColor().withAlphaComponent(0.8)
+            self.foldView.backgroundColor = STColor.whiteColor().withAlphaComponent(0.8)
             self.foldView.layer.cornerRadius = 2
             self.foldView.clipsToBounds = true
         }
@@ -36,18 +36,11 @@ class DebateDetailViewController: BaseViewController {
             self.foldIcon.image = UIImage.init(icon: .fontAwesome(.arrowDown), size: self.foldIcon.frame.size, textColor: ColorPrimary, backgroundColor: UIColor.clear)
         }
     }
-    @IBOutlet weak var tableView: UITableView! {
-        didSet {
-            self.tableView.tableFooterView = UIView() //消除底部视图
-            self.tableView.separatorStyle = .none //消除分割线
-            self.tableView.showsVerticalScrollIndicator = false
-            self.tableView.showsHorizontalScrollIndicator = false
-        }
-    }
+    @IBOutlet weak var tableView: BaseTableView!
     @IBOutlet weak var debateTitle: UILabel!
     @IBOutlet weak var followButton: UIButton! {
         didSet {
-            self.followButton.setImage(UIImage.init(icon: .fontAwesome(.plus), size: CGSize.init(width: 14, height: 14), textColor: GMColor.whiteColor(), backgroundColor: UIColor.clear), for: .normal
+            self.followButton.setImage(UIImage.init(icon: .fontAwesome(.plus), size: CGSize.init(width: 14, height: 14), textColor: STColor.whiteColor(), backgroundColor: UIColor.clear), for: .normal
             )
             self.followButton.addTarget(self, action: #selector(self.follow), for: .touchUpInside)
         }
@@ -59,7 +52,7 @@ class DebateDetailViewController: BaseViewController {
     @IBOutlet weak var topView: UIView!
     @IBOutlet weak var actionView: UIView!
     
-    //声明区
+    //MARK: - 声明区域
     open var section: Debate!
     
     override func viewDidLoad() {
@@ -77,26 +70,24 @@ class DebateDetailViewController: BaseViewController {
         super.didReceiveMemoryWarning()
     }
     
-    //私有成员
+    //MARK: - 私有成员
     fileprivate var viewModel: DebateDetailViewModel2!
     fileprivate var disposeBag = DisposeBag()
     fileprivate var currentOffset = CGPoint.zero
-    fileprivate lazy var emptyView: EmptyView = {
-        let emptyView = EmptyView(target: self.webViewContainer)
-        return emptyView
-    }()
     fileprivate var webViewHeight: CGFloat = 0
     fileprivate var maxWebViewHeight: CGFloat = 50
     fileprivate var isFold: Bool = true
     fileprivate var maxFoldHeight: CGFloat = SH - 44 - 38 - 36
-    fileprivate var panOffset: CGFloat = 0
-    fileprivate var offsetDistance: CGFloat = 0
     fileprivate var followed: Bool = false
+    fileprivate var scrollDragging: Bool = false
+    fileprivate var tableStatus: TableState = .headBottom
+    fileprivate var canScroll: Bool = true
 
 }
 
 extension DebateDetailViewController {
-    //初始化
+
+    //MARK: - 初始化
     fileprivate func setupUI() {
         //WebView
         self.webViewLoad()
@@ -105,40 +96,33 @@ extension DebateDetailViewController {
         score.text = "\(self.section.follows ?? 0)人关注"
         answerScore.text = "\(self.section.supports ?? 0)个声援 \(self.section.opposes ?? 0)个殊途"
         //Buttons
-        self.inviteButton.setImage(UIImage(icon: .fontAwesome(.userPlus), size: CGSize(width: 14, height: 14), textColor: GMColor.grey600Color(), backgroundColor: UIColor.clear), for: .normal)
+        self.inviteButton.setImage(UIImage(icon: .fontAwesome(.userPlus), size: CGSize(width: 14, height: 14), textColor: STColor.grey600Color(), backgroundColor: UIColor.clear), for: .normal)
         self.inviteButton.addTarget(self, action: #selector(self.gotoInvitePage), for: UIControlEvents.touchUpInside)
-        self.answerButton.setImage(UIImage(icon: .fontAwesome(.edit), size: CGSize(width: 14, height: 14), textColor: GMColor.grey600Color(), backgroundColor: UIColor.clear), for: .normal)
-        let answerTapGes = UITapGestureRecognizer.init(target: self, action: #selector(self.gotoAddAnswer))
+        self.answerButton.setImage(UIImage(icon: .fontAwesome(.edit), size: CGSize(width: 14, height: 14), textColor: STColor.grey600Color(), backgroundColor: UIColor.clear), for: .normal)
+        let answerTapGes = UITapGestureRecognizer.init(target: self, action: #selector(self.gotoAddAnswerCheck))
         self.answerButton.addGestureRecognizer(answerTapGes)
         //ActionView 添加边框
         let topBorderLayer = CALayer()
         topBorderLayer.frame = CGRect(x: 0, y: 0, width: SW, height: 1)
-        topBorderLayer.backgroundColor = GMColor.grey50Color().cgColor
+        topBorderLayer.backgroundColor = STColor.grey50Color().cgColor
         self.actionView.layer.addSublayer(topBorderLayer)
-        //View Gesture
-        self.view.rx
-            .panGesture()
-            .when(.began)
-            .subscribe(onNext: { [weak self] gesture in
-                self?.panOffset = gesture.location(in: self?.view).y
-            })
-            .disposed(by: self.disposeBag)
-        self.view.rx
-            .panGesture()
-            .when(.changed)
-            .subscribe(onNext: { [weak self] gesture in
-                guard let _ = self else { return }
-                
-                let currentPanOffset = gesture.location(in: self!.view).y
-                let scrollOffset = currentPanOffset - self!.panOffset
-                self!.scrollHeader(scrollOffset)
-                self!.panOffset = currentPanOffset
-            })
-            .disposed(by: self.disposeBag)
         //标题高度
         self.setupTitleLayout()
     }
     fileprivate func bindRx() {
+        //SonTableStatue
+        SonTableStatus.asObserver()
+            .subscribe(onNext: { [weak self] state in
+                switch state {
+                case .canParentScroll:
+                    self?.canScroll = true
+                case .noParentScroll:
+                    self?.canScroll = false
+                default:
+                    break
+                }
+            })
+            .disposed(by: self.disposeBag)
         //View Model
         viewModel = DebateDetailViewModel2.init(disposeBag: disposeBag, section: self.section)
         viewModel.outputs.followResult
@@ -152,6 +136,7 @@ extension DebateDetailViewController {
                         break
                     case .ok:
                         self!.applyFollowButton(false)
+                        ServiceUtil.userinfoPartRefresh(nil, false)
                         break
                     default:
                         break
@@ -163,6 +148,7 @@ extension DebateDetailViewController {
                         break
                     case .ok:
                         self!.applyFollowButton(true)
+                        ServiceUtil.userinfoPartRefresh(nil, true)
                         break
                     case .exist:
                         self!.applyFollowButton(true)
@@ -186,6 +172,22 @@ extension DebateDetailViewController {
                     break
                 default:
                     self?.applyFollowButton(false)
+                    break
+                }
+            })
+            .disposed(by: disposeBag)
+        viewModel.outputs.answerCheck
+            .asObservable()
+            .subscribe(onNext: { [weak self] result in
+                switch result {
+                case .exist:
+                    HUD.flash(.label("你已经提交过观点"))
+                    break
+                case .empty:
+                    self?.gotoAddAnswer()
+                    break
+                default:
+                    HUD.hide()
                     break
                 }
             })
@@ -217,7 +219,8 @@ extension DebateDetailViewController {
             self.webViewContainerHeightC.constant = webViewHeight
         }
     }
-    //关注按钮点击事件
+    
+    //MARK: - 按钮事件
     @objc fileprivate func follow() {
         if self.followed { //取消关注
             viewModel.inputs.followTap.onNext(false)
@@ -225,7 +228,29 @@ extension DebateDetailViewController {
             viewModel.inputs.followTap.onNext(true)
         }
     }
-    //关注按钮状态更新
+    @objc fileprivate func goBack() {
+        if (navigationController != nil) {
+            navigationController?.popViewController(animated: true)
+        } else {
+            dismiss(animated: true, completion: nil)
+        }
+    }
+    @objc fileprivate func gotoAddAnswerCheck() {
+        self.viewModel.inputs.answerCheck.onNext(())
+    }
+    fileprivate func gotoAddAnswer() {
+        let debateAnswerAddNewVC = GeneralFactory.getVCfromSb("Debate", "DebateAnswerAddNew") as! DebateAnswerAddNewViewController
+        debateAnswerAddNewVC.section = self.section
+        
+        self.navigationController?.pushViewController(debateAnswerAddNewVC, animated: true)
+    }
+    @objc fileprivate func gotoInvitePage() {
+        let debateInviteVC =  GeneralFactory.getVCfromSb("Debate", "DebateInvite") as! DebateInviteViewController
+        
+        self.navigationController?.pushViewController(debateInviteVC, animated: true)
+    }
+    
+    //MARK: - 按钮状态变更
     fileprivate func applyFollowButton(_ followed: Bool) {
         self.followed = followed
         self.followButton.isHidden = false
@@ -239,22 +264,13 @@ extension DebateDetailViewController {
             self.followButton.setImage(UIImage.init(icon: .fontAwesome(.plus), size: CGSize.init(width: 14, height: 14), textColor: UIColor.white, backgroundColor: UIColor.clear), for: .normal)
         }
     }
-    //滚动头部
-    fileprivate func scrollHeader(_ scrollOffset: CGFloat) {
-        let height = self.tableView.tableHeaderView!.frame.height
-        let contentOffset = self.tableView.contentOffset.y
-        let distance = contentOffset - scrollOffset
-        if (scrollOffset < 0 && distance < height) || (scrollOffset >= 0 && distance >= 0) { //向下滚动 & 向上滚动
-            self.offsetDistance = distance
-            self.tableView.setContentOffset(CGPoint.init(x: self.tableView.contentOffset.x, y: distance), animated: false)
-        }
-    }
-    //折叠事件
+    
+    //MARK: - 折叠事件
     @objc fileprivate func foldEvent() {
         var offset: CGFloat = 0
         if self.isFold { //伸展
             if self.webViewHeight > maxFoldHeight {
-                self.webView.scrollView.isScrollEnabled = false
+                self.webView.scrollView.isScrollEnabled = true
                 offset = maxFoldHeight - maxWebViewHeight
                 self.webViewContainerHeightC.constant = self.maxFoldHeight
             } else {
@@ -264,6 +280,7 @@ extension DebateDetailViewController {
             self.tableView.tableHeaderView!.frame.size.height += offset
             //图标更换
             self.foldIcon.image = UIImage.init(icon: .fontAwesome(.arrowUp), size: self.foldIcon.frame.size, textColor: ColorPrimary, backgroundColor: UIColor.clear)
+            self.foldDescLabel.text = "收起详情"
         } else { //折叠
             self.webView.scrollView.isScrollEnabled = false
             if self.webViewHeight < maxWebViewHeight {
@@ -276,44 +293,22 @@ extension DebateDetailViewController {
             self.tableView.tableHeaderView!.frame.size.height -= offset
             //图标更换
             self.foldIcon.image = UIImage.init(icon: .fontAwesome(.arrowDown), size: self.foldIcon.frame.size, textColor: ColorPrimary, backgroundColor: UIColor.clear)
+            self.foldDescLabel.text = "展开详情"
         }
         //状态变更
         self.isFold = !self.isFold
         self.tableView.tableHeaderView = self.tableView.tableHeaderView!
     }
-    //NavigationBarItem Action
-    @objc fileprivate func goBack() {
-        if (navigationController != nil) {
-            navigationController?.popViewController(animated: true)
-        } else {
-            dismiss(animated: true, completion: nil)
-        }
-    }
-    //跳转到添加回答页
-    @objc fileprivate func gotoAddAnswer() {
-        let debateAnswerAddNewVC = GeneralFactory.getVCfromSb("Debate", "DebateAnswerAddNew") as! DebateAnswerAddNewViewController
-        debateAnswerAddNewVC.section = self.section
-        
-        self.navigationController?.pushViewController(debateAnswerAddNewVC, animated: true)
-    }
-    //WebView Load Data
+    
+    //MARK: - 加载内容
     fileprivate func webViewLoad(){
         webView.loadHTMLString(self.section.description!, baseURL: nil)
-        self.emptyView.show(type: .loading(type: .indicator1), frame: CGRect.init(x: self.webView.frame.origin.x, y: self.webView.frame.origin.y, width: SW - 28, height: self.webViewContainer.frame.height))
-    }
-    //跳转到邀请页
-    @objc fileprivate func gotoInvitePage() {
-        let debateInviteVC =  GeneralFactory.getVCfromSb("Debate", "DebateInvite") as! DebateInviteViewController
-        
-        //隐藏 Tabbar
-        self.hidesBottomBarWhenPushed = true
-        self.navigationController?.pushViewController(debateInviteVC, animated: true)
-        self.hidesBottomBarWhenPushed = false
     }
 }
 
-extension DebateDetailViewController: UITableViewDelegate, UITableViewDataSource {
-    //TableView Delegate && DataSrouce
+extension DebateDetailViewController: UITableViewDelegate, UITableViewDataSource, UIScrollViewDelegate {
+    
+    //MARK: - TableView Delegate && DataSrouce
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return 1
     }
@@ -332,22 +327,57 @@ extension DebateDetailViewController: UITableViewDelegate, UITableViewDataSource
         
         return cell
     }
+    
+    //MARK: - ScrollView Delegate
+    func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
+        self.scrollDragging = true
+    }
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        if self.scrollDragging {
+            if self.canScroll {
+                let height = self.tableView.tableHeaderView!.frame.height
+                let scrollOffset = scrollView.contentOffset.y
+                if Int(scrollOffset) >= Int(height) {
+                    self.tableView.contentOffset.y = height
+                    TableStatus.onNext(.headTop)
+                    tableStatus = .headTop
+                } else if scrollOffset <= 0 {
+                    //self.tableView.contentOffset.y = 0
+                    tableStatus = .headBottom
+                    TableStatus.onNext(.headBottom)
+                } else {
+                    TableStatus.onNext(.headMid)
+                }
+            } else {
+                let height = self.tableView.tableHeaderView!.frame.height
+                switch tableStatus {
+                case .headBottom:
+                    self.canScroll = true
+                    self.tableView.contentOffset.y = 0
+                case .headTop:
+                    self.tableView.contentOffset.y = height
+                default:
+                    break
+                }
+            }
+        }
+    }
+    func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
+        self.scrollDragging = false
+    }
 }
 
 extension DebateDetailViewController: WKNavigationDelegate {
-    // WKNavigationDelegate
-    // --------------------
-    //页面开始加载
-    func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
+    
+    //MARK: - WKNavigationDelegate
+    func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) { //页面开始加载
+        self.webView.showBaseEmptyView()
+    }
+    func webView(_ webView: WKWebView, didCommit navigation: WKNavigation!) { //内容开始返回
         
     }
-    //内容开始返回
-    func webView(_ webView: WKWebView, didCommit navigation: WKNavigation!) {
-        
-    }
-    //页面加载完
-    func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
-        self.emptyView.hide()
+    func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) { //页面加载完
+        self.webView.hideEmptyView()
         //获取网页高度
         webView.evaluateJavaScript("document.body.scrollHeight", completionHandler: { [weak self] (result, error) in
             if error == nil {
@@ -357,9 +387,8 @@ extension DebateDetailViewController: WKNavigationDelegate {
             }
         })
     }
-    //页面加载失败
-    func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
-        self.emptyView.hide()
+    func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) { //页面加载失败
+        self.webView.hideEmptyView()
     }
     
 }

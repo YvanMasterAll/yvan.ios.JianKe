@@ -35,7 +35,7 @@ class DebateComment2TableViewCell: UITableViewCell {
         let x: CGFloat = 0, y: CGFloat = self.bottomView.frame.height - 0.5, width: CGFloat = self.bottomView.frame.width, height: CGFloat = 0.5
         let bottomLayer = CALayer()
         bottomLayer.frame = CGRect(x: x, y: y, width: width, height: height)
-        bottomLayer.backgroundColor = GMColor.grey300Color().cgColor
+        bottomLayer.backgroundColor = STColor.grey300Color().cgColor
         self.bottomView.layer.addSublayer(bottomLayer)
     }
 

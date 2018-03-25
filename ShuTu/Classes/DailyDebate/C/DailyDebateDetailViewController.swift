@@ -10,14 +10,12 @@ import UIKit
 import WebKit
 import RxCocoa
 import RxSwift
-import PMSuperButton
-import RxGesture
 
 class DailyDebateDetailViewController: BaseViewController {
 
     @IBOutlet weak var titleLabel: UILabel!
     
-    @IBOutlet weak var followButton: PMSuperButton! {
+    @IBOutlet weak var followButton: STButton! {
         didSet {
             self.followButton.addTarget(self, action: #selector(self.follow), for: .touchUpInside)
         }
@@ -31,7 +29,7 @@ class DailyDebateDetailViewController: BaseViewController {
             self.navigationBack.addGestureRecognizer(tapGes)
         }
     }
-    @IBOutlet weak var gotoDebate: PMSuperButton! {
+    @IBOutlet weak var gotoDebate: STButton! {
         didSet {
             self.gotoDebate.setImage(UIImage.init(named: "icon_go_white")!.reSizeImage(CGSize.init(width: 15, height: 15)), for: .normal)
             self.gotoDebate.imageEdgeInsets.right = 4
@@ -39,26 +37,19 @@ class DailyDebateDetailViewController: BaseViewController {
         }
     }
     @IBOutlet weak var actionVIew: UIView!
-    @IBOutlet weak var addAnswer: PMSuperButton! {
+    @IBOutlet weak var addAnswer: STButton! {
         didSet {
             self.addAnswer.setImage(UIImage.init(named: "icon_quiz_grey500")!.reSizeImage(CGSize.init(width: 15, height: 15)), for: .normal)
             self.addAnswer.imageEdgeInsets.right = 4
             if !Environment.tokenExists {
                 self.addAnswer.isEnabled = false
             }
-            self.addAnswer.addTarget(self, action: #selector(self.gotoAddAnswer), for: .touchUpInside)
+            self.addAnswer.addTarget(self, action: #selector(self.gotoAddAnswerCheck), for: .touchUpInside)
         }
     }
-    @IBOutlet weak var tableView: UITableView! {
-        didSet {
-            self.tableView.tableFooterView = UIView() //消除底部视图
-            self.tableView.separatorStyle = .none //消除分割线
-            self.tableView.showsVerticalScrollIndicator = false
-            self.tableView.showsHorizontalScrollIndicator = false
-        }
-    }
+    @IBOutlet weak var tableView: BaseTableView!
     
-    //声明区域
+    //MARK: - 声明区域
     open var section: Debate!
     
     override func viewDidLoad() {
@@ -73,16 +64,20 @@ class DailyDebateDetailViewController: BaseViewController {
         super.didReceiveMemoryWarning()
     }
     
-    //私有成员
+    //MARK: - 私有成员
     fileprivate weak var viewModel: DailyDebateDetailViewModel!
     fileprivate var disposeBag = DisposeBag()
-    fileprivate var panOffset: CGFloat = 0
     fileprivate var followed: Bool = false
+    fileprivate var scrollDragging: Bool = false
+    fileprivate var tableStatus: TableState = .headBottom
+    fileprivate var canScroll: Bool = true
+    fileprivate var tableOneScrolled: Bool = false
 
 }
 
 extension DailyDebateDetailViewController {
-    //初始化
+
+    //MARK: - 初始化
     fileprivate func setupUI() {
         //Init
         self.titleLabel.text = self.section.title
@@ -94,10 +89,23 @@ extension DailyDebateDetailViewController {
             })
         }
         //阴影
-        GeneralFactory.generateRectShadow(layer: self.actionVIew.layer, rect: CGRect.init(x: 0, y: -0.5, width: SW, height: 0.5), color: GMColor.grey800Color().cgColor)
+        GeneralFactory.generateRectShadow(layer: self.actionVIew.layer, rect: CGRect.init(x: 0, y: -0.5, width: SW, height: 0.5), color: STColor.grey800Color().cgColor)
         self.view.bringSubview(toFront: self.actionVIew)
     }
     fileprivate func bindRx() {
+        //SonTableStatue
+        SonTableStatus.asObserver()
+            .subscribe(onNext: { [weak self] state in
+                switch state {
+                case .canParentScroll:
+                    self?.canScroll = true
+                case .noParentScroll:
+                    self?.canScroll = false
+                default:
+                    break
+                }
+            })
+            .disposed(by: self.disposeBag)
         //View Model
         self.viewModel = DailyDebateDetailViewModel(disposeBag: disposeBag, section: self.section)
         viewModel.outputs.followResult
@@ -111,6 +119,7 @@ extension DailyDebateDetailViewController {
                         break
                     case .ok:
                         self?.applyFollowButton(false)
+                        ServiceUtil.userinfoPartRefresh(nil, false)
                         break
                     default:
                         break
@@ -122,6 +131,7 @@ extension DailyDebateDetailViewController {
                         break
                     case .ok:
                         self?.applyFollowButton(true)
+                        ServiceUtil.userinfoPartRefresh(nil, true)
                         break
                     case .exist:
                         self?.applyFollowButton(true)
@@ -149,18 +159,59 @@ extension DailyDebateDetailViewController {
                 }
             })
             .disposed(by: disposeBag)
+        viewModel.outputs.answerCheck
+            .asObservable()
+            .subscribe(onNext: { [weak self] result in
+                switch result {
+                case .exist:
+                    HUD.flash(.label("你已经提交过观点"))
+                    break
+                case .empty:
+                    self?.gotoAddAnswer()
+                    break
+                default:
+                    break
+                }
+            })
+            .disposed(by: disposeBag)
         //检查关注
         self.viewModel.inputs.followCheck.onNext(())
     }
-    //关注按钮点击事件
+    
+    //MARK: - 按钮事件
     @objc fileprivate func follow() {
-        if self.followed {// 取消关注
+        if self.followed { //取消关注
             viewModel.inputs.followTap.onNext(false)
-        } else {// 关注
+        } else { //关注
             viewModel.inputs.followTap.onNext(true)
         }
     }
-    //关注按钮状态更新
+    @objc fileprivate func goBack() {
+        if (navigationController != nil) {
+            navigationController?.popViewController(animated: true)
+        } else {
+            dismiss(animated: true, completion: nil)
+        }
+    }
+    @objc fileprivate func gotoDebateMethod() {
+        //跳转至详情
+        let debateDetailVC = GeneralFactory.getVCfromSb("Debate", "DebateDetail") as! DebateDetailViewController
+        debateDetailVC.section = self.section
+        
+        self.navigationController?.pushViewController(debateDetailVC, animated: true)
+        self.viewModel.inputs.followCheck.onNext(())
+    }
+    @objc fileprivate func gotoAddAnswerCheck() {
+        self.viewModel.inputs.answerCheck.onNext(())
+    }
+    fileprivate func gotoAddAnswer() {
+        let debateAnswerAddNewVC = GeneralFactory.getVCfromSb("Debate", "DebateAnswerAddNew") as! DebateAnswerAddNewViewController
+        debateAnswerAddNewVC.section = self.section
+        
+        self.navigationController?.pushViewController(debateAnswerAddNewVC, animated: true)
+    }
+    
+    //MAKR: - 按钮状态变更
     fileprivate func applyFollowButton(_ followed: Bool) {
         self.followed = followed
         self.followButton.isHidden = false
@@ -174,47 +225,17 @@ extension DailyDebateDetailViewController {
             self.followButton.setImage(UIImage.init(icon: .fontAwesome(.plus), size: CGSize.init(width: 14, height: 14), textColor: UIColor.white, backgroundColor: UIColor.clear), for: .normal)
         }
     }
-    //滚动头部
-    fileprivate func scrollHeader(_ scrollOffset: CGFloat) {
-        let height = self.tableView.tableHeaderView!.frame.height
-        let contentOffset = self.tableView.contentOffset.y
-        let distance = contentOffset - scrollOffset
-        if (scrollOffset < 0 && distance < height) || (scrollOffset >= 0 && distance >= 0) { //向下滚动 & 向上滚动
-            self.tableView.setContentOffset(CGPoint.init(x: self.tableView.contentOffset.x, y: distance), animated: false)
-        }
-    }
-    //NavigationBarItem Action
-    @objc fileprivate func goBack() {
-        if (navigationController != nil) {
-            navigationController?.popViewController(animated: true)
-        } else {
-            dismiss(animated: true, completion: nil)
-        }
-    }
-    //Button Action
-    @objc fileprivate func gotoDebateMethod() {
-        //跳转至详情
-        let debateDetailVC = GeneralFactory.getVCfromSb("Debate", "DebateDetail") as! DebateDetailViewController
-        debateDetailVC.section = self.section
-
-        self.navigationController?.pushViewController(debateDetailVC, animated: true)
-    }
-    //跳转到添加回答页
-    @objc fileprivate func gotoAddAnswer() {
-        let debateAnswerAddNewVC = GeneralFactory.getVCfromSb("Debate", "DebateAnswerAddNew") as! DebateAnswerAddNewViewController
-        debateAnswerAddNewVC.section = self.section
-        
-        self.navigationController?.pushViewController(debateAnswerAddNewVC, animated: true)
-    }
 }
 
 extension DailyDebateDetailViewController: UITableViewDelegate, UITableViewDataSource {
-    //TableViewDelegate
+    
+    //MARK: - TableViewDelegate
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         //取消cell选中状态
         tableView.deselectRow(at: indexPath, animated: true)
     }
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        //54
         return SH - 54
     }
     func tableView(_ tableView: UITableView, shouldHighlightRowAt indexPath: IndexPath) -> Bool {
@@ -232,6 +253,43 @@ extension DailyDebateDetailViewController: UITableViewDelegate, UITableViewDataS
         }
         
         return cell
+    }
+    
+    //MARK: - ScrollView Delegate
+    func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
+        self.scrollDragging = true
+    }
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        if self.scrollDragging {
+            if self.canScroll {
+                let height = self.tableView.tableHeaderView!.frame.height
+                let scrollOffset = scrollView.contentOffset.y
+                if Int(scrollOffset) >= Int(height) {
+                    self.tableView.contentOffset.y = height
+                    tableStatus = .headTop
+                    TableStatus.onNext(.headTop)
+                } else if scrollOffset <= 0 {
+                    tableStatus = .headBottom
+                    TableStatus.onNext(.headBottom)
+                } else {
+                    TableStatus.onNext(.headMid)
+                }
+            } else {
+                let height = self.tableView.tableHeaderView!.frame.height
+                switch tableStatus {
+                case .headBottom:
+                    self.canScroll = true
+                    self.tableView.contentOffset.y = 0
+                case .headTop:
+                    self.tableView.contentOffset.y = height
+                default:
+                    break
+                }
+            }
+        }
+    }
+    func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
+        self.scrollDragging = false
     }
 }
 

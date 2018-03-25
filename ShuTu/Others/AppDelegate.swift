@@ -14,16 +14,17 @@ import WatchdogInspector
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
+    //MARK: - 成员
     var window: UIWindow?
-    
     var tabBarNavigationController: UINavigationController!
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
+        
         //创建窗口
         self.window = UIWindow(frame: UIScreen.main.bounds)
         self.window?.backgroundColor = UIColor.white
         
-        //FPS 监听
+        //FPS
         #if DEBUG
             TWWatchdogInspector.setEnableMainthreadStallingException(false)
             TWWatchdogInspector.setUseLogs(false)
@@ -38,7 +39,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         IQKeyboardManager.shared().shouldResignOnTouchOutside = true //点击背景隐藏键盘
         IQKeyboardManager.shared().isEnableAutoToolbar = false //隐藏工具栏
         
-        //判断首次启动
+        //判断首次使用
         if Environment.isFirstLaunch {
             print("first launch")
         } else {
@@ -49,25 +50,23 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             }
         }
 
-        //初始化 TabBar
+        //TabBar
         setupTabBar()
-        
-        //判断用户登录
-//        if !Environment.tokenExists {
-//            let LoginStoryBoard = UIStoryboard(name: "Login", bundle: nil)
-//            let loginViewController = LoginStoryBoard.instantiateViewController(withIdentifier: "Login")
-//            self.window?.rootViewController?.present(loginViewController, animated: false, completion: nil)
-//        }
         
         return true
     }
     
-    //初始化 TabBar
+    /// TabBar
     func setupTabBar() {
-        //MenuViewController
-        let menuNavigationController = GeneralFactory.getVCfromSb("Me", "Me") as! UINavigationController
-        //TabBar Controller
+        
+        //ViewControllers
         let tabBarController = UITabBarController()
+        let menuNavigationController = GeneralFactory.getVCfromSb("Me", "Me") as! UINavigationController
+        let debateNavigationController = GeneralFactory.getVCfromSb("Debate", "Debate") as! UINavigationController
+        let friendNavigationController = GeneralFactory.getVCfromSb("Friend", "Friend") as! UINavigationController
+        let dailyDebateNavigationController = GeneralFactory.getVCfromSb("DailyDebate", "DailyDebate") as! UINavigationController
+        let findNavigationController = GeneralFactory.getVCfromSb("Find", "Find") as! UINavigationController
+        //TabBar
         tabBarController.tabBar.tintColor = ColorPrimary
         tabBarController.tabBar.barTintColor = UIColor.white
         tabBarController.tabBar.backgroundImage = GeneralFactory.createImageWithColor(UIColor.clear)
@@ -75,11 +74,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         let tabBarNavigationController = UINavigationController.init(rootViewController: tabBarController)
         tabBarController.navigationController?.setNavigationBarHidden(true, animated: false)
         tabBarController.navigationItem.backBarButtonItem = UIBarButtonItem.init(title: "", style: .plain, target: self, action: nil)
-        //ViewControllers
-        let debateNavigationController = GeneralFactory.getVCfromSb("Debate", "Debate") as! UINavigationController
-        let friendNavigationController = GeneralFactory.getVCfromSb("Friend", "Friend") as! UINavigationController
-        let dailyDebateNavigationController = GeneralFactory.getVCfromSb("DailyDebate", "DailyDebate") as! UINavigationController
-        let findNavigationController = GeneralFactory.getVCfromSb("Find", "Find") as! UINavigationController
         tabBarController.viewControllers = [dailyDebateNavigationController, debateNavigationController, friendNavigationController, findNavigationController]
         //TabBars
         debateNavigationController.tabBarItem = UITabBarItem(title: "首页", image: UIImage(named: "icon_home_grey500"), selectedImage: UIImage(named: "icon_home_primary"))
@@ -91,46 +85,43 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         findNavigationController.tabBarItem = UITabBarItem(title: "发现", image: UIImage(named: "icon_find_grey500"), selectedImage: UIImage(named: "icon_find_primary"))
         findNavigationController.tabBarItem.setTitleTextAttributes([NSAttributedStringKey.font: UIFont.systemFont(ofSize: 11)], for: .normal)
         tabBarController.tabBar.frame.size = CGSize(width: SW, height: TarBarHeight)
-        //阴影
-        let gradient = GradientLayer.init(direction: .leftToRight, colors: [GMColor.grey300Color().withAlphaComponent(0.5), GMColor.grey300Color().withAlphaComponent(0)], cornerRadius: 0)
+        //Gradient
+        let gradient = STGradientLayer.init(direction: .leftToRight, colors: [STColor.grey300Color().withAlphaComponent(0.5), STColor.grey300Color().withAlphaComponent(0)], cornerRadius: 0)
         tabBarController.tabBar.addGradient(gradient, frame: CGRect.init(x: 0, y: -2, width: SW, height: 2))
-        
-        //添加通知, 用户未登录时发起需要身份认证的请求, 将会转到登录界面
+        //Notification - 未登录用户跳转至登录页
         self.tabBarNavigationController = tabBarNavigationController
         NotificationCenter.default.addObserver(self, selector: #selector(self.gotoLogin(_:)), name:NSNotification.Name(rawValue: NotificationName3), object: nil)
-        
-        self.window?.rootViewController = SlideMenuController.init(mainViewController: self.tabBarNavigationController, leftMenuViewController: menuNavigationController)
+        //Show
+        self.window?.rootViewController = STSlideMenuController.init(mainViewController: self.tabBarNavigationController, leftMenuViewController: menuNavigationController)
         self.window?.makeKeyAndVisible()
     }
     
-    ///跳转到登录页
+    /// 跳转到登录页
     @objc fileprivate func gotoLogin(_ notification: NSNotification) {
         guard let type = (notification.userInfo!["type"] as? String) else { return }
-        if type == "push" { //跳转
+        if type == "push" { //跳转到登录页
             let loginVC = GeneralFactory.getVCfromSb("Login", "Login") as! LoginViewController
             loginVC.isPushed = true
             self.tabBarNavigationController.pushViewController(loginVC, animated: true)
-        } else if type == "hud" { //提示
+        } else if type == "hud" { //仅提示, 不跳转
             HUD.flash(HUDContentType.label("请先登录"))
         }
     }
 
     func applicationWillResignActive(_ application: UIApplication) {
-        // Sent when the application is about to move from active to inactive state. This can occur for certain types of temporary interruptions (such as an incoming phone call or SMS message) or when the user quits the application and it begins the transition to the background state.
-        // Use this method to pause ongoing tasks, disable timers, and invalidate graphics rendering callbacks. Games should use this method to pause the game.
+       
     }
 
     func applicationDidEnterBackground(_ application: UIApplication) {
-        // Use this method to release shared resources, save user data, invalidate timers, and store enough application state information to restore your application to its current state in case it is terminated later.
-        // If your application supports background execution, this method is called instead of applicationWillTerminate: when the user quits.
+        
     }
 
     func applicationWillEnterForeground(_ application: UIApplication) {
-        // Called as part of the transition from the background to the active state; here you can undo many of the changes made on entering the background.
+        
     }
 
     func applicationDidBecomeActive(_ application: UIApplication) {
-        // Restart any tasks that were paused (or not yet started) while the application was inactive. If the application was previously in the background, optionally refresh the user interface.
+        
     }
 
     func applicationWillTerminate(_ application: UIApplication) {

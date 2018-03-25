@@ -13,15 +13,15 @@ import Moya
 import ObjectMapper
 
 class UserService {
-    //单例
+    
+    //MARK: - 单例
     static let instance = UserService()
     private init() {}
     
-    //字符长度界限
-    let minCharactersCount = 3
+    let minCharactersCount = 3 //字符长度界限
     
-    //用户名验证
-    func validateUsername(_ username: String) -> Observable<Result2> {
+    /// 用户名验证
+    func validateUsername(_ username: String) -> Observable<ResultType> {
         //字符串长度检查
         if username.count == 0 {
             return .just(.empty)
@@ -30,15 +30,15 @@ class UserService {
             return .just(.empty)
         }
         
-        return .just(Ok001)
+        return .just(OkSuccess)
     }
     
-    //手机号验证
+    /// 手机号验证
     func validatePhone(_ phone: String) -> Observable<Bool> {
         return .just(RegularValidate.phoneNum(phone).isRight)
     }
     
-    //获取验证码
+    /// 获取验证码
     func getVcode(_ phone: String, handler: @escaping SMSGetCodeResultHandler) {
         SMSSDK.getVerificationCode(by: SMSGetCodeMethod.SMS, phoneNumber: phone, zone: "86", result: handler)
     }
@@ -46,9 +46,9 @@ class UserService {
         SMSSDK.commitVerificationCode(vcode, phoneNumber: phone, zone: "86", result: handler)
     }
     
-    //用户登录
-    func signIn(_ username: String, _ password: String) -> Observable<Result2> {
-        return ShuTuProvider2.rx.request(.login(username: username, password: password))
+    /// 用户登录
+    func signIn(_ username: String, _ password: String) -> Observable<ResultType> {
+        return STProvider.rx.request(.login(username: username, password: password))
             .mapObject(Callback2.self)
             .asObservable()
             .observeOn(MainScheduler.instance)
@@ -59,99 +59,118 @@ class UserService {
                     let token = result.token!
                     Environment.token = token
                     if let user = User.init(map: Map.init(mappingType: .fromJSON, JSON: result.data!)) {
-                        self.saveUserInfo(user)
+                        ServiceUtil.saveUserInfo(user)
                     }
                     //登录通知
-                    LoginStatus.onNext(LoginState.ok)
-                    return Result2.ok(message: "登录成功")
+                    AppStatus.onNext(AppState.login)
+                    return ResultType.ok(message: "登录成功")
                 } else {
-                    return Result2.failed(message: result.msg!)
+                    return ResultType.failed(message: result.msg!)
                 }
             }
             .catchError { error in
-                return .just(Error003)
+                return .just(ErrorRequestFailed)
             }
     }
     
-    //用户注册
-    func register(_ username: String, _ password: String) -> Observable<Result2> {
-        return ShuTuProvider2.rx.request(.register(username: username, password: password))
+    /// 用户登出
+    func logout() {
+        STProvider.request(.logout, completion: { _ in })
+    }
+    
+    /// 用户注册
+    func register(_ username: String, _ password: String) -> Observable<ResultType> {
+        return STProvider.rx.request(.register(username: username, password: password))
             .mapObject(Callback2.self)
             .asObservable()
             .observeOn(MainScheduler.instance)
             .map { result in
                 let code = result.code
-                if code == 0 {
+                if code == ErrorCode.ok.code {
                     //设置 Token
                     let token = result.token!
                     Environment.token = token
                     if let user = User.init(map: Map.init(mappingType: .fromJSON, JSON: result.data!)) {
-                        self.saveUserInfo(user)
+                        ServiceUtil.saveUserInfo(user)
                     }
                     //登录通知
-                    LoginStatus.onNext(LoginState.ok)
-                    return Result2.ok(message: "注册成功")
+                    AppStatus.onNext(AppState.login)
+                    return ResultType.ok(message: "注册成功")
                 } else {
-                    return Result2.failed(message: result.msg!)
+                    if code == ErrorCode.exists.code {
+                        return ResultType.exist
+                    } else {
+                        return ResultType.failed(message: result.msg!)
+                    }
                 }
             }
             .catchError { error in
-                return .just(Error003)
+                return .just(ErrorRequestFailed)
         }
     }
-    
-    //保存用户信息
-    fileprivate func saveUserInfo(_ user: User) {
-        if let protrait = user.portrait {
-            Environment.protrait = protrait
-        }
-    }
+
 }
 
 class DebateService {
-    //单例
+    
+    //MARK: - 单例
     static let instance = DebateService()
     private init() {}
     
-    //添加回答
-    func answerAdd(_ topicid: Int, _ side: AnswerSide, _ viewpoint: String) -> Observable<Result2> {
+    //MARK: - 添加回答
+    func answerAdd(_ topicid: Int, _ side: AnswerSide, _ anony: Bool, _ viewpoint: String) -> Observable<ResultType> {
         //处理页面图片
         let (vp, urls) = ServiceUtil.handleHtml(viewpoint)
-        return ShuTuProvider2.rx.request(.viewpointadd(id: topicid, side: side, viewpoint: vp, urls: urls))
+        return STProvider.rx.request(.viewpointadd(id: topicid, side: side, anony: anony, viewpoint: vp, urls: urls))
             .mapObject(Callback.self)
             .asObservable()
             .observeOn(MainScheduler.instance)
             .map{ result in
                 let code = result.code
                 if code == 0 {
-                    return Result2.ok(message: result.msg!)
+                    return ResultType.ok(message: result.msg!)
                 } else {
-                    return Result2.failed(message: result.msg!)
+                    return ResultType.failed(message: result.msg!)
                 }
             }
-            .catchErrorJustReturn(Error001)
+            .catchErrorJustReturn(ErrorRequestFailed)
+    }
+    func answerCheck(_ topicid: Int) -> Observable<ResultType> {
+        return STProvider.rx.request(.viewpointcheck(id: topicid))
+            .mapObject(Callback.self)
+            .asObservable()
+            .observeOn(MainScheduler.instance)
+            .map{ result in
+                let code = result.code
+                if code == 0 {
+                    return ResultType.exist
+                } else {
+                    return ResultType.empty
+                }
+            }
+            .catchErrorJustReturn(ErrorRequestFailed)
     }
     
-    //态度事件
-    func attitudeCheck(_ vpid: Int) -> Observable<(AnswerAttitude?, Result2)> {
-        return ShuTuProvider2.rx.request(.attitudecheck(id: vpid))
-            .mapObject(Callback.self)
+    //MARK: - 态度事件
+    func attitudeCheck(_ vpid: Int) -> Observable<(AnswerAttitude?, ResultType)> {
+        return STProvider.rx.request(.attitudecheck(id: vpid))
+            .mapObject(Callback2.self)
             .asObservable()
             .observeOn(MainScheduler.instance)
             .map{ result in
                 let code = result.code
                 if code == 0 {
-                    let attitude = [AnswerAttitude].init(JSONArray: result.data!)
-                    return (attitude[0], Ok001)
+                    let attitude = AnswerAttitude.init(map: Map.init(mappingType: .fromJSON, JSON: result.data!))
+                    return (attitude, OkSuccess)
                 } else {
-                    return (nil, Result2.failed(message: result.msg!))
+                    return (nil, ResultType.failed(message: result.msg!))
                 }
             }
-            .catchErrorJustReturn((nil, Error001))
+            .catchErrorJustReturn((nil, ErrorRequestFailed))
     }
-    func attitudeAdd(_ vpid: Int, attitude: AttitudeStand, type: AttitudeType, toggle: Toggle) -> Observable<(AnswerAttitude?, Result2)> {
-        return ShuTuProvider2.rx.request(.attitudeadd(id: vpid, attitude: attitude, type: type, toggle: toggle))
-            .mapObject(Callback.self)
+    func attitudeAdd(_ vpid: Int, attitude: AttitudeStand, type: AttitudeType, toggle: Toggle) -> Observable<(AnswerAttitude?, ResultType)> {
+        return STProvider.rx.request(.attitudeadd(id: vpid, attitude: attitude, type: type, toggle: toggle))
+            .mapObject(Callback2.self)
             .asObservable()
             .observeOn(MainScheduler.instance)
             .map{ result in
@@ -159,55 +178,55 @@ class DebateService {
                 if code == 0 {
                     switch type {
                     case .viewpoint:
-                        let attitude = [AnswerAttitude].init(JSONArray: result.data!)
-                        return (attitude[0], Ok001)
+                        let attitude = AnswerAttitude.init(map: Map.init(mappingType: .fromJSON, JSON: result.data!))
+                        return (attitude, OkSuccess)
                     case .comment:
-                        return (nil, Ok001)
+                        return (nil, OkSuccess)
                     }
                 } else {
-                    return (nil, Result2.failed(message: result.msg!))
+                    return (nil, ResultType.failed(message: result.msg!))
                 }
             }
-            .catchErrorJustReturn((nil, Error001))
+            .catchErrorJustReturn((nil, ErrorRequestFailed))
     }
     
-    //关注事件
-    func followCheck(_ topicid: Int) -> Observable<Result2> {
-        return ShuTuProvider2.rx.request(.followcheck(type: FollowType.topic, id: topicid))
+    //MARK: - 关注事件
+    func followCheck(_ topicid: Int) -> Observable<ResultType> {
+        return STProvider.rx.request(.followcheck(type: FollowType.topic, id: topicid))
             .mapObject(Callback.self)
             .asObservable()
             .observeOn(MainScheduler.instance)
             .map{ result in
                 let code = result.code
                 if code == 0 {
-                    return Result2.exist
+                    return ResultType.exist
                 } else {
-                    return Result2.empty
+                    return ResultType.empty
                 }
             }
-            .catchErrorJustReturn(Error001)
+            .catchErrorJustReturn(ErrorRequestFailed)
     }
-    func followAdd(_ topicid: Int, _ toggle: Toggle) -> Observable<Result2> {
-        return ShuTuProvider2.rx.request(.followadd(type: FollowType.topic, id: topicid, toggle: toggle))
+    func followAdd(_ topicid: Int, _ toggle: Toggle) -> Observable<ResultType> {
+        return STProvider.rx.request(.followadd(type: FollowType.topic, id: topicid, toggle: toggle))
             .mapObject(Callback.self)
             .asObservable()
             .observeOn(MainScheduler.instance)
             .map{ result in
                 let code = result.code
                 if code == 0 {
-                    return Result2.ok(message: result.msg!)
+                    return ResultType.ok(message: result.msg!)
                 } else if code == 1 {
-                    return Result2.exist
+                    return ResultType.exist
                 } else {
-                    return Result2.failed(message: result.msg!)
+                    return ResultType.failed(message: result.msg!)
                 }
             }
-            .catchErrorJustReturn(Error001)
+            .catchErrorJustReturn(ErrorRequestFailed)
     }
     
-    //拉取今日话题
-    func getDailyTopics(pageIndex: Int) -> Observable<([Debate], Result2)> {
-        return ShuTuProvider2.rx.request(.today(pageIndex: pageIndex))
+    /// 拉取今日话题
+    func getDailyTopics(pageIndex: Int) -> Observable<([Debate], ResultType)> {
+        return STProvider.rx.request(.today(pageIndex: pageIndex))
             .mapObject(Callback.self)
             .asObservable()
             .observeOn(MainScheduler.instance)
@@ -215,17 +234,17 @@ class DebateService {
                 let code = result.code
                 if code == 0 {
                     let data = [Debate].init(JSONArray: result.data!)
-                    return (data, Ok001)
+                    return (data, OkSuccess)
                 } else {
-                    return ([], Result2.failed(message: result.msg!))
+                    return ([], ResultType.failed(message: result.msg!))
                 }
             }
-            .catchErrorJustReturn(([], Error001))
+            .catchErrorJustReturn(([], ErrorRequestFailed))
     }
     
-    //拉取话题
-    func getTopics(pageIndex: Int) -> Observable<([Debate], Result2)> {
-        return ShuTuProvider2.rx.request(.topics(pageIndex: pageIndex))
+    /// 拉取话题
+    func getTopics(pageIndex: Int) -> Observable<([Debate], ResultType)> {
+        return STProvider.rx.request(.topics(pageIndex: pageIndex))
             .mapObject(Callback.self)
             .asObservable()
             .observeOn(MainScheduler.instance)
@@ -238,36 +257,36 @@ class DebateService {
                         let html = data[i].content!
                         data[i].puredesc = ServiceUtil.handleHtml2(html)
                     }
-                    return (data, Ok001)
+                    return (data, OkSuccess)
                 } else {
-                    return ([], Result2.failed(message: result.msg!))
+                    return ([], ResultType.failed(message: result.msg!))
                 }
             }
-            .catchErrorJustReturn(([], Error001))
+            .catchErrorJustReturn(([], ErrorRequestFailed))
     }
     
-    //添加话题
-    func topicAdd(_ title: String, _ content: String) -> Observable<Result2> {
+    /// 添加话题
+    func topicAdd(_ title: String, _ content: String) -> Observable<ResultType> {
         //处理页面图片
         let (tp, urls) = ServiceUtil.handleHtml(content)
-        return ShuTuProvider2.rx.request(.topicadd(title: title, content: tp, urls: urls))
+        return STProvider.rx.request(.topicadd(title: title, content: tp, urls: urls))
             .mapObject(Callback.self)
             .asObservable()
             .observeOn(MainScheduler.instance)
             .map{ result in
                 let code = result.code
                 if code == 0 {
-                    return Result2.ok(message: result.msg!)
+                    return ResultType.ok(message: result.msg!)
                 } else {
-                    return Result2.failed(message: result.msg!)
+                    return ResultType.failed(message: result.msg!)
                 }
             }
-            .catchErrorJustReturn(Error001)
+            .catchErrorJustReturn(ErrorRequestFailed)
     }
     
-    //搜索话题
-    func getTopics(title: String, pageIndex: Int) -> Observable<([Debate], Result2)> {
-        return ShuTuProvider2.rx.request(.topicsearch(title: title, pageIndex: pageIndex))
+    /// 搜索话题
+    func getTopics(title: String, pageIndex: Int) -> Observable<([Debate], ResultType)> {
+        return STProvider.rx.request(.topicsearch(title: title, pageIndex: pageIndex))
             .mapObject(Callback.self)
             .asObservable()
             .observeOn(MainScheduler.instance)
@@ -280,29 +299,29 @@ class DebateService {
                         let html = data[i].description!
                         data[i].puredesc = ServiceUtil.handleHtml2(html)
                     }
-                    return (data, Ok001)
+                    return (data, OkSuccess)
                 } else {
-                    return ([], Result2.failed(message: result.msg!))
+                    return ([], ResultType.failed(message: result.msg!))
                 }
             }
-            .catchErrorJustReturn(([], Error001))
+            .catchErrorJustReturn(([], ErrorRequestFailed))
     }
     
-    //拉取 Debate
-    func getDebate(pageIndex: Int) -> Observable<([Debate], Result2)> {
-        return ShuTuProvider.rx.request(.debate(pageIndex: pageIndex))
+    /// 拉取话题
+    func getDebate(pageIndex: Int) -> Observable<([Debate], ResultType)> {
+        return STTestProvider.rx.request(.debate(pageIndex: pageIndex))
             .mapArray(Debate.self)
             .asObservable()
             .observeOn(MainScheduler.instance)
             .map{ data in
-                return (data, Ok001)
+                return (data, OkSuccess)
             }
-            .catchErrorJustReturn(([], Error001))
+            .catchErrorJustReturn(([], ErrorRequestFailed))
     }
     
-    //拉取回答
-    func getAnswer(id: Int, pageIndex: Int, side: AnswerSide) -> Observable<([Answer], Result2)> {
-        return ShuTuProvider2.rx.request(.viewpoint(id: id, pageIndex: pageIndex, side: side))
+    /// 拉取回答
+    func getAnswer(id: Int, pageIndex: Int, side: AnswerSide) -> Observable<([Answer], ResultType)> {
+        return STProvider.rx.request(.viewpoint(id: id, pageIndex: pageIndex, side: side))
             .mapObject(Callback.self)
             .asObservable()
             .observeOn(MainScheduler.instance)
@@ -312,32 +331,32 @@ class DebateService {
                     var data = [Answer].init(JSONArray: result.data!)
                     //获取描述的纯文本内容
                     for i in 0..<data.count {
-                        let html = data[i].answer!
+                        let html = data[i].content!
                         data[i].pureanswer = ServiceUtil.handleHtml2(html)
                     }
-                    return (data, Ok001)
+                    return (data, OkSuccess)
                 } else {
-                    return ([], Result2.failed(message: result.msg!))
+                    return ([], ResultType.failed(message: result.msg!))
                 }
             }
-            .catchErrorJustReturn(([], Error001))
+            .catchErrorJustReturn(([], ErrorRequestFailed))
     }
     
-    //拉取回答详情
-    func getAnswerDetail(id: Int) -> Observable<(AnswerDetail, Result2)> {
-        return ShuTuProvider.rx.request(.answerDetail(id: id))
+    /// 拉取回答详情
+    func getAnswerDetail(id: Int) -> Observable<(AnswerDetail, ResultType)> {
+        return STTestProvider.rx.request(.answerDetail(id: id))
             .mapObject(AnswerDetail.self)
             .asObservable()
             .observeOn(MainScheduler.instance)
             .map{ data in
-                return (data, Ok001)
+                return (data, OkSuccess)
             }
-            .catchErrorJustReturn((AnswerDetail(), Error001))
+            .catchErrorJustReturn((AnswerDetail(), ErrorFailed))
     }
     
-    //拉取回答评论
-    func getAnswerComment(id: Int, pageIndex: Int) -> Observable<([AnswerComment], Result2)> {
-        return ShuTuProvider2.rx.request(.comments(id: id, pageIndex: pageIndex, type: CommentType.viewpoint))
+    //MARK: - 拉取回答评论
+    func getAnswerComment(id: Int, pageIndex: Int) -> Observable<([AnswerComment], ResultType)> {
+        return STProvider.rx.request(.comments(id: id, pageIndex: pageIndex, type: CommentType.viewpoint))
             .mapObject(Callback.self)
             .asObservable()
             .observeOn(MainScheduler.instance)
@@ -345,15 +364,15 @@ class DebateService {
                 let code = result.code
                 if code == 0 {
                     let data = [AnswerComment].init(JSONArray: result.data!)
-                    return (data, Ok001)
+                    return (data, OkSuccess)
                 } else {
-                    return ([], Result2.failed(message: result.msg!))
+                    return ([], ResultType.failed(message: result.msg!))
                 }
             }
-            .catchErrorJustReturn(([], Error001))
+            .catchErrorJustReturn(([], ErrorRequestFailed))
     }
-    func getDeepComment(id: Int, pageIndex: Int) -> Observable<([AnswerComment], Result2)> {
-        return ShuTuProvider2.rx.request(.comments(id: id, pageIndex: pageIndex, type: CommentType.comment))
+    func getDeepComment(id: Int, pageIndex: Int) -> Observable<([AnswerComment], ResultType)> {
+        return STProvider.rx.request(.comments(id: id, pageIndex: pageIndex, type: CommentType.comment))
             .mapObject(Callback.self)
             .asObservable()
             .observeOn(MainScheduler.instance)
@@ -361,51 +380,51 @@ class DebateService {
                 let code = result.code
                 if code == 0 {
                     let data = [AnswerComment].init(JSONArray: result.data!)
-                    return (data, Ok001)
+                    return (data, OkSuccess)
                 } else {
-                    return ([], Result2.failed(message: result.msg!))
+                    return ([], ResultType.failed(message: result.msg!))
                 }
             }
-            .catchErrorJustReturn(([], Error001))
+            .catchErrorJustReturn(([], ErrorRequestFailed))
     }
-    func commentAdd(id: Int, content: String) -> Observable<Result2> {
-        return ShuTuProvider2.rx.request(.commentadd(id: id, content: content))
+    func commentAdd(id: Int, content: String) -> Observable<ResultType> {
+        return STProvider.rx.request(.commentadd(id: id, content: content))
             .mapObject(Callback.self)
             .asObservable()
             .observeOn(MainScheduler.instance)
             .map { result in
                 let code = result.code
                 if code == 0 {
-                    return Ok001
+                    return OkSuccess
                 } else {
-                    return Result2.failed(message: result.msg!)
+                    return ResultType.failed(message: result.msg!)
                 }
             }
             .catchError { error in
-                return .just(Error003)
+                return .just(ErrorRequestFailed)
         }
     }
-    func commentAdd(id: Int, cmid: Int, content: String) -> Observable<Result2> {
-        return ShuTuProvider2.rx.request(.commentadd2(id: id, cmid: cmid, content: content))
+    func commentAdd(id: Int, cmid: Int, content: String) -> Observable<ResultType> {
+        return STProvider.rx.request(.commentadd2(id: id, cmid: cmid, content: content))
             .mapObject(Callback.self)
             .asObservable()
             .observeOn(MainScheduler.instance)
             .map { result in
                 let code = result.code
                 if code == 0 {
-                    return Ok001
+                    return OkSuccess
                 } else {
-                    return Result2.failed(message: result.msg!)
+                    return ResultType.failed(message: result.msg!)
                 }
             }
             .catchError { error in
-                return .just(Error003)
+                return .just(ErrorRequestFailed)
         }
     }
     
-    //拉取轮播图片
+    /// 拉取轮播图片
     func getDebateCarousel() -> Observable<[DebateImage]>{
-        return ShuTuProvider.rx.request(.carousel)
+        return STTestProvider.rx.request(.carousel)
             .mapArray(DebateImage.self)
             .asObservable()
             .observeOn(MainScheduler.instance)
@@ -415,13 +434,14 @@ class DebateService {
 }
 
 class FriendService {
-    //单例
+    
+    //MARK: - 单例
     static let instance = FriendService()
     private init() {}
     
-    //获取动态
-    func trend(_ pageIndex: Int) -> Observable<([Dynamic], Result2)> {
-        return ShuTuProvider2.rx.request(.trend(pageIndex: pageIndex))
+    /// 获取动态
+    func trend(_ pageIndex: Int) -> Observable<([Dynamic], ResultType)> {
+        return STProvider.rx.request(.trend(pageIndex: pageIndex))
             .mapObject(Callback.self)
             .asObservable()
             .observeOn(MainScheduler.instance)
@@ -429,17 +449,17 @@ class FriendService {
                 let code = result.code
                 if code == 0 {
                     let data = [Dynamic].init(JSONArray: result.data!)
-                    return (data, Ok001)
+                    return (data, OkSuccess)
                 } else {
-                    return ([], Result2.failed(message: result.msg!))
+                    return ([], ResultType.failed(message: result.msg!))
                 }
             }
-            .catchErrorJustReturn(([], Error001))
+            .catchErrorJustReturn(([], ErrorRequestFailed))
     }
     
-    //拉取好友列表
-    func getFriend(id: Int, pageIndex: Int) -> Observable<([User], Result2)> {
-        return ShuTuProvider2.rx.request(.friends(pageIndex: pageIndex))
+    /// 拉取好友列表
+    func getFriend(id: Int, pageIndex: Int) -> Observable<([User], ResultType)> {
+        return STProvider.rx.request(.friends(pageIndex: pageIndex))
             .mapObject(Callback.self)
             .asObservable()
             .observeOn(MainScheduler.instance)
@@ -447,72 +467,90 @@ class FriendService {
                 let code = result.code
                 if code == 0 {
                     let data = [User].init(JSONArray: result.data!)
-                    return (data, Ok001)
+                    return (data, OkSuccess)
                 } else {
-                    return ([], Result2.failed(message: result.msg!))
+                    return ([], ResultType.failed(message: result.msg!))
                 }
             }
-            .catchErrorJustReturn(([], Error001))
+            .catchErrorJustReturn(([], ErrorRequestFailed))
     }
-    //拉取动态
-    func getDynamic(id: Int, pageIndex: Int) -> Observable<([Dynamic], Result2)> {
-        return ShuTuProvider.rx.request(.friendDynamic(id: id, pageIndex: pageIndex))
+    
+    /// 拉取动态
+    func getDynamic(id: Int, pageIndex: Int) -> Observable<([Dynamic], ResultType)> {
+        return STTestProvider.rx.request(.friendDynamic(id: id, pageIndex: pageIndex))
             .mapArray(Dynamic.self)
             .asObservable()
             .observeOn(MainScheduler.instance)
             .map { data in
-                return (data, Ok001)
+                return (data, OkSuccess)
             }
-            .catchErrorJustReturn(([], Error001))
+            .catchErrorJustReturn(([], ErrorRequestFailed))
     }
-}
-
-class FindService {
-    //单例
-    static let instance = FindService()
-    private init() {}
     
-    //关注好友事件
-    func followAdd(_ topicid: Int, _ toggle: Toggle) -> Observable<Result2> {
-        return ShuTuProvider2.rx.request(.followadd(type: FollowType.person, id: topicid, toggle: toggle))
+    //MARK: - 关注好友事件
+    func followAdd(_ fuserid: Int, _ toggle: Toggle) -> Observable<ResultType> {
+        return STProvider.rx.request(.followadd(type: FollowType.person, id: fuserid, toggle: toggle))
             .mapObject(Callback.self)
             .asObservable()
             .observeOn(MainScheduler.instance)
             .map{ result in
                 let code = result.code
                 if code == 0 {
-                    return Result2.ok(message: result.msg!)
+                    return ResultType.ok(message: result.msg!)
                 } else if code == 1 {
-                    return Result2.exist
+                    return ResultType.exist
                 } else {
-                    return Result2.failed(message: result.msg!)
+                    return ResultType.failed(message: result.msg!)
                 }
             }
-            .catchErrorJustReturn(Error001)
+            .catchErrorJustReturn(ErrorRequestFailed)
+    }
+    func followCheck(_ fuserif: Int) -> Observable<ResultType> {
+        return STProvider.rx.request(.followcheck(type: FollowType.person, id: fuserif))
+            .mapObject(Callback.self)
+            .asObservable()
+            .observeOn(MainScheduler.instance)
+            .map{ result in
+                let code = result.code
+                if code == 0 {
+                    return ResultType.exist
+                } else {
+                    return ResultType.empty
+                }
+            }
+            .catchErrorJustReturn(ErrorRequestFailed)
     }
     
-    //投票
-    func vote(_ id: Int, _ attitude: AttitudeStand) -> Observable<Result2> {
-        return ShuTuProvider2.rx.request(.vote(id: id, attitude: attitude))
+}
+
+class FindService {
+    
+    //MARK: - 单例
+    static let instance = FindService()
+    private init() {}
+    
+    /// 投票
+    func vote(_ id: Int, _ attitude: AttitudeStand) -> Observable<ResultType> {
+        return STProvider.rx.request(.vote(id: id, attitude: attitude))
             .mapObject(Callback.self)
             .asObservable()
             .observeOn(MainScheduler.instance)
             .map { result in
                 let code = result.code
                 if code == 0 {
-                    return Ok001
+                    return OkSuccess
                 } else {
-                    return Result2.failed(message: result.msg!)
+                    return ResultType.failed(message: result.msg!)
                 }
             }
             .catchError { error in
-                return .just(Error003)
+                return .just(ErrorRequestFailed)
         }
     }
     
-    //发现话题
-    func findTopic() -> Observable<([Debate], Result2)> {
-        return ShuTuProvider2.rx.request(.findtopic)
+    /// 发现话题
+    func findTopic() -> Observable<([Debate], ResultType)> {
+        return STProvider.rx.request(.findtopic)
             .mapObject(Callback.self)
             .asObservable()
             .observeOn(MainScheduler.instance)
@@ -520,16 +558,17 @@ class FindService {
                 let code = result.code
                 if code == 0 {
                     let data = [Debate].init(JSONArray: result.data!)
-                    return (data, Ok001)
+                    return (data, OkSuccess)
                 } else {
-                    return ([], Result2.failed(message: result.msg!))
+                    return ([], ResultType.failed(message: result.msg!))
                 }
             }
-            .catchErrorJustReturn(([], Error001))
+            .catchErrorJustReturn(([], ErrorRequestFailed))
     }
-    //发现征集
-    func findCollect() -> Observable<([DebateCollect], Result2)> {
-        return ShuTuProvider2.rx.request(.findcollect)
+    
+    /// 发现征集
+    func findCollect() -> Observable<([DebateCollect], ResultType)> {
+        return STProvider.rx.request(.findcollect)
             .mapObject(Callback.self)
             .asObservable()
             .observeOn(MainScheduler.instance)
@@ -537,16 +576,17 @@ class FindService {
                 let code = result.code
                 if code == 0 {
                     let data = [DebateCollect].init(JSONArray: result.data!)
-                    return (data, Ok001)
+                    return (data, OkSuccess)
                 } else {
-                    return ([], Result2.failed(message: result.msg!))
+                    return ([], ResultType.failed(message: result.msg!))
                 }
             }
-            .catchErrorJustReturn(([], Error001))
+            .catchErrorJustReturn(([], ErrorRequestFailed))
     }
-    //发现感兴趣的人
-    func findPerson() -> Observable<([User], Result2)> {
-        return ShuTuProvider2.rx.request(.findperson)
+    
+    /// 发现感兴趣的人
+    func findPerson() -> Observable<([User], ResultType)> {
+        return STProvider.rx.request(.findperson)
             .mapObject(Callback.self)
             .asObservable()
             .observeOn(MainScheduler.instance)
@@ -554,23 +594,24 @@ class FindService {
                 let code = result.code
                 if code == 0 {
                     let data = [User].init(JSONArray: result.data!)
-                    return (data, Ok001)
+                    return (data, OkSuccess)
                 } else {
-                    return ([], Result2.failed(message: result.msg!))
+                    return ([], ResultType.failed(message: result.msg!))
                 }
             }
-            .catchErrorJustReturn(([], Error001))
+            .catchErrorJustReturn(([], ErrorRequestFailed))
     }
 }
 
 class MeService {
-    //单例
+    
+    //MARK: - 单例
     static let instance = MeService()
     private init() {}
     
-    //获取用户信息
-    func userinfo() -> Observable<(UserInfo?, Result2)> {
-        return ShuTuProvider2.rx.request(.userinfo)
+    /// 获取用户信息
+    func userinfo() -> Observable<(UserInfo?, ResultType)> {
+        return STProvider.rx.request(.userinfo)
             .mapObject(Callback2.self)
             .asObservable()
             .observeOn(MainScheduler.instance)
@@ -578,30 +619,37 @@ class MeService {
                 let code = result.code
                 if code == 0 {
                     let data = UserInfo.init(map: Map.init(mappingType: .fromJSON, JSON: result.data!))
-                    return (data, Ok001)
+                    if let userInfo = data {
+                        ServiceUtil.saveUserInfo(userInfo)
+                    }
+                    return (data, OkSuccess)
                 } else {
-                    return (nil, Result2.failed(message: result.msg!))
+                    return (nil, ResultType.failed(message: result.msg!))
                 }
             }
-            .catchErrorJustReturn((nil, Error001))
+            .catchErrorJustReturn((nil, ErrorRequestFailed))
     }
     
-    //保存用户信息
-    fileprivate func saveUserInfo(_ userinfo: UserInfo) {
-        if let followtopics = userinfo.followtopics {
-            Environment.followtopics = followtopics
-        }
-        if let followpersons = userinfo.follows {
-            Environment.followpersons = followpersons
-        }
-        if let fans = userinfo.fans {
-            Environment.fans = fans
-        }
+    /// 设置用户信息
+    func setuserinfo(_ infos: [String: Any]) -> Observable<ResultType> {
+        return STProvider.rx.request(.setuserinfo(infos: infos))
+            .mapObject(Callback.self)
+            .asObservable()
+            .observeOn(MainScheduler.instance)
+            .map{ result in
+                let code = result.code
+                if code == 0 {
+                    return OkSuccess
+                } else {
+                    return ResultType.failed(message: result.msg!)
+                }
+            }
+            .catchErrorJustReturn(ErrorRequestFailed)
     }
     
-    //获取动态
-    func trend(_ pageIndex: Int) -> Observable<([Dynamic], Result2)> {
-        return ShuTuProvider2.rx.request(.trend2(pageIndex: pageIndex))
+    /// 获取动态
+    func trend(_ pageIndex: Int) -> Observable<([Dynamic], ResultType)> {
+        return STProvider.rx.request(.trend2(pageIndex: pageIndex))
             .mapObject(Callback.self)
             .asObservable()
             .observeOn(MainScheduler.instance)
@@ -609,17 +657,17 @@ class MeService {
                 let code = result.code
                 if code == 0 {
                     let data = [Dynamic].init(JSONArray: result.data!)
-                    return (data, Ok001)
+                    return (data, OkSuccess)
                 } else {
-                    return ([], Result2.failed(message: result.msg!))
+                    return ([], ResultType.failed(message: result.msg!))
                 }
             }
-            .catchErrorJustReturn(([], Error001))
+            .catchErrorJustReturn(([], ErrorRequestFailed))
     }
     
-    //获取关注的人
-    func follows(_ pageIndex: Int) -> Observable<([User], Result2)> {
-        return ShuTuProvider2.rx.request(.mefollows(pageIndex: pageIndex))
+    /// 获取关注的人
+    func follows(_ pageIndex: Int) -> Observable<([User], ResultType)> {
+        return STProvider.rx.request(.mefollows(pageIndex: pageIndex))
             .mapObject(Callback.self)
             .asObservable()
             .observeOn(MainScheduler.instance)
@@ -627,17 +675,17 @@ class MeService {
                 let code = result.code
                 if code == 0 {
                     let data = [User].init(JSONArray: result.data!)
-                    return (data, Ok001)
+                    return (data, OkSuccess)
                 } else {
-                    return ([], Result2.failed(message: result.msg!))
+                    return ([], ResultType.failed(message: result.msg!))
                 }
             }
-            .catchErrorJustReturn(([], Error001))
+            .catchErrorJustReturn(([], ErrorRequestFailed))
     }
     
-    //获取关注我的人
-    func fans(_ pageIndex: Int) -> Observable<([User], Result2)> {
-        return ShuTuProvider2.rx.request(.mefans(pageIndex: pageIndex))
+    /// 获取关注我的人
+    func fans(_ pageIndex: Int) -> Observable<([User], ResultType)> {
+        return STProvider.rx.request(.mefans(pageIndex: pageIndex))
             .mapObject(Callback.self)
             .asObservable()
             .observeOn(MainScheduler.instance)
@@ -645,17 +693,17 @@ class MeService {
                 let code = result.code
                 if code == 0 {
                     let data = [User].init(JSONArray: result.data!)
-                    return (data, Ok001)
+                    return (data, OkSuccess)
                 } else {
-                    return ([], Result2.failed(message: result.msg!))
+                    return ([], ResultType.failed(message: result.msg!))
                 }
             }
-            .catchErrorJustReturn(([], Error001))
+            .catchErrorJustReturn(([], ErrorRequestFailed))
     }
     
-    //获取关注的话题
-    func followtopics(_ pageIndex: Int) -> Observable<([Debate], Result2)> {
-        return ShuTuProvider2.rx.request(.followtopics(pageIndex: pageIndex))
+    /// 获取关注的话题
+    func followtopics(_ pageIndex: Int) -> Observable<([Debate], ResultType)> {
+        return STProvider.rx.request(.followtopics(pageIndex: pageIndex))
             .mapObject(Callback.self)
             .asObservable()
             .observeOn(MainScheduler.instance)
@@ -668,17 +716,17 @@ class MeService {
                         let html = data[i].description!
                         data[i].puredesc = ServiceUtil.handleHtml2(html)
                     }
-                    return (data, Ok001)
+                    return (data, OkSuccess)
                 } else {
-                    return ([], Result2.failed(message: result.msg!))
+                    return ([], ResultType.failed(message: result.msg!))
                 }
             }
-            .catchErrorJustReturn(([], Error001))
+            .catchErrorJustReturn(([], ErrorRequestFailed))
     }
     
-    //获取观点
-    func viewpoints(_ pageIndex: Int) -> Observable<([Answer], Result2)> {
-        return ShuTuProvider2.rx.request(.meviewpoints(pageIndex: pageIndex))
+    /// 获取观点
+    func viewpoints(_ pageIndex: Int) -> Observable<([Answer], ResultType)> {
+        return STProvider.rx.request(.meviewpoints(pageIndex: pageIndex))
             .mapObject(Callback.self)
             .asObservable()
             .observeOn(MainScheduler.instance)
@@ -688,20 +736,20 @@ class MeService {
                     var data = [Answer].init(JSONArray: result.data!)
                     //获取描述的纯文本内容
                     for i in 0..<data.count {
-                        let html = data[i].answer!
+                        let html = data[i].content!
                         data[i].pureanswer = ServiceUtil.handleHtml2(html)
                     }
-                    return (data, Ok001)
+                    return (data, OkSuccess)
                 } else {
-                    return ([], Result2.failed(message: result.msg!))
+                    return ([], ResultType.failed(message: result.msg!))
                 }
             }
-            .catchErrorJustReturn(([], Error001))
+            .catchErrorJustReturn(([], ErrorRequestFailed))
     }
     
-    //获取话题
-    func topics(_ pageIndex: Int) -> Observable<([Debate], Result2)> {
-        return ShuTuProvider2.rx.request(.metopics(pageIndex: pageIndex))
+    /// 获取话题
+    func topics(_ pageIndex: Int) -> Observable<([Debate], ResultType)> {
+        return STProvider.rx.request(.metopics(pageIndex: pageIndex))
             .mapObject(Callback.self)
             .asObservable()
             .observeOn(MainScheduler.instance)
@@ -714,17 +762,17 @@ class MeService {
                         let html = data[i].description!
                         data[i].puredesc = ServiceUtil.handleHtml2(html)
                     }
-                    return (data, Ok001)
+                    return (data, OkSuccess)
                 } else {
-                    return ([], Result2.failed(message: result.msg!))
+                    return ([], ResultType.failed(message: result.msg!))
                 }
             }
-            .catchErrorJustReturn(([], Error001))
+            .catchErrorJustReturn(([], ErrorRequestFailed))
     }
     
-    //获取支持
-    func supports(_ pageIndex: Int) -> Observable<([Answer], Result2)> {
-        return ShuTuProvider2.rx.request(.supports(pageIndex: pageIndex))
+    /// 获取支持
+    func supports(_ pageIndex: Int) -> Observable<([Answer], ResultType)> {
+        return STProvider.rx.request(.supports(pageIndex: pageIndex))
             .mapObject(Callback.self)
             .asObservable()
             .observeOn(MainScheduler.instance)
@@ -734,20 +782,20 @@ class MeService {
                     var data = [Answer].init(JSONArray: result.data!)
                     //获取描述的纯文本内容
                     for i in 0..<data.count {
-                        let html = data[i].answer!
+                        let html = data[i].content!
                         data[i].pureanswer = ServiceUtil.handleHtml2(html)
                     }
-                    return (data, Ok001)
+                    return (data, OkSuccess)
                 } else {
-                    return ([], Result2.failed(message: result.msg!))
+                    return ([], ResultType.failed(message: result.msg!))
                 }
             }
-            .catchErrorJustReturn(([], Error001))
+            .catchErrorJustReturn(([], ErrorRequestFailed))
     }
     
-    //获取收藏
-    func collects(_ pageIndex: Int) -> Observable<([Answer], Result2)> {
-        return ShuTuProvider2.rx.request(.collects(pageIndex: pageIndex))
+    /// 获取收藏
+    func collects(_ pageIndex: Int) -> Observable<([Answer], ResultType)> {
+        return STProvider.rx.request(.collects(pageIndex: pageIndex))
             .mapObject(Callback.self)
             .asObservable()
             .observeOn(MainScheduler.instance)
@@ -757,28 +805,121 @@ class MeService {
                     var data = [Answer].init(JSONArray: result.data!)
                     //获取描述的纯文本内容
                     for i in 0..<data.count {
-                        let html = data[i].answer!
+                        let html = data[i].content!
                         data[i].pureanswer = ServiceUtil.handleHtml2(html)
                     }
-                    return (data, Ok001)
+                    return (data, OkSuccess)
                 } else {
-                    return ([], Result2.failed(message: result.msg!))
+                    return ([], ResultType.failed(message: result.msg!))
                 }
             }
-            .catchErrorJustReturn(([], Error001))
+            .catchErrorJustReturn(([], ErrorRequestFailed))
     }
 }
     
 
 class TestService {
-    //单例
+    
+    //MARK: - 单例
     static let instance = TestService()
     private init() {}
-    
 }
 
 class ServiceUtil {
-    ///获取页面代码中的图片资源
+    
+    /// 检查登录
+    static func loginCheck(_ withHUD: Bool = false) -> Bool {
+        if Environment.tokenExists {
+            return true
+        }
+        
+        if withHUD {
+            HUD.flash(.label("请先登录"))
+        }
+        return false
+    }
+    
+    /// 保存用户信息
+    static func saveUserInfo(_ user: User) {
+        if let portrait = user.portrait {
+            Environment.portrait = portrait
+        }
+        if let nickname = user.nickname {
+            Environment.nickname = nickname
+        }
+    }
+    static func saveUserInfo(_ userinfo: UserInfo) {
+        if let portrait = userinfo.portrait {
+            Environment.portrait = portrait
+        }
+        if let nickname = userinfo.nickname {
+            Environment.nickname = nickname
+        }
+        if let follows = userinfo.follows {
+            Environment.follows = follows
+        }
+        if let followtopics = userinfo.followtopics {
+            Environment.followtopics = followtopics
+        }
+        Environment.userinfo = userinfo
+    }
+    
+    /// 局部更新用户信息
+    /// - parameter followsAdd: true, 关注的人增加
+    /// - parameter followTopicsAdd: true, 关注的话题增加
+    static func userinfoPartRefresh(_ followsAdd: Bool?, _ followTopicsAdd: Bool?) {
+        if let _ = Environment.token {
+            if let add = followsAdd {
+                if add {
+                    if let follows = Environment.follows {
+                        Environment.follows = follows + 1
+                        AppStatus.onNext(AppState.userinfo_part)
+                    }
+                } else {
+                    if let follows = Environment.follows {
+                        Environment.follows = (follows - 1) < 0 ? 0:(follows - 1)
+                        AppStatus.onNext(AppState.userinfo_part)
+                    }
+                }
+            }
+            if let add = followTopicsAdd {
+                if add {
+                    if let followtopics = Environment.followtopics {
+                        Environment.followtopics = followtopics + 1
+                        AppStatus.onNext(AppState.userinfo_part)
+                    }
+                } else {
+                    if let followtopics = Environment.followtopics {
+                        Environment.followtopics = (followtopics - 1) < 0 ? 0:(followtopics - 1)
+                        AppStatus.onNext(AppState.userinfo_part)
+                    }
+                }
+            }
+        }
+    }
+    
+    /// 添加网页属性
+    static func updateHtmlStyle(_ html: String, _ padding: Int?, _ fontSize: Int = 11) -> String {
+        var content = html + "<style>"
+        if let p = padding {
+            content += "body{padding: \(p)px !important;}"
+        }
+        content += "html{font-size: \(fontSize)px !important;}"
+        content += "p{margin: 10px 0 !important;}"
+        content += "img{display: block !important; max-width: \(SW*0.8)px; margin: 0 auto;}img.emoji{display: inline-block;}img.emoji.tiny{max-width: 20px;position: relative;top: 4px;}"
+        content += "</style>"
+        return content
+    }
+    
+    /// 网络地址编码
+    static func urlEncode(_ url: String) -> String {
+        var a = url.split(separator: "/")
+        let b = a.last?.addingPercentEncoding(withAllowedCharacters: .urlHostAllowed)
+        a.removeLast()
+        return a.joined(separator: "/") + "/\(b ?? "")"
+    }
+    
+    /// 获取页面代码中的图片资源
     static func handleHtml(_ html: String) -> (String, [URL]) {
         var html2 = html
         var urls: [URL] = []
@@ -795,14 +936,16 @@ class ServiceUtil {
                 let imageUrl = URL.init(fileURLWithPath: imagePath)
                 if imageUrl.isFileURL {
                     urls.append(imageUrl)
-                    html2 = (html2 as NSString).replacingOccurrences(of: sub, with: "{{image_\(i)}}")
+                    let sub3 = (sub as NSString).replacingOccurrences(of: imagePath, with: "{{image_\(i)}}")
+                    html2 = (html2 as NSString).replacingOccurrences(of: sub, with: sub3)
                 }
             }
         }
         
         return (html2, urls)
     }
-    ///获得纯净的文本
+    
+    /// 获得纯净的文本
     static func handleHtml2(_ o: String) -> String {
         var html = o
         html = html.replacingOccurrences(of: "<img[^>]*>", with: "", options: .regularExpression, range: html.startIndex..<html.endIndex)
@@ -828,8 +971,9 @@ class ServiceUtil {
     }
 }
 
-//常用验证
+/// 常用验证
 enum RegularValidate {
+    
     case email(_: String)
     case phoneNum(_: String)
     case carNum(_: String)

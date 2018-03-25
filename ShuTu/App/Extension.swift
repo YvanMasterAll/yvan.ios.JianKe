@@ -12,23 +12,22 @@ import RxCocoa
 import Moya
 import ObjectMapper
 
-/// 扩展
-/// 导入的库中存在很多扩展
+/// 常用扩展
 
-///字符串扩展
+/// 字符串扩展
 extension String {
     
-    ///除去空格
+    /// 除去空格
     public var trimmed: String {
         return trimmingCharacters(in: .whitespacesAndNewlines)
     }
     
-    //URL Escape
+    /// URL Escape
     var urlEscaped: String {
         return self.addingPercentEncoding(withAllowedCharacters: .urlHostAllowed)!
     }
     
-    ///正则表达式获取目标值
+    /// 正则表达式获取目标值
     /// - parameter pattern: 一个字符串类型的正则表达式
     /// - parameter str: 需要比较判断的对象
     /// - returns: 返回字符串数组
@@ -43,12 +42,12 @@ extension String {
         }
         return subStr
     }
-    
 }
 
-///日期扩展
+/// 日期扩展
 extension Date {
-    ///日期转字符串
+    
+    /// 日期转字符串
     /// - parameter date: 日期
     /// - parameter dateFormat: 格式字符串
     static func toString(date: Date = Date(), dateFormat: String = "yyyy-MM-dd HH:mm:ss") -> String {
@@ -60,7 +59,8 @@ extension Date {
         
         return formatter.string(from: date)
     }
-    ///字符串转日期
+    
+    /// 字符串转日期
     /// - parameter dateString: 日期字符串
     /// - parameter dateFormat: 格式字符串
     static func toDate(dateString: String, dateFormat: String = "yyyy-MM-dd HH:mm:ss") -> Date {
@@ -75,22 +75,24 @@ extension Date {
     
 }
 
-///UILabel 扩展
+/// UILabel
 extension UILabel {
     
-    ///获取文本一行的高度
+    /// 获取文本一行的高度
     var heightOfLine: CGFloat {
         get {
             return (self.text! as NSString).boundingRect(with: CGSize(width: self.frame.width, height:CGFloat(MAXFLOAT)), options: .usesLineFragmentOrigin, attributes: [NSAttributedStringKey.font : self.font], context: nil).height
         }
     }
-    ///获取文本宽度
+    
+    /// 获取文本宽度
     var widthOfString: CGFloat {
         get {
             return (self.text! as NSString).boundingRect(with: CGSize(width: CGFloat(MAXFLOAT), height: 0), options: .usesLineFragmentOrigin, attributes: [NSAttributedStringKey.font : self.font], context: nil).width
         }
     }
-    ///获取文本相应行数的高度
+    
+    /// 获取文本相应行数的高度
     /// - parameter by: 行数
     /// - returns: 返回相应行数的文本高度
     func heightOfLines(by: Int) -> CGFloat {
@@ -104,10 +106,10 @@ extension UILabel {
     
 }
 
-///UIView 扩展
+/// UIView
 extension UIView {
     
-    ///加载 XIB, 返回 UIView
+    /// 加载 XIB, 返回 UIView
     func loadViewFromNib() -> UIView {
         let className = type(of: self)
         let bundle = Bundle(for: className)
@@ -116,86 +118,12 @@ extension UIView {
         let view = nib.instantiate(withOwner: self, options: nil).first as! UIView
         return view
     }
-    
-    ///生成外阴影
-    open func generateOuterShadow() {
-        let view = UIView()
-        view.translatesAutoresizingMaskIntoConstraints = false
-        view.layer.cornerRadius = layer.cornerRadius
-        view.layer.shadowRadius = layer.shadowRadius
-        view.layer.shadowOpacity = layer.shadowOpacity
-        view.layer.shadowColor = layer.shadowColor
-        view.layer.shadowOffset = CGSize.zero
-        view.clipsToBounds = false
-        view.backgroundColor = .white
-        
-        superview?.insertSubview(view, belowSubview: self)
-        
-        let constraints = [
-            NSLayoutConstraint(item: view, attribute: .left, relatedBy: .equal, toItem: self, attribute: .left, multiplier: 1.0, constant: 0.0),
-            NSLayoutConstraint(item: view, attribute: .right, relatedBy: .equal, toItem: self, attribute: .right, multiplier: 1.0, constant: 0.0),
-            NSLayoutConstraint(item: view, attribute: .top, relatedBy: .equal, toItem: self, attribute: .top, multiplier: 1.0, constant: 0.0),
-            NSLayoutConstraint(item: view, attribute: .bottom, relatedBy: .equal, toItem: self, attribute: .bottom, multiplier: 1.0, constant: 0.0),
-            ]
-        superview?.addConstraints(constraints)
-    }
-    ///生成内阴影
-    open func generateInnerShadow() {
-        let view = SwiftyInnerShadowView()
-        view.translatesAutoresizingMaskIntoConstraints = false
-        view.shadowLayer.cornerRadius = layer.cornerRadius
-        view.shadowLayer.shadowRadius = layer.shadowRadius
-        view.shadowLayer.shadowOpacity = layer.shadowOpacity
-        view.shadowLayer.shadowColor = layer.shadowColor
-        view.shadowLayer.shadowOffset = CGSize.zero
-        view.clipsToBounds = false
-        view.backgroundColor = .clear
-        
-        superview?.insertSubview(view, aboveSubview: self)
-        view.isUserInteractionEnabled = false
-        
-        let constraints = [
-            NSLayoutConstraint(item: view, attribute: .left, relatedBy: .equal, toItem: self, attribute: .left, multiplier: 1.0, constant: 0.0),
-            NSLayoutConstraint(item: view, attribute: .right, relatedBy: .equal, toItem: self, attribute: .right, multiplier: 1.0, constant: 0.0),
-            NSLayoutConstraint(item: view, attribute: .top, relatedBy: .equal, toItem: self, attribute: .top, multiplier: 1.0, constant: 0.0),
-            NSLayoutConstraint(item: view, attribute: .bottom, relatedBy: .equal, toItem: self, attribute: .bottom, multiplier: 1.0, constant: 0.0),
-            ]
-        superview?.addConstraints(constraints)
-    }
-    ///生成底部阴影
-    open func generateEllipticalShadow() {
-        let view = UIView()
-        view.translatesAutoresizingMaskIntoConstraints = false
-        view.layer.cornerRadius = layer.cornerRadius
-        view.layer.shadowRadius = layer.shadowRadius
-        view.layer.shadowOpacity = layer.shadowOpacity
-        view.layer.shadowColor = layer.shadowColor
-        view.layer.shadowOffset = CGSize.zero
-        view.clipsToBounds = false
-        view.backgroundColor = .white
-        
-        let ovalRect = CGRect(x: 0, y: frame.size.height + 10, width: frame.size.width, height: 15)
-        let path = UIBezierPath(ovalIn: ovalRect)
-        
-        view.layer.shadowPath = path.cgPath
-        
-        superview?.insertSubview(view, belowSubview: self)
-        
-        let constraints = [
-            NSLayoutConstraint(item: view, attribute: .left, relatedBy: .equal, toItem: self, attribute: .left, multiplier: 1.0, constant: 0.0),
-            NSLayoutConstraint(item: view, attribute: .right, relatedBy: .equal, toItem: self, attribute: .right, multiplier: 1.0, constant: 0.0),
-            NSLayoutConstraint(item: view, attribute: .top, relatedBy: .equal, toItem: self, attribute: .top, multiplier: 1.0, constant: 0.0),
-            NSLayoutConstraint(item: view, attribute: .bottom, relatedBy: .equal, toItem: self, attribute: .bottom, multiplier: 1.0, constant: 0.0),
-            ]
-        superview?.addConstraints(constraints)
-    }
-    
 }
 
-///扩展 UIImage
+/// UIImage
 extension UIImage {
     
-    ///重设图片尺寸
+    /// 重设图片尺寸
     func reSizeImage(_ reSize: CGSize)->UIImage {
         UIGraphicsBeginImageContextWithOptions(reSize,false,UIScreen.main.scale)
         self.draw(in: CGRect.init(x: 0, y: 0, width: reSize.width, height: reSize.height))
@@ -204,13 +132,15 @@ extension UIImage {
         
         return reSizeImage
     }
-    ///等比例缩放
+    
+    /// 等比例缩放
     func scaleImage(scaleSize:CGFloat)->UIImage {
         let reSize = CGSize(width: self.size.width * scaleSize, height: self.size.height * scaleSize)
         
         return reSizeImage(reSize)
     }
-    ///为图片叠加颜色
+    
+    /// 为图片叠加颜色
     public func imageWithTintColor(_ color : UIColor) -> UIImage{
         UIGraphicsBeginImageContext(self.size)
         color.setFill()
@@ -222,22 +152,20 @@ extension UIImage {
         
         return tintedImage!
     }
-    
 }
 
-///扩展 UIImageVIew
+/// UIImageVIew
 extension UIImageView {
     
-    ///更改图片颜色
+    /// 更改图片颜色
     public func changeImageColor(_ color : UIColor){
         let maskLayer = CALayer.init()
         maskLayer.frame = self.bounds
-//        maskLayer.contents = GeneralFactory.createImageWithColor(color)
+        //maskLayer.contents = GeneralFactory.createImageWithColor(color)
         maskLayer.backgroundColor = color.cgColor
         self.layer.addSublayer(maskLayer)
         
         self.clipsToBounds = true
     }
-    
 }
 

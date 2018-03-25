@@ -47,6 +47,12 @@ public struct TLPHAsset {
         }
     }
     
+    public func fullResolutionImagePath(handler: @escaping (String) -> Swift.Void) {
+        guard let phAsset = self.phAsset else { return }
+        
+        return TLPhotoLibrary.fullResolutionImagePath(asset: phAsset, handler: handler)
+    }
+    
     public func extType() -> ImageExtType {
         var ext = ImageExtType.png
         if let fileName = self.originalFileName, let extention = URL(string: fileName)?.pathExtension.lowercased() {

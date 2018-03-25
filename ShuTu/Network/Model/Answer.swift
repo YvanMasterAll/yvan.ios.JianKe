@@ -17,11 +17,13 @@ public struct Answer: Mappable {
     var title: String?
     var nickname: String?
     var portrait: String?
-    var answer: String?
+    var content: String?
     var pureanswer: String?
     var stand: String?
     var supports: Int?
     var comments: Int?
+    var anonymous: String?
+    var isanonymous: Bool = false
     
     public init(){}
     public init?(map: Map) {}
@@ -32,10 +34,15 @@ public struct Answer: Mappable {
         topicid <- map["topicid"]
         nickname <- map["nickname"]
         portrait <- map["portrait"]
-        answer <- map["content"]
+        content <- map["content"]
         stand <- map["stand"]
         supports <- map["supports"]
         comments <- map["comments"]
+        anonymous <- map["anonymous"]
+        
+        self.isanonymous = ModelHelper.handleAnonymous(anonymous)
+        self.portrait = ModelHelper.handleUrl(self.portrait)
+        self.content = ModelHelper.handleContent(content)
     }
 }
 
@@ -84,8 +91,9 @@ public struct AnswerComment: Mappable {
         supports <- map["supports"]
         supported <- map["supported"]
         replyed <- map["replyed"]
+        
+        self.portrait = ModelHelper.handleUrl(self.portrait)
     }
-    
 }
 
 public struct AnswerAttitude: Mappable {
@@ -96,7 +104,12 @@ public struct AnswerAttitude: Mappable {
     var collect: Int?
     
     public init(){}
-    public init?(map: Map) {}
+    public init?(map: Map) {
+        support <- map["support"]
+        oppose <- map["oppose"]
+        bravo <- map["bravo"]
+        collect <- map["collect"]
+    }
     
     public mutating func mapping(map: Map) {
         support <- map["support"]
@@ -104,5 +117,4 @@ public struct AnswerAttitude: Mappable {
         bravo <- map["bravo"]
         collect <- map["collect"]
     }
-    
 }

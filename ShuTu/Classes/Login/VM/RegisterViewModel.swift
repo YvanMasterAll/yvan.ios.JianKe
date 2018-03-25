@@ -21,25 +21,29 @@ public struct RegisterViewModelOutput {
     var phoneUsable: Driver<Bool>?
     var vcodeUsable: Driver<Bool>?
     var registerUsable: Driver<Bool>?
-    var vcodeStatus: Variable<Result2>
+    var vcodeStatus: Variable<ResultType>
     var passwordUsable: Driver<Bool>?
-    var registerStatus: Variable<Result2>
+    var registerStatus: Variable<ResultType>
 }
 
 public class RegisterViewModel {
+
     fileprivate struct RegisterModel {
         var disposeBag: DisposeBag
         var staticPhone: String
     }
-    //Inputs
+
+    //MARK: - Inputs
     open var inputs: RegisterViewModelInput = {
         return RegisterViewModelInput.init(phone: PublishSubject<String>(), vcode: PublishSubject<String>(), password: PublishSubject<String>(), registerTap: PublishSubject<Void>(), verifyTap: PublishSubject<Void>())
     }()
-    //Outputs
+
+    //MARK: - Outputs
     open var outputs: RegisterViewModelOutput = {
-        return RegisterViewModelOutput.init(phoneUsable: nil, vcodeUsable: nil, registerUsable: nil, vcodeStatus: Variable<Result2>(.empty), passwordUsable: nil, registerStatus: Variable<Result2>(.empty))
+        return RegisterViewModelOutput.init(phoneUsable: nil, vcodeUsable: nil, registerUsable: nil, vcodeStatus: Variable<ResultType>(.empty), passwordUsable: nil, registerStatus: Variable<ResultType>(.empty))
     }()
-    //私有成员
+    
+    //MARK: - 私有成员
     fileprivate var registerModel: RegisterModel!
     fileprivate var service = UserService.instance
     
@@ -78,12 +82,12 @@ public class RegisterViewModel {
             .subscribe(onNext: { [weak self] (phone, usable) in
                 guard usable else {
                     HUD.flash(.label("获取验证码失败"))
-                    self?.outputs.vcodeStatus.value = Error001
+                    self?.outputs.vcodeStatus.value = ErrorFailed
                     return
                 }
                 if Environment.vtime.value > 0 {
                     HUD.flash(.label("请勿频繁操作"))
-                    self?.outputs.vcodeStatus.value = Error001
+                    self?.outputs.vcodeStatus.value = ErrorFailed
                     return
                 }
                 
@@ -94,12 +98,12 @@ public class RegisterViewModel {
                 self?.service.getVcode(phone, handler: { error in
                     if error != nil {
                         HUD.flash(.label("获取验证码失败"))
-                        self?.outputs.vcodeStatus.value = Error001
+                        self?.outputs.vcodeStatus.value = ErrorFailed
                     } else {
                         //计时
                         Environment.setVtime()
                         HUD.flash(.label("成功获取验证码"))
-                        self?.outputs.vcodeStatus.value = Ok001
+                        self?.outputs.vcodeStatus.value = OkSuccess
                     }
                 })
             })
@@ -110,31 +114,30 @@ public class RegisterViewModel {
             .drive(onNext: { (phone, password, vcode) in
                 //遮盖
                 HUD.show(.progress)
-                //测试
-                self.service.register(phone, password)
-                    .asObservable()
-                    .subscribe(onNext: { result in
-                        self.outputs.registerStatus.value = result
-                    })
-                    .disposed(by: self.registerModel.disposeBag)
-                return
-                
+//                //测试
+//                self.service.register(phone, password)
+//                    .asObservable()
+//                    .subscribe(onNext: { result in
+//                        self.outputs.registerStatus.value = result
+//                    })
+//                    .disposed(by: self.registerModel.disposeBag)
+//                return
                 //验证码验证
-//                self.service.verifyVcode(phone, vcode, handler: { error in
-//                    if error != nil {
-//                        //验证码错误
-//                        HUD.flash(.label("验证码错误"))
-//                        self.outputs.registerStatus.value = .empty
-//                    } else {
-//                        //验证码正确, 发起注册
-//                        self.service.register(phone, password)
-//                            .asObservable()
-//                            .subscribe(onNext: { result in
-//                                self.outputs.registerStatus.value = result
-//                            })
-//                            .disposed(by: self.registerModel.disposeBag)
-//                    }
-//                })
+                self.service.verifyVcode(phone, vcode, handler: { error in
+                    if error != nil {
+                        //验证码错误
+                        HUD.flash(.label("验证码错误"))
+                        self.outputs.registerStatus.value = .empty
+                    } else {
+                        //验证码正确, 发起注册
+                        self.service.register(phone, password)
+                            .asObservable()
+                            .subscribe(onNext: { result in
+                                self.outputs.registerStatus.value = result
+                            })
+                            .disposed(by: self.registerModel.disposeBag)
+                    }
+                })
             })
             .disposed(by: registerModel.disposeBag)
     }

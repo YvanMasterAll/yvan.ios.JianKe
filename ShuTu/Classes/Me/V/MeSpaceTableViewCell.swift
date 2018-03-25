@@ -23,11 +23,11 @@ class MeSpaceTableViewCell: UITableViewCell {
             self.pagerView.dataSource = self
         }
     }
-    @IBOutlet weak var tabView: TabView! {
+    @IBOutlet weak var tabView: STTabView! {
         didSet {
-            var option = TabPageOption()
+            var option = STTabPageOption()
             option.currentColor = ColorPrimary
-            option.defaultColor = GMColor.grey600Color()
+            option.defaultColor = STColor.grey600Color()
             option.pageBackgoundColor = ColorPrimary
             self.tabView.initOption(option: option)
             tabView.translatesAutoresizingMaskIntoConstraints = false
@@ -42,7 +42,7 @@ class MeSpaceTableViewCell: UITableViewCell {
         }
     }
     
-    //声明区域
+    //MARK: - 声明区域
     open var titles = ["动态", "提问", "回答"]
     
     override func awakeFromNib() {
@@ -55,7 +55,7 @@ class MeSpaceTableViewCell: UITableViewCell {
         super.setSelected(selected, animated: animated)
     }
     
-    //私有成员
+    //MARK: - 私有成员
     fileprivate var dynamicViewModel: MeSpaceDynamicViewModel!
     fileprivate var topicViewModel: MeSpaceTopicViewModel!
     fileprivate var answerViewModel: MeSpaceAnswerViewModel!
@@ -66,14 +66,16 @@ class MeSpaceTableViewCell: UITableViewCell {
 }
 
 extension MeSpaceTableViewCell {
-    //初始化
+
+    //MARK: - 初始化
     fileprivate func commonInit() {
         //View Model
         self.dynamicViewModel = MeSpaceDynamicViewModel.init(disposeBag: self.disposeBag)
         self.topicViewModel = MeSpaceTopicViewModel.init(disposeBag: self.disposeBag)
         self.answerViewModel = MeSpaceAnswerViewModel.init(disposeBag: self.disposeBag)
     }
-    //TabView 点击事件
+    
+    /// TabView Click Action
     fileprivate func tabView(itemSelectedAtIndex index: Int) {
         if index == pagerView.currentIndex { return }
         
@@ -82,7 +84,8 @@ extension MeSpaceTableViewCell {
 }
 
 extension MeSpaceTableViewCell: FSPagerViewDelegate, FSPagerViewDataSource {
-    //FSPagerView Delegate && DataSource
+    
+    //MARK: - FSPagerView Delegate && DataSource
     func numberOfItems(in pagerView: FSPagerView) -> Int {
         return 3
     }

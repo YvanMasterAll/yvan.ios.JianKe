@@ -333,6 +333,11 @@ open class RichEditorView: UIView, UIScrollViewDelegate, UIWebViewDelegate, UIGe
         runJS("RE.insertImage('\(url.escaped)', '\(alt.escaped)');")
     }
     
+    public func insertEmoji(_ url: String, alt: String, style: String = "tiny") {
+        runJS("RE.prepareInsert();")
+        runJS("RE.insertImage('\(url.escaped)', '\(alt.escaped)', 'emoji \(style)');")
+    }
+    
     public func insertLink(_ href: String, title: String) {
         runJS("RE.prepareInsert();")
         runJS("RE.insertLink('\(href.escaped)', '\(title.escaped)');")

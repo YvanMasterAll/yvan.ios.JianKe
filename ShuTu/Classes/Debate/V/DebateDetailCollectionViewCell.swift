@@ -20,7 +20,7 @@ class DebateDetailCollectionViewCell: FSPagerViewCell {
         }
     }
     
-    //声明区
+    //MARK: - 声明区域
     public var side: AnswerSide!
     public var viewModel: DebateDetailViewModel! {
         didSet {
@@ -29,15 +29,22 @@ class DebateDetailCollectionViewCell: FSPagerViewCell {
     }
     public var section: Debate!
     public var navigationController: UINavigationController!
-    //私有成员
+    
+    //MARK: - 私有成员
     fileprivate var disposeBag = DisposeBag()
     fileprivate var dataSource: RxTableViewSectionedReloadDataSource<DebateDetailSectionModel>!
-    fileprivate var emptyView: EmptyView!
+    fileprivate var scrollDragging: Bool = false
+    fileprivate var parentTableStatus: TableState = .headBottom
+    fileprivate var contentOffset: CGPoint!
     
     override func awakeFromNib() {
         super.awakeFromNib()
         
         setupUI()
+    }
+    
+    override func reload() {
+        self.tableView.switchRefreshHeader(to: .refreshing)
     }
     
     override init(frame: CGRect) {
@@ -51,11 +58,9 @@ class DebateDetailCollectionViewCell: FSPagerViewCell {
 }
 
 extension DebateDetailCollectionViewCell {
-    //初始化
+
+    //MARK: - 初始化
     fileprivate func setupUI() {
-        //EmptyView
-        self.emptyView = EmptyView(target: self)
-        self.emptyView.delegate = self
         //TableView
         self.tableView.tableFooterView = UIView() //消除底部视图
         self.tableView.separatorStyle = .none //消除分割线
@@ -82,15 +87,22 @@ extension DebateDetailCollectionViewCell {
             }
         })
     }
-    //绑定 Rx
     fileprivate func bindRx() {
+        //TableStatus
+        TableStatus.asObserver()
+            .subscribe(onNext: { [weak self] state in
+                self?.parentTableStatus = state
+            })
+            .disposed(by: self.disposeBag)
         //Delegate
         tableView.rx.setDelegate(self)
             .disposed(by: disposeBag)
         dataSource = RxTableViewSectionedReloadDataSource<DebateDetailSectionModel>(
             configureCell: { ds, tv, ip, item in
                 let cell = tv.dequeueReusableCell(withIdentifier: "answerCell", for: ip) as! DebateAnswerTableViewCell
-                cell.thumbnail.kf.setImage(with: URL(string: item.portrait!))
+                if !item.isanonymous {
+                    cell.thumbnail.kf.setImage(with: URL(string: item.portrait!))
+                }
                 cell.name.text = item.nickname
                 cell.answer.text = item.pureanswer
                 cell.score.text = "\(item.supports ?? 0 ) 赞同 · \(item.comments ?? 0) 评论"
@@ -114,15 +126,39 @@ extension DebateDetailCollectionViewCell {
         //Side
         switch self.side {
         case .SY:
-            self.viewModel.initAnswerY(answer: (disposeBag: self.disposeBag, tableView: self.tableView, emptyView: emptyView))
+            self.viewModel.initAnswerY(disposeBag: self.disposeBag)
             self.viewModel.outputsY.sections!.asDriver()
                 .drive(tableView.rx.items(dataSource: dataSource))
                 .disposed(by: disposeBag)
-            self.viewModel.outputsY.emptyStateObserver.asObservable()
-                .subscribe(onNext: { [weak self] state in
+            self.viewModel.outputsY.refreshStateObserver.asObservable()
+                .subscribe(onNext: { [unowned self] state in
                     switch state {
-                    case .empty:
-                        self?.showEmptyView(type: .empty(size: nil))
+                    case .noNet:
+                        self.tableView.switchRefreshHeader(to: .normal(.none, 0))
+                        if self.hasRequested {
+                            HUD.flash(.label("网络走失了"))
+                        } else {
+                            self.showBaseEmptyView()
+                        }
+                        break
+                    case .noData:
+                        self.tableView.switchRefreshHeader(to: .normal(.none, 0))
+                        self.tableView.switchRefreshFooter(to: FooterRefresherState.removed)
+                        self.showBaseEmptyView("还没有数据")
+                        break
+                    case .beginHeaderRefresh:
+                        break
+                    case .endHeaderRefresh:
+                        self.hasRequested = true
+                        self.tableView.switchRefreshHeader(to: .normal(.success, 0))
+                        break
+                    case .beginFooterRefresh:
+                        break
+                    case .endFooterRefresh:
+                        self.tableView.switchRefreshFooter(to: .normal)
+                        break
+                    case .endRefreshWithoutData:
+                        self.tableView.switchRefreshFooter(to: .noMoreData)
                         break
                     default:
                         break
@@ -131,15 +167,39 @@ extension DebateDetailCollectionViewCell {
                 .disposed(by: disposeBag)
             break
         case .ST:
-            self.viewModel.initAnswerS(answer: (disposeBag: self.disposeBag, tableView: self.tableView, emptyView: emptyView))
+            self.viewModel.initAnswerS(disposeBag: self.disposeBag)
             self.viewModel.outputsS.sections!.asDriver()
                 .drive(tableView.rx.items(dataSource: dataSource))
                 .disposed(by: disposeBag)
-            self.viewModel.outputsS.emptyStateObserver.asObservable()
-                .subscribe(onNext: { [weak self] state in
+            self.viewModel.outputsS.refreshStateObserver.asObservable()
+                .subscribe(onNext: { [unowned self] state in
                     switch state {
-                    case .empty:
-                        self?.showEmptyView(type: .empty(size: nil))
+                    case .noNet:
+                        self.tableView.switchRefreshHeader(to: .normal(.none, 0))
+                        if self.hasRequested {
+                            HUD.flash(.label("网络走失了"))
+                        } else {
+                            self.showBaseEmptyView()
+                        }
+                        break
+                    case .noData:
+                        self.tableView.switchRefreshHeader(to: .normal(.none, 0))
+                        self.tableView.switchRefreshFooter(to: FooterRefresherState.removed)
+                        self.showBaseEmptyView("还没有数据")
+                        break
+                    case .beginHeaderRefresh:
+                        break
+                    case .endHeaderRefresh:
+                        self.hasRequested = true
+                        self.tableView.switchRefreshHeader(to: .normal(.success, 0))
+                        break
+                    case .beginFooterRefresh:
+                        break
+                    case .endFooterRefresh:
+                        self.tableView.switchRefreshFooter(to: .normal)
+                        break
+                    case .endRefreshWithoutData:
+                        self.tableView.switchRefreshFooter(to: .noMoreData)
                         break
                     default:
                         break
@@ -153,23 +213,11 @@ extension DebateDetailCollectionViewCell {
         //刷新
         self.tableView.switchRefreshHeader(to: .refreshing)
     }
-    //显示 & 隐藏 Empty Zone
-    fileprivate func showEmptyView(type: EmptyViewType) {
-        self.tableView.switchRefreshHeader(to: .normal(.none, 0))
-        tableView.isHidden = true
-        var frame = self.tableView.frame
-        frame.size.height = SH*2/3
-        self.emptyView.show(type: type, frame: frame)
-    }
-    fileprivate func hideEmptyView() {
-        self.emptyView.hide()
-        tableView.isHidden = false
-        self.tableView.switchRefreshHeader(to: .refreshing)
-    }
 }
 
-extension DebateDetailCollectionViewCell: UITableViewDelegate, EmptyViewDelegate {
-    //TableViewDelegate && TableViewDataSource
+extension DebateDetailCollectionViewCell: UITableViewDelegate {
+    
+    //MARK: - TableViewDelegate && TableViewDataSource
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return UITableViewAutomaticDimension
     }
@@ -177,9 +225,43 @@ extension DebateDetailCollectionViewCell: UITableViewDelegate, EmptyViewDelegate
         //取消cell选中状态
         tableView.deselectRow(at: indexPath, animated: true)
     }
-    //EmptyView Delegate
-    func emptyViewClicked() {
-        self.hideEmptyView()
+    
+    //MARK: - ScrollView Delegate
+    func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
+        self.scrollDragging = true
+        self.contentOffset = scrollView.contentOffset
+    }
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        if self.scrollDragging {
+            let direction = self.contentOffset.y - scrollView.contentOffset.y
+            switch self.parentTableStatus {
+            case .headTop:
+                if direction > 0 && scrollView.contentOffset.y <= 0 {
+                    self.tableView.contentOffset.y = 0
+                    SonTableStatus.onNext(.canParentScroll)
+                } else {
+                    SonTableStatus.onNext(.noParentScroll)
+                }
+                break
+            case .headBottom:
+                if direction < 0 && scrollView.contentOffset.y > 0 {
+                    self.tableView.contentOffset.y = 0
+                    SonTableStatus.onNext(.canParentScroll)
+                } else {
+                    SonTableStatus.onNext(.noParentScroll)
+                }
+                break
+            case .headMid:
+                self.tableView.contentOffset.y = 0
+                SonTableStatus.onNext(.canParentScroll)
+                break
+            default:
+                break
+            }
+        }
+    }
+    func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
+        self.scrollDragging = false
     }
 }
 

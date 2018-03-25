@@ -34,7 +34,7 @@ class FriendViewController: BaseViewController {
         super.didReceiveMemoryWarning()
     }
     
-    //私有成员
+    //MARK: - 私有成员
     fileprivate var disposeBag = DisposeBag()
     fileprivate var friendViewModel: FriendViewModel!
     fileprivate var dynamicViewModel: FriendDynamicViewModel!
@@ -42,7 +42,8 @@ class FriendViewController: BaseViewController {
 }
 
 extension FriendViewController {
-    //初始化
+
+    //MARK: - 初始化
     fileprivate func setupUI() {
         //SegmentControl
         self.segmentControl.addTarget(self, action: #selector(self.segmentControlChanged), for: UIControlEvents.valueChanged)
@@ -52,14 +53,16 @@ extension FriendViewController {
         self.friendViewModel = FriendViewModel(disposeBag: disposeBag)
         self.dynamicViewModel = FriendDynamicViewModel(disposeBag: disposeBag)
     }
-    //SegmengControl Changed
+    
+    //MAKR: - SegmentControl Action
     @objc fileprivate func segmentControlChanged(sender: UISegmentedControl) {
         self.pagerView.scrollToItem(at: sender.selectedSegmentIndex, animated: true)
     }
 }
 
 extension FriendViewController: FSPagerViewDelegate, FSPagerViewDataSource {
-    //FSPagerView Delegate && DataSource
+    
+    //MARK: - FSPagerView Delegate && DataSource
     public func numberOfItems(in pagerView: FSPagerView) -> Int {
         return 2
     }

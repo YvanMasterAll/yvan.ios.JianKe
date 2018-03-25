@@ -11,6 +11,9 @@ import Photos
 import PhotosUI
 import MobileCoreServices
 
+/// https://github.com/tilltue/TLPhotoPicker
+/// 图片选择器
+
 public protocol TLPhotosPickerViewControllerDelegate: class {
     func dismissPhotoPicker(withPHAssets: [PHAsset])
     func dismissPhotoPicker(withTLPHAssets: [TLPHAsset])
@@ -132,6 +135,7 @@ open class TLPhotosPickerViewController: UIViewController {
     fileprivate var thumbnailSize = CGSize.zero
     fileprivate var placeholderThumbnail: UIImage? = nil
     fileprivate var cameraImage: UIImage? = nil
+    fileprivate var oneSelectedIndex: IndexPath! //如果只选择一张图片, 记录当前的图片索引
     
     deinit {
         //print("deinit TLPhotosPickerViewController")
@@ -672,14 +676,29 @@ extension TLPhotosPickerViewController: UICollectionViewDelegate,UICollectionVie
             }
         }else {
         //select
-            guard !maxCheck() else { return }
-            asset.selectedOrder = self.selectedAssets.count + 1
-            self.selectedAssets.append(asset)
-            //requestCloudDownload(asset: asset, indexPath: indexPath)
-            cell.selectedAsset = true
-            cell.orderLabel?.text = "\(asset.selectedOrder)"
-            if asset.type != .photo, self.configure.autoPlay {
-                playVideo(asset: asset, indexPath: indexPath)
+            //guard !maxCheck() else { return }
+            if maxCheck() && self.configure.maxSelectedAssets == 1 {
+                asset.selectedOrder = 1
+                self.selectedAssets.removeFirst()
+                self.selectedAssets.append(asset)
+                //requestCloudDownload(asset: asset, indexPath: indexPath)
+                cell.selectedAsset = true
+                cell.orderLabel?.text = "\(asset.selectedOrder)"
+                if asset.type != .photo, self.configure.autoPlay {
+                    playVideo(asset: asset, indexPath: indexPath)
+                }
+                self.collectionView.reloadItems(at: [oneSelectedIndex])
+                self.oneSelectedIndex = indexPath
+            } else {
+                self.oneSelectedIndex = indexPath
+                asset.selectedOrder = self.selectedAssets.count + 1
+                self.selectedAssets.append(asset)
+                //requestCloudDownload(asset: asset, indexPath: indexPath)
+                cell.selectedAsset = true
+                cell.orderLabel?.text = "\(asset.selectedOrder)"
+                if asset.type != .photo, self.configure.autoPlay {
+                    playVideo(asset: asset, indexPath: indexPath)
+                }
             }
         }
     }

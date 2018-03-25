@@ -8,7 +8,7 @@
 
 import UIKit
 
-class RichTextView: GrowingTextView {
+class RichTextView: STGrowingTextView {
 
     open func insertImage(_ image: UIImage, mode: ImageFitMode) {
         //获取textView的所有文本，转成可变的文本

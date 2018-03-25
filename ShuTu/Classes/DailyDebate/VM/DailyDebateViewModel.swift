@@ -19,19 +19,22 @@ public struct DailyDebateViewModelOutput {
     var refreshStateObserver: Variable<RefreshStatus>
 }
 public class DailyDebateViewModel {
+
+    //MARK: - 私有成员
     fileprivate struct DailyDebateModel {
         var pageIndex: Int
         var disposeBag: DisposeBag
         var models: Variable<[Debate]>
     }
-    //私有成员
     fileprivate var debateModel: DailyDebateModel!
     fileprivate var service = DebateService.instance
-    //Inputs
+
+    //MARK: - Inputs
     open var inputs: DailyDebateViewModelInput = {
         return DailyDebateViewModelInput(refreshNewData: PublishSubject<Bool>())
     }()
-    //Outputs
+    
+    //MARK: - Outputs
     open var outputs: DailyDebateViewModelOutput = {
         return DailyDebateViewModelOutput(sections: nil, refreshStateObserver: Variable<RefreshStatus>(.none))
     }()
@@ -46,7 +49,7 @@ public class DailyDebateViewModel {
             .asDriver(onErrorJustReturn: [])
         self.inputs.refreshNewData.asObserver()
             .subscribe(onNext: { full in
-                if full {//头部刷新
+                if full { //头部刷新
                     self.outputs.refreshStateObserver.value = .endFooterRefresh
                     //初始化
                     self.debateModel.pageIndex = 1
@@ -57,19 +60,24 @@ public class DailyDebateViewModel {
                             let result = response.1
                             switch result {
                             case .ok:
-                                self.debateModel.models.value.removeAll()
-                                self.debateModel.models.value = data
-                                //结束刷新
-                                self.outputs.refreshStateObserver.value = .endHeaderRefresh
+                                if data.count > 0 {
+                                    self.debateModel.models.value.removeAll()
+                                    self.debateModel.models.value = data
+                                    //结束刷新
+                                    self.outputs.refreshStateObserver.value = .endHeaderRefresh
+                                } else {
+                                    //没有数据
+                                    self.outputs.refreshStateObserver.value = .noData
+                                }
                                 break
                             default:
                                 //请求错误
-                                self.outputs.refreshStateObserver.value = .noData
+                                self.outputs.refreshStateObserver.value = .noNet
                                 break
                             }
                         })
                         .disposed(by: self.debateModel.disposeBag)
-                } else {//加载更多
+                } else { //加载更多
                     self.debateModel.pageIndex += 1
                     //拉取数据
                     self.service.getDailyTopics(pageIndex: self.debateModel.pageIndex)
@@ -88,7 +96,7 @@ public class DailyDebateViewModel {
                                 }
                                 break
                             default:
-                                //没有更多数据
+                                //请求失败
                                 self.outputs.refreshStateObserver.value = .endRefreshWithoutData
                                 break
                             }

@@ -43,10 +43,10 @@ class LoginViewController: BaseViewController {
         }
     }
     
-    //声明区域
+    //MARK: - 声明区域
     open var isPushed: Bool = false //true, 表示登录页在其它页面被打开
     
-    //私有成员
+    //MARK: - 私有成员
     fileprivate let viewModel = LoginViewModel()
     fileprivate let disposeBag = DisposeBag()
     
@@ -65,7 +65,8 @@ class LoginViewController: BaseViewController {
 }
 
 extension LoginViewController {
-    //初始化
+
+    //MARK: - 初始化
     fileprivate func setupUI() {
         self.loginButton.backgroundColor = ColorPrimary
         applyLoginButton(enabled: false)
@@ -116,7 +117,7 @@ extension LoginViewController {
             .disposed(by: disposeBag)
     }
     
-    //按钮状态变更
+    /// 按钮状态变更
     fileprivate func applyLoginButton(enabled: Bool) {
         self.loginButton.isEnabled = enabled
         if enabled {

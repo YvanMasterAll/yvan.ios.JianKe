@@ -7,6 +7,8 @@
 //
 
 import UIKit
+import RxCocoa
+import RxSwift
 
 class MeEditViewController: BaseViewController {
     
@@ -26,45 +28,83 @@ class MeEditViewController: BaseViewController {
         }
     }
     
+    //MARK: - 声明区域
+    open var userinfo: UserInfo!
+    
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        showNavbar = true
         hideNavbar = true
-        navBarTitle = "资料编辑"
         setupUI()
+        bindRx()
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        
+        //显示导航栏
+        self.navigationController?.setNavigationBarHidden(false, animated: false)
+        self.navigationItem.title = "资料编辑"
+        self.navigationItem.rightBarButtonItem = UIBarButtonItem.init(title: "保存", style: .plain, target: self, action: #selector(self.saveUserInfo))
     }
 
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
     }
     
-    //私有成员
+    //MARK: - 私有成员
+    fileprivate var viewModel: MeEditViewModel!
+    fileprivate var disposeBag = DisposeBag()
     fileprivate var selectedAssets = [TLPHAsset]()
-    fileprivate lazy var photoPicker: TLPhotosPickerViewController = {
-        let photoPicker = TLPhotosPickerViewController()
+    fileprivate lazy var photoPicker: TLPhotosPickerViewController! = {
+        //相册控制器
+        let photoPicker = GeneralFactory.generatePhotoPicker(self.selectedAssets)
         photoPicker.delegate = self
-        photoPicker.didExceedMaximumNumberOfSelection = { [weak self] (picker) in
-            //图片数超过设定
-        }
-        var configure = TLPhotosPickerConfigure()
-        configure.maxSelectedAssets = 1
-        configure.numberOfColumn = 3
-        configure.allowedVideo = false
-        photoPicker.configure = configure
-        photoPicker.selectedAssets = self.selectedAssets
         
         return photoPicker
     }()
+    fileprivate var imagePath: String?
+    fileprivate var nickname: String?
+    fileprivate var gender: String?
+    fileprivate var signature: String?
     
 }
 
 extension MeEditViewController {
-    //初始化
+    
+    //MARK: - 初始化
     fileprivate func setupUI() {
-        
+        //用户信息
+        self.nickname = userinfo.nickname
+        self.gender = userinfo.gender
+        self.signature = userinfo.signature
+        if let t = userinfo.portrait {
+            self.thumbnail.kf.setImage(with: URL.init(string: t))
+        }
     }
-    //修改头像
+    fileprivate func bindRx() {
+        //View Model
+        self.viewModel = MeEditViewModel.init(disposeBag: self.disposeBag)
+        self.viewModel.outputs.saveResult.asObservable()
+            .subscribe(onNext: { [unowned self] result in
+                switch result {
+                case .ok:
+                    HUD.flash(.label("保存成功"))
+                    //更新用户信息
+                    self.userinfoRefresh(nil)
+                    //退出编辑
+                    self.navigationController?.popViewController(animated: true)
+                case .failed:
+                    HUD.flash(.label("保存失败"))
+                default:
+                    HUD.hide()
+                    break
+                }
+            })
+            .disposed(by: self.disposeBag)
+    }
+    
+    //MARK: - 修改头像
     @objc fileprivate func gotoPhotoPicker() {
         self.present(self.photoPicker, animated: true, completion: nil)
     }
@@ -72,30 +112,52 @@ extension MeEditViewController {
         if let asset = self.selectedAssets.first {
             if let image = asset.fullResolutionImage {
                 self.thumbnail.image = image
+                asset.fullResolutionImagePath(handler: { [unowned self] imagePath in
+                    self.imagePath = imagePath
+                })
             } else {
                 //获取图片资源错误
             }
+            self.photoPicker.selectedAssets.removeAll()
         }
+    }
+    
+    //MARK: - 保存用户信息
+    @objc fileprivate func saveUserInfo() {
+        var p: [String: Any] = [:]
+        if let url = self.imagePath {
+            p["url"] = url
+        }
+        if self.nickname != userinfo.nickname {
+            p["nickname"] = nickname
+        }
+        if self.gender != userinfo.gender {
+            p["gender"] = gender
+        }
+        if self.signature != userinfo.signature {
+            p["signature"] = signature
+        }
+
+        self.viewModel.inputs.saveTap.onNext(p)
     }
 }
 
-fileprivate var data: Dictionary<String, [String]> = ["title": ["昵称", "性别", "个人简历"], "content": ["吃饭很幸苦的", "男", "插科打挥可以的"]]
 extension MeEditViewController: UITableViewDelegate, TLPhotosPickerViewControllerDelegate, UITableViewDataSource {
-    //TableView Delegate && DataSource
+    
+    //MARK: - TableView Delegate && DataSource
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         //取消选中
         tableView.deselectRow(at: indexPath, animated: true)
         switch indexPath.row {
         case 0:
             let alert = UIAlertController.init(title: "修改昵称", message: "", preferredStyle: .alert)
-            alert.addTextField(configurationHandler: { (textField: UITextField!) in
+            alert.addTextField(configurationHandler: { [unowned self] (textField: UITextField!) in
                 textField.placeholder = "请输入昵称"
-                textField.text = data["content"]![0]
+                textField.text = self.nickname
             })
             let cancle = UIAlertAction.init(title: "取消", style: .cancel, handler: nil)
             let ok = UIAlertAction.init(title: "保存", style: .default, handler: { [weak self] action in
-                let nickname = alert.textFields!.first!.text!
-                data["content"]![0] = nickname
+                self?.nickname = alert.textFields!.first!.text!
                 self?.tableView.reloadData()
             })
             alert.addAction(cancle)
@@ -106,11 +168,11 @@ extension MeEditViewController: UITableViewDelegate, TLPhotosPickerViewControlle
             let alert = UIAlertController.init(title: "选择性别", message: "", preferredStyle: .actionSheet)
             let cancle = UIAlertAction.init(title: "取消", style: .cancel, handler: nil)
             let boy = UIAlertAction.init(title: "男", style: .default, handler: { [weak self] action in
-                data["content"]![1] = "男"
+                self?.gender = "男"
                 self?.tableView.reloadData()
             })
             let girl = UIAlertAction.init(title: "女", style: .default, handler: { [weak self] action in
-                data["content"]![1] = "女"
+                self?.gender = "女"
                 self?.tableView.reloadData()
             })
             alert.addAction(cancle)
@@ -120,9 +182,9 @@ extension MeEditViewController: UITableViewDelegate, TLPhotosPickerViewControlle
             break
         case 2:
             let meEditIntroVC = GeneralFactory.getVCfromSb("Me", "MeEditIntro") as! MeEditIntroViewController
-            meEditIntroVC.intro = data["content"]![2]
+            meEditIntroVC.signature = signature
             meEditIntroVC.block = { [weak self] text in
-                data["content"]![2] = text
+                self?.signature = text
                 self?.tableView.reloadData()
             }
             
@@ -138,16 +200,31 @@ extension MeEditViewController: UITableViewDelegate, TLPhotosPickerViewControlle
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath)
         let title = cell.viewWithTag(10001) as! UILabel
-        title.text = data["title"]![indexPath.row]
         let content = cell.viewWithTag(10002) as! UILabel
-        content.text = data["content"]![indexPath.row]
+        switch indexPath.row {
+        case 0:
+            title.text = "昵称"
+            content.text = nickname
+            break
+        case 1:
+            title.text = "性别"
+            content.text = gender
+            break
+        case 2:
+            title.text = "个性签名"
+            content.text = signature
+            break
+        default:
+            break
+        }
         
         return cell
     }
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return 42
     }
-    //TLPhotosPickerViewControllerDelegate
+    
+    //MAKR: - TLPhotosPickerViewControllerDelegate
     func dismissPhotoPicker(withTLPHAssets: [TLPHAsset]) {
         //获取选中图片
         self.selectedAssets = withTLPHAssets

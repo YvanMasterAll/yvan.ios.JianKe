@@ -12,10 +12,10 @@ typealias MeEditIntroViewControllerBlock = (_ text: String) -> Void
 
 class MeEditIntroViewController: BaseViewController {
 
-    @IBOutlet weak var textView: GrowingTextView!
+    @IBOutlet weak var textView: STGrowingTextView!
     
-    //声明区域
-    open var intro: String!
+    //MARK: - 声明区域
+    open var signature: String!
     open var block: MeEditIntroViewControllerBlock?
     
     override func viewDidLoad() {
@@ -34,19 +34,21 @@ class MeEditIntroViewController: BaseViewController {
         //显示导航栏
         self.navigationController?.setNavigationBarHidden(false, animated: false)
         self.navigationItem.title = "个人简介"
-        self.navigationItem.rightBarButtonItem = UIBarButtonItem.init(title: "保存", style: .plain, target: self, action: #selector(self.saveIntro))
+        self.navigationItem.rightBarButtonItem = UIBarButtonItem.init(title: "保存", style: .plain, target: self, action: #selector(self.saveSignature))
     }
     
 }
 
 extension MeEditIntroViewController {
-    //初始化
+
+    //MARK: - 初始化
     fileprivate func setupUI() {
         //TextView
-        self.textView.text = intro
+        self.textView.text = signature
     }
-    //保存
-    @objc fileprivate func saveIntro() {
+    
+    /// 保存
+    @objc fileprivate func saveSignature() {
         self.block?(self.textView.text!)
         self.navigationController?.popViewController(animated: true)
     }

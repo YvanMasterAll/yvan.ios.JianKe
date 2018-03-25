@@ -30,7 +30,7 @@ class DebateSearchViewController: BaseViewController {
     @IBOutlet weak var categoryView: UIView!
     @IBOutlet weak var searchTextField: UITextField! {
         didSet {
-            self.searchTextField.attributedPlaceholder = NSAttributedString.init(string: self.searchTextField.placeholder!, attributes: [NSAttributedStringKey.foregroundColor: GMColor.grey300Color(), NSAttributedStringKey.font: self.searchTextField.font!])
+            self.searchTextField.attributedPlaceholder = NSAttributedString.init(string: self.searchTextField.placeholder!, attributes: [NSAttributedStringKey.foregroundColor: STColor.grey300Color(), NSAttributedStringKey.font: self.searchTextField.font!])
             self.searchTextField.delegate = self
         }
     }
@@ -51,12 +51,16 @@ class DebateSearchViewController: BaseViewController {
         setupUI()
         bindRx()
     }
+    
+    override func reload() {
+        self.tableView.switchRefreshHeader(to: .refreshing)
+    }
 
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
     }
     
-    //私有成员
+    //MARK: - 私有成员
     fileprivate var categories: [String]!
     fileprivate var histories: [String]!
     fileprivate lazy var tableView: UITableView = {
@@ -78,7 +82,6 @@ class DebateSearchViewController: BaseViewController {
         return tableView
     }()
     fileprivate var dataSource: RxTableViewSectionedReloadDataSource<DebateSearchSectionModel>!
-    fileprivate var emptyView: EmptyView!
     fileprivate var viewModel: DebateSearchViewModel!
     fileprivate var disposeBag = DisposeBag()
     fileprivate var searchText = ""
@@ -86,13 +89,11 @@ class DebateSearchViewController: BaseViewController {
 }
 
 extension DebateSearchViewController {
-    //初始化
+
+    //MARK: - 初始化
     fileprivate func setupUI() {
         self.setupCategoryLayout()
         self.setupHistoryLayout()
-        //EmptyView
-        self.emptyView = EmptyView(target: self.view)
-        self.emptyView.delegate = self
         //PullToRefreshKit
         let secondHeader = SecondRefreshHeader()
         tableView.configRefreshHeader(with: secondHeader, action: { [weak self] () -> Void in
@@ -102,7 +103,7 @@ extension DebateSearchViewController {
             self?.viewModel.inputs.refreshNewData.onNext((false, self!.searchText))
         })
         //阴影
-        GeneralFactory.generateRectShadow(layer: self.searchView.layer, rect: CGRect.init(x: 0, y: self.searchView.frame.height, width: SW, height: 0.5), color: GMColor.grey800Color().cgColor)
+        GeneralFactory.generateRectShadow(layer: self.searchView.layer, rect: CGRect.init(x: 0, y: self.searchView.frame.height, width: SW, height: 0.5), color: STColor.grey800Color().cgColor)
         self.view.bringSubview(toFront: self.searchView)
     }
     fileprivate func bindRx() {
@@ -124,23 +125,34 @@ extension DebateSearchViewController {
             })
             .disposed(by: disposeBag)
         self.viewModel.outputs.refreshStateObserver.asObservable()
-            .subscribe(onNext: { [weak self] state in
+            .subscribe(onNext: { [unowned self] state in
                 switch state {
+                case .noNet:
+                    self.tableView.switchRefreshHeader(to: .normal(.none, 0))
+                    if self.hasRequested {
+                        HUD.flash(.label("网络走失了"))
+                    } else {
+                        self.showBaseEmptyView()
+                    }
+                    break
                 case .noData:
-                    self?.showEmptyView(type: .empty(size: nil))
+                    self.tableView.switchRefreshHeader(to: .normal(.none, 0))
+                    self.tableView.switchRefreshFooter(to: FooterRefresherState.removed)
+                    self.showBaseEmptyView("还没有数据")
                     break
                 case .beginHeaderRefresh:
                     break
                 case .endHeaderRefresh:
-                    self?.tableView.switchRefreshHeader(to: .normal(.success, 0))
+                    self.hasRequested = true
+                    self.tableView.switchRefreshHeader(to: .normal(.success, 0))
                     break
                 case .beginFooterRefresh:
                     break
                 case .endFooterRefresh:
-                    self?.tableView.switchRefreshFooter(to: .normal)
+                    self.tableView.switchRefreshFooter(to: .normal)
                     break
                 case .endRefreshWithoutData:
-                    self?.tableView.switchRefreshFooter(to: .noMoreData)
+                    self.tableView.switchRefreshFooter(to: .noMoreData)
                     break
                 default:
                     break
@@ -168,7 +180,7 @@ extension DebateSearchViewController {
             let button = UIButton.init(frame: CGRect.zero)
             button.setTitle(self.categories[i], for: .normal)
             button.titleLabel?.font = UIFont.systemFont(ofSize: 11)
-            button.setTitleColor(GMColor.grey500Color(), for: .normal)
+            button.setTitleColor(STColor.grey500Color(), for: .normal)
             button.backgroundColor = UIColor.white
             button.contentEdgeInsets.left = 8
             button.contentEdgeInsets.right = 8
@@ -208,7 +220,7 @@ extension DebateSearchViewController {
             let button = UIButton.init(frame: CGRect.zero)
             button.setTitle(histories[i], for: .normal)
             button.titleLabel?.font = UIFont.systemFont(ofSize: 13)
-            button.setTitleColor(GMColor.grey500Color(), for: .normal)
+            button.setTitleColor(STColor.grey500Color(), for: .normal)
             button.backgroundColor = UIColor.white
             button.contentHorizontalAlignment = UIControlContentHorizontalAlignment.left
             button.contentEdgeInsets.left = 10
@@ -216,11 +228,11 @@ extension DebateSearchViewController {
             button.imageEdgeInsets.right = 8
             button.layer.cornerRadius = 1
             button.clipsToBounds = true
-            button.setImage(UIImage.init(icon: .fontAwesome(.history), size: CGSize.init(width: 20, height: 20), textColor: GMColor.grey500Color(), backgroundColor: UIColor.clear), for: .normal)
+            button.setImage(UIImage.init(icon: .fontAwesome(.history), size: CGSize.init(width: 20, height: 20), textColor: STColor.grey500Color(), backgroundColor: UIColor.clear), for: .normal)
             let divider = UIView.init(frame: CGRect.init(x: 0, y: btnH - 0.5, width: width, height: 0.5))
-            divider.backgroundColor = GMColor.grey50Color()
+            divider.backgroundColor = STColor.grey50Color()
             button.addSubview(divider)
-            let removeImage = UIImageView.init(image: UIImage.init(icon: .fontAwesome(.remove), size: CGSize.init(width: 20, height: 20), textColor: GMColor.grey500Color(), backgroundColor: UIColor.clear))
+            let removeImage = UIImageView.init(image: UIImage.init(icon: .fontAwesome(.remove), size: CGSize.init(width: 20, height: 20), textColor: STColor.grey500Color(), backgroundColor: UIColor.clear))
             removeImage.frame.origin = CGPoint(x: width - 30, y: (btnH - 20)/2)
             removeImage.tag = 10000 + i
             button.addSubview(removeImage)
@@ -235,22 +247,11 @@ extension DebateSearchViewController {
         }
         self.historyViewHeightC.constant = y
     }
-    //显示 & 隐藏 Empty Zone
-    fileprivate func showEmptyView(type: EmptyViewType) {
-        self.tableView.switchRefreshHeader(to: .normal(.none, 0))
-        tableView.isHidden = true
-        self.emptyView.show(type: type, frame: self.tableView.frame)
-    }
-    fileprivate func hideEmptyView() {
-        self.emptyView.hide()
-        tableView.isHidden = false
-        self.tableView.switchRefreshHeader(to: .refreshing)
-    }
-    //搜索框点击事件
+    
+    //MARK: - 按钮事件
     @objc fileprivate func searchViewClicked() {
         self.searchTextField.becomeFirstResponder()
     }
-    //返回
     @objc fileprivate func goBack() {
         if (navigationController != nil) {
             navigationController?.popViewController(animated: true)
@@ -258,7 +259,6 @@ extension DebateSearchViewController {
             dismiss(animated: true, completion: nil)
         }
     }
-    //删除历史搜索记录
     @objc fileprivate func removeHistory(_ gesture: UITapGestureRecognizer) {
         let removeImage = gesture.view as! UIImageView
         let index = removeImage.tag - 10000
@@ -272,7 +272,8 @@ extension DebateSearchViewController {
 }
 
 extension DebateSearchViewController: UITableViewDelegate {
-    //TableViewDelegate && TableViewDataSource
+    
+    //MARK: - TableViewDelegate && TableViewDataSource
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return UITableViewAutomaticDimension
     }
@@ -280,13 +281,11 @@ extension DebateSearchViewController: UITableViewDelegate {
         //取消cell选中状态
         tableView.deselectRow(at: indexPath, animated: true)
     }
-    //EmptyView Delegate
-    override func emptyViewClicked() {
-        self.hideEmptyView()
-    }
 }
 
 extension DebateSearchViewController: UITextFieldDelegate {
+    
+    //MARK: - UITextFieldDelegate
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         let target = self.searchTextField.text!.trimmed
         if target == "" { return false }

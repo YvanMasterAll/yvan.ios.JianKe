@@ -60,5 +60,8 @@ public struct Dynamic: Mappable {
         nickname <- map["nickname"]
         portrait <- map["portrait"]
         createtime <- map["createtime"]
+        
+        self.portrait = ModelHelper.handleUrl(self.portrait)
+        self.content = ModelHelper.handleContent(content)
     }
 }

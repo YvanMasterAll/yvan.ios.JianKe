@@ -7,7 +7,6 @@
 //
 
 import UIKit
-import PMSuperButton
 import RxCocoa
 import RxSwift
 
@@ -21,7 +20,7 @@ class FindGayCollectionViewCell: UICollectionViewCell {
             self.thumbnail.layer.masksToBounds = true
         }
     }
-    @IBOutlet weak var followButton: PMSuperButton! {
+    @IBOutlet weak var followButton: STButton! {
         didSet {
             self.followButton.setImage(UIImage.init(named: "icon_plus_white")!.reSizeImage(CGSize.init(width: 14, height: 14)), for: .normal)
             self.followButton.contentEdgeInsets.left = 8
@@ -30,7 +29,7 @@ class FindGayCollectionViewCell: UICollectionViewCell {
         }
     }
     
-    //声明区域
+    //MARK: - 声明区域
     open var id: Int!
     open var viewModel: FindViewModel! {
         didSet {
@@ -49,14 +48,15 @@ class FindGayCollectionViewCell: UICollectionViewCell {
 
     }
     
-    //私有
+    //MARK: - 私有成员
     fileprivate var followed: Bool = false
     fileprivate var following: Bool = false
     
 }
 
 extension FindGayCollectionViewCell {
-    ///初始化
+
+    //MARK: - 初始化
     fileprivate func bindRx() {
         self.viewModel.outputs.followResult.asObservable()
             .subscribe(onNext: { [weak self] result in
@@ -67,6 +67,11 @@ extension FindGayCollectionViewCell {
                 case .ok:
                     self!.followed = !self!.followed
                     self!.applyFollowButton()
+                    if self!.followed {
+                        ServiceUtil.userinfoPartRefresh(true, nil)
+                    } else {
+                        ServiceUtil.userinfoPartRefresh(false, nil)
+                    }
                     break
                 case .failed:
                     if self!.followed {
@@ -81,12 +86,14 @@ extension FindGayCollectionViewCell {
             })
             .disposed(by: self.disposeBag)
     }
-    //按钮事件
+    
+    //MARK: - 按钮事件
     @objc fileprivate func follow() {
         self.viewModel.inputs.followTap.onNext((id, !self.followed))
         self.following = true
     }
-    //按钮变更
+    
+    //MAKR: - 按钮状态变更
     fileprivate func applyFollowButton() {
         if self.followed {
             self.followButton.setTitle("已关注", for: .normal)

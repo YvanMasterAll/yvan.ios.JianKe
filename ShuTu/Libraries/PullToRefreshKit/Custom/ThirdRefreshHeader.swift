@@ -22,7 +22,7 @@ class ThirdRefreshHeader: UIView, RefreshableHeader{
         
     }
     
-    //初始化
+    //MARK: - 初始化
     fileprivate func setupUI() {
     
     }
@@ -34,9 +34,9 @@ class ThirdRefreshHeader: UIView, RefreshableHeader{
         animateView.frame = CGRect.init(x: self.bounds.width/2 - 50, y: self.bounds.height/2 - 50, width: 100, height: 100)
         animateView.loopAnimation = true
         // animateView.logHierarchyKeypaths() //记录所有的 KeyPath
-        animateView.setValue(GMColor.grey500Color(), forKeypath: "Shape Layer 1.Ellipse 1.Fill 1.Color", atFrame: 0)
-        animateView.setValue(GMColor.grey500Color(), forKeypath: "Shape Layer 2.Ellipse 1.Fill 1.Color", atFrame: 0)
-        animateView.setValue(GMColor.grey500Color(), forKeypath: "Shape Layer 3.Ellipse 1.Fill 1.Color", atFrame: 0)
+        animateView.setValue(STColor.grey500Color(), forKeypath: "Shape Layer 1.Ellipse 1.Fill 1.Color", atFrame: 0)
+        animateView.setValue(STColor.grey500Color(), forKeypath: "Shape Layer 2.Ellipse 1.Fill 1.Color", atFrame: 0)
+        animateView.setValue(STColor.grey500Color(), forKeypath: "Shape Layer 3.Ellipse 1.Fill 1.Color", atFrame: 0)
         self.addSubview(animateView)
     }
     

@@ -11,7 +11,7 @@ import XCTest
 @testable import ShuTu
 @testable import Moya
 
-class ShuTuTest: XCTestCase {
+class ShuTuTest: BaseUnitTest {
     
     ///测试用户登录
     func testUserLogin() {
@@ -36,6 +36,40 @@ class ShuTuTest: XCTestCase {
             ept.fulfill()//请求结束
         })
         //等待请求结束
+        waitForExpectations(timeout: timeout, handler: nil)
+    }
+    
+    ///测试轮播页数
+    func testViewController() {
+        let controller = GeneralFactory.getVCfromSb("Debate", "DebateVC") as! DebateViewController
+        UIApplication.shared.keyWindow?.rootViewController = controller
+    
+        let carousel = controller.pageControl
+        let carousel_count = 7
+        let timeout = 5 as TimeInterval
+        XCTAssert(carousel != nil)
+        let result = NSPredicate.init(format: "numberOfPages = \(carousel_count)")
+        expectation(for: result, evaluatedWith: carousel!, handler: nil)
+        waitForExpectations(timeout: timeout, handler: nil)
+    }
+    
+    ///测试性能
+    func testPerformace() {
+        measure {
+            print(99999999*99999999)
+        }
+    }
+    
+    ///测试可选框
+    func testCheckBox() {
+        let controller = UIViewController()
+        UIApplication.shared.keyWindow?.rootViewController = controller
+        
+        let checkbox = STCheckBoxView.init(frame: CGRect.init(x: 0, y: 50, width: SW, height: 40))
+        let timeout = 10 as TimeInterval
+        controller.view.addSubview(checkbox)
+        let result = NSPredicate.init(format: "check = true")
+        expectation(for: result, evaluatedWith: checkbox, handler: nil)
         waitForExpectations(timeout: timeout, handler: nil)
     }
     

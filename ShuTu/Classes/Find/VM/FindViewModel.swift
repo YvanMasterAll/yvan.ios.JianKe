@@ -18,26 +18,30 @@ public struct FindViewModelInput {
     var followTap: PublishSubject<(Int, Bool)>
 }
 public struct FindViewModelOutput {
-    var models1: Variable<([Debate], Result2)>
-    var models2: Variable<([DebateCollect], Result2)>
-    var models3: Variable<([User], Result2)>
-    var voteResult: Variable<Result2>
-    var followResult: Variable<Result2>
+    var models1: Variable<([Debate], ResultType)>
+    var models2: Variable<([DebateCollect], ResultType)>
+    var models3: Variable<([User], ResultType)>
+    var voteResult: Variable<ResultType>
+    var followResult: Variable<ResultType>
 }
 public class FindViewModel {
+
+    //MARK: - 私有成员
     fileprivate struct FindModel {
         var disposeBag: DisposeBag
     }
-    //私有成员
     fileprivate var findModel: FindModel!
     fileprivate var service = FindService.instance
-    //Inputs
+    fileprivate var fservice = FriendService.instance
+
+    //MARK: - Inputs
     open var inputs: FindViewModelInput = {
         return FindViewModelInput(refreshNewData1: PublishSubject<Bool>(), refreshNewData2: PublishSubject<Bool>(), refreshNewData3: PublishSubject<Bool>(), voteTap: PublishSubject<(Int, AttitudeStand)>(), followTap: PublishSubject<(Int, Bool)>())
     }()
-    //Outputs
+
+    //MARK: - Outputs
     open var outputs: FindViewModelOutput = {
-        return FindViewModelOutput.init(models1: Variable<([Debate], Result2)>(([], Result2.empty)), models2: Variable<([DebateCollect], Result2)>(([], Result2.empty)), models3: Variable<([User], Result2)>(([], Result2.empty)), voteResult: Variable<Result2>(.none), followResult: Variable<Result2>(.none))
+        return FindViewModelOutput.init(models1: Variable<([Debate], ResultType)>(([], ResultType.empty)), models2: Variable<([DebateCollect], ResultType)>(([], ResultType.empty)), models3: Variable<([User], ResultType)>(([], ResultType.empty)), voteResult: Variable<ResultType>(.none), followResult: Variable<ResultType>(.none))
     }()
     
     init(disposeBag: DisposeBag) {
@@ -96,14 +100,14 @@ public class FindViewModel {
                 }
                 HUD.show(.progress)
                 if add {
-                    self.service.followAdd(id, Toggle.on)
+                    self.fservice.followAdd(id, Toggle.on)
                         .subscribe(onNext: { result in
                             HUD.hide()
                             self.outputs.followResult.value = result
                         })
                         .disposed(by: self.findModel.disposeBag)
                 } else {
-                    self.service.followAdd(id, Toggle.off)
+                    self.fservice.followAdd(id, Toggle.off)
                         .subscribe(onNext: { result in
                             HUD.hide()
                             self.outputs.followResult.value = result

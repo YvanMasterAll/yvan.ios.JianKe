@@ -18,7 +18,7 @@ class DebateTableViewCell: UITableViewCell {
     @IBOutlet weak var category: UILabel!
     @IBOutlet weak var descHeightConstraint: NSLayoutConstraint!
     
-    //私有成员
+    //MARK: - 私有成员
     fileprivate var isInit = false
     
     override func awakeFromNib() {
@@ -35,18 +35,18 @@ class DebateTableViewCell: UITableViewCell {
 }
 
 extension DebateTableViewCell {
-    //初始化
+
+    //MARK: - 初始化
     fileprivate func setupUI() {
         //为分割线上边框
         let ilayer = CALayer()
         ilayer.frame = CGRect(x: 0, y: 0, width: SW, height: 1)
-        ilayer.backgroundColor = GMColor.grey100Color().cgColor
+        ilayer.backgroundColor = STColor.grey100Color().cgColor
         self.divider.layer.addSublayer(ilayer)
         //头像圆形
         self.thumbnail.layer.cornerRadius = self.thumbnail.frame.size.width / 2
         self.thumbnail.layer.masksToBounds = true
     }
-    //添加约束
     public func setupConstraint() {
         guard !self.isInit else {
             return

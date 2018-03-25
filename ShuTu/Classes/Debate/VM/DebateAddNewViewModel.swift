@@ -16,7 +16,7 @@ public struct DebateAddNewViewModelInput {
 }
 public struct DebateAddNewViewModelOutput {
     var titleUsable: Observable<Bool>?
-     var sendResult: Variable<Result2>
+     var sendResult: Variable<ResultType>
 }
 public class DebateAddNewViewModel {
     fileprivate struct DebateAddNewModel {
@@ -29,7 +29,7 @@ public class DebateAddNewViewModel {
         return DebateAddNewViewModelInput(title: PublishSubject<String>(), sendTap: PublishSubject<(String, String)>())
     }()
     open var outputs: DebateAddNewViewModelOutput! = {
-        return DebateAddNewViewModelOutput(titleUsable: nil, sendResult: Variable<Result2>(.none))
+        return DebateAddNewViewModelOutput(titleUsable: nil, sendResult: Variable<ResultType>(.none))
     }()
     
     init(disposeBag: DisposeBag) {

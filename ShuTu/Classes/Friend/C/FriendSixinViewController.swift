@@ -23,22 +23,23 @@ class FriendSixinViewController: BaseViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        showNavbar = true
+        navBarTitle = "私信"
         setupUI()
         bindRx()
     }
     
-    //私有成员
+    //MARK: - 私有成员
     fileprivate var dataSource: RxTableViewSectionedReloadDataSource<SectionModel<String, Model>>!
     fileprivate var disposeBag = DisposeBag()
 
 }
 
 extension FriendSixinViewController {
-    //初始化
+
+    //MARK: - 初始化
     fileprivate func setupUI() {
-        //创建导航
-        self.navigationItem.title = "私信"
-        self.navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: UIBarButtonSystemItem.edit, target: self, action: nil)
+        
     }
     fileprivate func bindRx() {
         //TableView
@@ -60,7 +61,8 @@ extension FriendSixinViewController {
             .bind(to: tableView.rx.items(dataSource: dataSource))
             .disposed(by: disposeBag)
     }
-    //TestViewModel
+    
+    //MARK: - Test ViewModel
     fileprivate struct Model {
         var title: String
     }
@@ -77,7 +79,8 @@ extension FriendSixinViewController {
 }
 
 extension FriendSixinViewController: UITableViewDelegate {
-    //TableViewDelegate
+    
+    //MAKR: - TableViewDelegate
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         //取消cell选中状态
         tableView.deselectRow(at: indexPath, animated: true)

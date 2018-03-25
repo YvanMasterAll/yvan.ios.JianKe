@@ -15,7 +15,6 @@ PODS:
     - NVActivityIndicatorView/Presenter (= 4.0.1)
   - NVActivityIndicatorView/Presenter (4.0.1)
   - ObjectMapper (3.1.0)
-  - PMSuperButton (2.0.4)
   - Result (3.2.4)
   - RichEditorView (4.0.0)
   - RxCocoa (4.0.0):
@@ -40,7 +39,6 @@ DEPENDENCIES:
   - Moya/RxSwift
   - NVActivityIndicatorView
   - ObjectMapper
-  - PMSuperButton
   - RichEditorView
   - RxCocoa
   - RxDataSources
@@ -69,7 +67,6 @@ SPEC CHECKSUMS:
   Moya: 9e621707ff754eeb51ff3ec51a3d54e517c0733a
   NVActivityIndicatorView: 77ed6d7b571643e24899e7858bf9ae2ee4c21f31
   ObjectMapper: 20505058f54e5c3ca69e1d6de9897d152a5369a6
-  PMSuperButton: 148f52039b68d13b9335a3e8af81f37aec55cfa8
   Result: d2d07204ce72856f1fd9130bbe42c35a7b0fea10
   RichEditorView: e5990b1a092539559def9df135e064b29ab97e68
   RxCocoa: d62846ca96495d862fa4c59ea7d87e5031d7340e
@@ -80,6 +77,6 @@ SPEC CHECKSUMS:
   Stellar: 0fef0b57654a5128a05664c3c2e42993dc59a88c
   WatchdogInspector: 2820de2548107c1e5d712671bd04d81ea649f916
 
-PODFILE CHECKSUM: c22d0fd44fc7d30414c5d8720e0bf76c0754689c
+PODFILE CHECKSUM: 0c7d4cf568501f548df801faf7737c8244920622
 
 COCOAPODS: 1.3.1

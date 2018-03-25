@@ -27,7 +27,7 @@ class DebateInviteViewController: BaseViewController {
     }
     @IBOutlet weak var searchTextField: UITextField! {
         didSet {
-            self.searchTextField.attributedPlaceholder = NSAttributedString.init(string: self.searchTextField.placeholder!, attributes: [NSAttributedStringKey.foregroundColor: GMColor.grey300Color(), NSAttributedStringKey.font: self.searchTextField.font!])
+            self.searchTextField.attributedPlaceholder = NSAttributedString.init(string: self.searchTextField.placeholder!, attributes: [NSAttributedStringKey.foregroundColor: STColor.grey300Color(), NSAttributedStringKey.font: self.searchTextField.font!])
             self.searchTextField.delegate = self
         }
     }
@@ -45,12 +45,16 @@ class DebateInviteViewController: BaseViewController {
         self.setupUI()
         self.bindRx()
     }
+    
+    override func reload() {
+        self.tableView.switchRefreshHeader(to: .refreshing)
+    }
 
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
     }
     
-    //私有成员
+    //MARK: - 私有成员
     fileprivate var disposeBag = DisposeBag()
     fileprivate var viewModel: DebateInviteViewModel!
     fileprivate var dataSource: RxTableViewSectionedReloadDataSource<DebateInviteSectionModel>!
@@ -58,14 +62,15 @@ class DebateInviteViewController: BaseViewController {
 }
 
 extension DebateInviteViewController {
-    //初始化
+
+    //MARK: - 初始化
     fileprivate func setupUI() {
         //PullToRefreshKit
         self.tableView.configRefreshFooter(with: FirstRefreshFooter(), action: { [weak self] () -> Void in
             self?.viewModel.inputs.refreshNewData.onNext(false)
         })
         //阴影
-        GeneralFactory.generateRectShadow(layer: self.searchView.layer, rect: CGRect.init(x: 0, y: self.searchView.frame.height, width: SW, height: 0.5), color: GMColor.grey800Color().cgColor)
+        GeneralFactory.generateRectShadow(layer: self.searchView.layer, rect: CGRect.init(x: 0, y: self.searchView.frame.height, width: SW, height: 0.5), color: STColor.grey800Color().cgColor)
         self.view.bringSubview(toFront: self.searchView)
     }
     fileprivate func bindRx() {
@@ -87,22 +92,34 @@ extension DebateInviteViewController {
             })
             .disposed(by: disposeBag)
         self.viewModel.outputs.refreshStateObserver.asObservable()
-            .subscribe(onNext: { [weak self] state in
+            .subscribe(onNext: { [unowned self] state in
                 switch state {
+                case .noNet:
+                    self.tableView.switchRefreshHeader(to: .normal(.none, 0))
+                    if self.hasRequested {
+                        HUD.flash(.label("网络走失了"))
+                    } else {
+                        self.showBaseEmptyView()
+                    }
+                    break
                 case .noData:
+                    self.tableView.switchRefreshHeader(to: .normal(.none, 0))
+                    self.tableView.switchRefreshFooter(to: FooterRefresherState.removed)
+                    self.showBaseEmptyView("还没有数据")
                     break
                 case .beginHeaderRefresh:
                     break
                 case .endHeaderRefresh:
-                    self?.tableView.switchRefreshHeader(to: .normal(.success, 0))
+                    self.hasRequested = true
+                    self.tableView.switchRefreshHeader(to: .normal(.success, 0))
                     break
                 case .beginFooterRefresh:
                     break
                 case .endFooterRefresh:
-                    self?.tableView.switchRefreshFooter(to: .normal)
+                    self.tableView.switchRefreshFooter(to: .normal)
                     break
                 case .endRefreshWithoutData:
-                    self?.tableView.switchRefreshFooter(to: .noMoreData)
+                    self.tableView.switchRefreshFooter(to: .noMoreData)
                     break
                 default:
                     break
@@ -115,7 +132,8 @@ extension DebateInviteViewController {
         //刷新
         self.viewModel.inputs.refreshNewData.onNext(true)
     }
-    //返回
+    
+    //MAKR: - 按钮事件
     @objc fileprivate func goBack() {
         if (navigationController != nil) {
             navigationController?.popViewController(animated: true)
@@ -123,13 +141,14 @@ extension DebateInviteViewController {
             dismiss(animated: true, completion: nil)
         }
     }
-    //搜索框点击事件
     @objc fileprivate func searchViewClicked() {
         self.searchTextField.becomeFirstResponder()
     }
 }
 
 extension DebateInviteViewController: UITextFieldDelegate {
+    
+    //MARK: - UITextFieldDelegate
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         //按下回车
         return true
@@ -137,7 +156,8 @@ extension DebateInviteViewController: UITextFieldDelegate {
 }
 
 extension DebateInviteViewController: UITableViewDelegate {
-    //TableViewDelegate && TableViewDataSource
+    
+    //MARK: - TableViewDelegate && TableViewDataSource
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return UITableViewAutomaticDimension
     }

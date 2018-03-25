@@ -7,7 +7,6 @@
 //
 
 import UIKit
-import PMSuperButton
 import RxCocoa
 import RxSwift
 import RxDataSources
@@ -16,23 +15,18 @@ class DebateCommentViewController: BaseViewController {
     
     @IBOutlet weak var tableView: UITableView!
     @IBOutlet weak var SlackTextView: UIView!
-    @IBOutlet weak var textView: GrowingTextView!
-    @IBOutlet weak var sendButton: PMSuperButton! {
+    @IBOutlet weak var textView: STGrowingTextView!
+    @IBOutlet weak var sendButton: STButton! {
         didSet {
             self.sendButton.addTarget(self, action: #selector(self.send), for: .touchUpInside)
         }
     }
     
-    //声明区
+    //MARK: - 声明区域
     public var section: Answer!
     
-    //私有成员
+    //MARK: - 私有成员
     fileprivate var viewModel: DebateCommentViewModel!
-    fileprivate lazy var emptyView: EmptyView = {
-        let emptyView = EmptyView.init(target: self.view)
-        emptyView.delegate = self
-        return emptyView
-    }()
     fileprivate var disposeBag = DisposeBag()
     fileprivate var dataSource: RxTableViewSectionedReloadDataSource<CommentSectionModel>!
 
@@ -45,6 +39,10 @@ class DebateCommentViewController: BaseViewController {
         self.setupUI()
         self.bindRx()
     }
+    
+    override func reload() {
+        self.tableView.switchRefreshHeader(to: .refreshing)
+    }
 
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
@@ -53,7 +51,8 @@ class DebateCommentViewController: BaseViewController {
 }
 
 extension DebateCommentViewController {
-    //初始化
+
+    //MARK: - 初始化
     fileprivate func setupUI() {
         //SlackTextView
         self.textView.layer.cornerRadius = 4
@@ -74,7 +73,7 @@ extension DebateCommentViewController {
     }
     fileprivate func bindRx() {
         //View Model
-        self.viewModel = DebateCommentViewModel.init(disposeBag: self.disposeBag, section: self.section, tableView: self.tableView)
+        self.viewModel = DebateCommentViewModel.init(disposeBag: self.disposeBag, section: self.section)
         //Rx
         tableView.rx.setDelegate(self)
             .disposed(by: disposeBag)
@@ -116,16 +115,6 @@ extension DebateCommentViewController {
         viewModel.outputs.sections!.asDriver()
             .drive(tableView.rx.items(dataSource: dataSource))
             .disposed(by: disposeBag)
-        viewModel.outputs.emptyStateObserver.asObservable()
-            .subscribe(onNext: { [unowned self] state in
-                switch state {
-                case .empty:
-                    self.showEmptyView(type: .empty(size: nil))
-                default:
-                    break
-                }
-            })
-            .disposed(by: disposeBag)
         viewModel.outputs.sendResult.asObservable()
             .subscribe(onNext: { result in
                 switch result {
@@ -138,10 +127,52 @@ extension DebateCommentViewController {
                 }
             })
             .disposed(by: disposeBag)
+        self.viewModel.outputs.refreshStateObserver.asObservable()
+            .subscribe(onNext: { [unowned self] state in
+                switch state {
+                case .noNet:
+                    self.tableView.switchRefreshHeader(to: .normal(.none, 0))
+                    if self.hasRequested {
+                        HUD.flash(.label("网络走失了"))
+                    } else {
+                        self.showBaseEmptyView()
+                    }
+                    break
+                case .noData:
+                    self.tableView.switchRefreshHeader(to: .normal(.none, 0))
+                    self.tableView.switchRefreshFooter(to: FooterRefresherState.removed)
+                    self.showBaseEmptyView("还没有数据", self.SlackTextView.height)
+                    break
+                case .beginHeaderRefresh:
+                    break
+                case .endHeaderRefresh:
+                    self.hasRequested = true
+                    self.tableView.switchRefreshHeader(to: .normal(.success, 0))
+                    break
+                case .beginFooterRefresh:
+                    break
+                case .endFooterRefresh:
+                    self.tableView.switchRefreshFooter(to: .normal)
+                    break
+                case .endRefreshWithoutData:
+                    self.tableView.switchRefreshFooter(to: .noMoreData)
+                    break
+                default:
+                    break
+                }
+            })
+            .disposed(by: disposeBag)
         //刷新
         self.tableView.switchRefreshHeader(to: .refreshing)
     }
-    //NavigationBarItem Action
+    
+    //MARK: - 按钮事件
+    @objc fileprivate func send() {
+        guard let content = self.textView.text else {
+           return
+        }
+        self.viewModel.inputs.sendTap.onNext(content)
+    }
     @objc fileprivate func goBack() {
         if (navigationController != nil) {
             navigationController?.popViewController(animated: true)
@@ -149,37 +180,17 @@ extension DebateCommentViewController {
             dismiss(animated: true, completion: nil)
         }
     }
-    //按钮事件
-    @objc fileprivate func send() {
-        guard let content = self.textView.text else {
-           return
-        }
-        self.viewModel.inputs.sendTap.onNext(content)
-    }
-    //显示 & 隐藏 Empty Zone
-    fileprivate func showEmptyView(type: EmptyViewType) {
-        self.tableView.switchRefreshHeader(to: .normal(.none, 0))
-        tableView.isHidden = true
-        self.emptyView.show(type: type, frame: self.tableView.frame)
-    }
-    fileprivate func hideEmptyView() {
-        self.emptyView.hide()
-        tableView.isHidden = false
-        self.tableView.switchRefreshHeader(to: .refreshing)
-    }
 }
 
-extension DebateCommentViewController: GrowingTextViewDelegate, UITableViewDelegate {
-    //GrowingTextViewDelegate
-    func textViewDidChangeHeight(_ textView: GrowingTextView, height: CGFloat) {
+extension DebateCommentViewController: STGrowingTextViewDelegate, UITableViewDelegate {
+    
+    //MARK: - STGrowingTextViewDelegate
+    func textViewDidChangeHeight(_ textView: STGrowingTextView, height: CGFloat) {
         //TextView 高度改变
     }
-    //TableViewDelegate
+    
+    //MARK: - TableViewDelegate
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
-    }
-    //EmptyViewDelegate
-    override func emptyViewClicked() {
-        self.hideEmptyView()
     }
 }

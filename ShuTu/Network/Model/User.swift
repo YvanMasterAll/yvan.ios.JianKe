@@ -38,6 +38,7 @@ public struct User: Mappable {
         address <- map["address"]
         college <- map["college"]
         
+        self.portrait = ModelHelper.handleUrl(self.portrait)
     }
     
     public mutating func mapping(map: Map) {
@@ -54,6 +55,7 @@ public struct User: Mappable {
         address <- map["address"]
         college <- map["college"]
         
+        self.portrait = ModelHelper.handleUrl(self.portrait)
     }
 }
 
@@ -89,11 +91,12 @@ public struct UserInfo: Mappable {
         email <- map["email"]
         address <- map["address"]
         college <- map["college"]
-        follows <- map["followNums"]
-        followtopics <- map["followTopicNums"]
-        fans <- map["fansNums"]
-        supports <- map["supportNums"]
+        follows <- map["follows"]
+        followtopics <- map["followtopics"]
+        fans <- map["fans"]
+        supports <- map["supports"]
         
+        self.portrait = ModelHelper.handleUrl(self.portrait)
     }
     
     public mutating func mapping(map: Map) {
@@ -109,10 +112,12 @@ public struct UserInfo: Mappable {
         email <- map["email"]
         address <- map["address"]
         college <- map["college"]
-        follows <- map["followNums"]
-        fans <- map["fansNums"]
-        supports <- map["supportNums"]
+        follows <- map["follows"]
+        followtopics <- map["followtopics"]
+        fans <- map["fans"]
+        supports <- map["supports"]
         
+        self.portrait = ModelHelper.handleUrl(self.portrait)
     }
 }
 

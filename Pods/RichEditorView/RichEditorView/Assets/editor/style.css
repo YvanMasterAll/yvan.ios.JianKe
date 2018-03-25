@@ -65,5 +65,15 @@ div {
     max-width: 280px;
     max-height: 280px;
     display: block;
-    margin: 0 auto;
+    
+}
+
+#editor img.emoji {
+    display: inline-block;
+}
+
+#editor img.emoji.tiny {
+    max-width: 20px;
+    position: relative;
+    top: 4px;
 }

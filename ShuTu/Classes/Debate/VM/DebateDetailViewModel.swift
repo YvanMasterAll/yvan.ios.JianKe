@@ -16,26 +16,26 @@ public struct DebateDetailViewModelInput {
 }
 public struct DebateDetailViewModelOutput {
     var sections: Driver<[DebateDetailSectionModel]>?
-    var emptyStateObserver: Variable<EmptyViewType>
+    var refreshStateObserver: Variable<RefreshStatus>
 }
 class DebateDetailViewModel {
+
+    //MARK: - 私有成员
     fileprivate struct DebateAnswerModel {
         var pageIndex: Int
         var models: Variable<[Answer]>
         var disposeBag: DisposeBag
-        var tableView: UITableView
-        var emptyView: EmptyView
-        var refreshStateObserver: Variable<RefreshStatus>
     }
-    //私有成员
     fileprivate var answerY:  DebateAnswerModel!
     fileprivate var answerS: DebateAnswerModel!
     fileprivate var service = DebateService.instance
-    //inputs
+
+    //MARK: - inputs
     public var section: Debate!
     public var inputsY: DebateDetailViewModelInput!
     public var inputsS: DebateDetailViewModelInput!
-    //outputs
+    
+    //MARK: - outputs
     public var outputsY: DebateDetailViewModelOutput!
     public var outputsS: DebateDetailViewModelOutput!
     
@@ -44,13 +44,13 @@ class DebateDetailViewModel {
         self.section = section
         self.inputsY = DebateDetailViewModelInput(refreshNewData: PublishSubject<Bool>())
         self.inputsS = DebateDetailViewModelInput(refreshNewData: PublishSubject<Bool>())
-        self.outputsY = DebateDetailViewModelOutput(sections: nil, emptyStateObserver: Variable<EmptyViewType>(.none))
-        self.outputsS = DebateDetailViewModelOutput(sections: nil, emptyStateObserver: Variable<EmptyViewType>(.none))
+        self.outputsY = DebateDetailViewModelOutput(sections: nil, refreshStateObserver: Variable<RefreshStatus>(.none))
+        self.outputsS = DebateDetailViewModelOutput(sections: nil, refreshStateObserver: Variable<RefreshStatus>(.none))
     }
     
-    //初始化
-    public func initAnswerY(answer: (disposeBag: DisposeBag, tableView: UITableView, emptyView: EmptyView)) {
-        self.answerY = DebateAnswerModel(pageIndex: 0, models: Variable<[Answer]>([]), disposeBag: answer.disposeBag, tableView: answer.tableView, emptyView: answer.emptyView, refreshStateObserver: Variable<RefreshStatus>(.none))
+    //MARK: - 初始化
+    public func initAnswerY(disposeBag: DisposeBag) {
+        self.answerY = DebateAnswerModel(pageIndex: 0, models: Variable<[Answer]>([]), disposeBag: disposeBag )
         //Rx
         self.outputsY.sections = self.answerY.models.asObservable()
             .map{ models -> [DebateDetailSectionModel] in
@@ -59,26 +59,31 @@ class DebateDetailViewModel {
             .asDriver(onErrorJustReturn: [])
         self.inputsY.refreshNewData.asObserver()
             .subscribe(onNext: { full in
-                if full {//头部刷新
-                    self.answerY.refreshStateObserver.value = .endFooterRefresh
+                if full { //头部刷新
+                    self.outputsY.refreshStateObserver.value = .endFooterRefresh
                     //初始化
                     self.answerY.pageIndex = 1
                     //拉取数据
                     self.service.getAnswer(id: self.section.id!, pageIndex: self.answerY.pageIndex, side: .SY)
                         .subscribe(onNext: { response in
                             let data = response.0
-                            //let result = response.1
-                            if data.count > 0 {
-                                self.answerY.models.value.removeAll()
-                                self.answerY.models.value = data
-                                //结束刷新
-                                self.answerY.refreshStateObserver.value = .endHeaderRefresh
-                            } else {
-                                self.answerY.refreshStateObserver.value = .noData
+                            let result = response.1
+                            switch result {
+                            case .ok:
+                                if data.count > 0 {
+                                    self.answerY.models.value.removeAll()
+                                    self.answerY.models.value = data
+                                    //结束刷新
+                                    self.outputsY.refreshStateObserver.value = .endHeaderRefresh
+                                } else {
+                                    self.outputsY.refreshStateObserver.value = .noData
+                                }
+                            default:
+                                self.outputsY.refreshStateObserver.value = .noNet
                             }
                         })
                         .disposed(by: self.answerY.disposeBag)
-                } else {//加载更多
+                } else { //加载更多
                     self.answerY.pageIndex += 1
                     //拉取数据
                     self.service.getAnswer(id: self.section.id!, pageIndex: self.answerY.pageIndex, side: .SY)
@@ -88,43 +93,19 @@ class DebateDetailViewModel {
                             if data.count > 0 {
                                 self.answerY.models.value += data
                                 //结束刷新
-                                self.answerY.refreshStateObserver.value = .endFooterRefresh
-                            } else {//没有更多数据
+                                self.outputsY.refreshStateObserver.value = .endFooterRefresh
+                            } else { //没有更多数据
                                 //结束刷新
-                                self.answerY.refreshStateObserver.value = .endRefreshWithoutData
+                                self.outputsY.refreshStateObserver.value = .endRefreshWithoutData
                             }
                         })
                         .disposed(by: self.answerY.disposeBag)
                 }
             })
             .disposed(by: self.answerY.disposeBag)
-        self.answerY.refreshStateObserver.asObservable()
-            .subscribe(onNext: { state in
-                switch state {
-                case .noData:
-                    self.outputsY.emptyStateObserver.value = .empty(size: nil)
-                    break
-                case .beginHeaderRefresh:
-                    break
-                case .endHeaderRefresh:
-                    self.answerY.tableView.switchRefreshHeader(to: .normal(.success, 0))
-                    break
-                case .beginFooterRefresh:
-                    break
-                case .endFooterRefresh:
-                    self.answerY.tableView.switchRefreshFooter(to: .normal)
-                    break
-                case .endRefreshWithoutData:
-                    self.answerY.tableView.switchRefreshFooter(to: .noMoreData)
-                    break
-                default:
-                    break
-                }
-            })
-            .disposed(by: self.answerY.disposeBag)
     }
-    public func initAnswerS(answer: (disposeBag: DisposeBag, tableView: UITableView, emptyView: EmptyView)) {
-        self.answerS = DebateAnswerModel(pageIndex: 0, models: Variable<[Answer]>([]), disposeBag: answer.disposeBag, tableView: answer.tableView, emptyView: answer.emptyView, refreshStateObserver: Variable<RefreshStatus>(.none))
+    public func initAnswerS(disposeBag: DisposeBag) {
+        self.answerS = DebateAnswerModel(pageIndex: 0, models: Variable<[Answer]>([]), disposeBag: disposeBag)
         //Rx
         self.outputsS.sections = self.answerS.models.asObservable()
             .map{ models -> [DebateDetailSectionModel] in
@@ -133,27 +114,32 @@ class DebateDetailViewModel {
             .asDriver(onErrorJustReturn: [])
         self.inputsS.refreshNewData.asObserver()
             .subscribe(onNext: { full in
-                if full {//头部刷新
-                    self.answerS.refreshStateObserver.value = .endFooterRefresh
+                if full { //头部刷新
+                    self.outputsS.refreshStateObserver.value = .endFooterRefresh
                     //初始化
                     self.answerS.pageIndex = 1
                     //拉取数据
                     self.service.getAnswer(id: self.section.id!, pageIndex: self.answerS.pageIndex, side: .ST)
                         .subscribe(onNext: { response in
                             let data = response.0
-//                            let result = response.1
-                            if data.count > 0 {
-                                self.answerS.models.value.removeAll()
-                                self.answerS.models.value = data
-                                //结束刷新
-                                self.answerS.refreshStateObserver.value = .endHeaderRefresh
-                            } else {
-                                //没有数据
-                                self.answerS.refreshStateObserver.value = .noData
+                            let result = response.1
+                            switch result {
+                            case .ok:
+                                if data.count > 0 {
+                                    self.answerS.models.value.removeAll()
+                                    self.answerS.models.value = data
+                                    //结束刷新
+                                    self.outputsS.refreshStateObserver.value = .endHeaderRefresh
+                                } else {
+                                    //没有数据
+                                    self.outputsS.refreshStateObserver.value = .noData
+                                }
+                            default:
+                                self.outputsS.refreshStateObserver.value = .noNet
                             }
                         })
                         .disposed(by: self.answerS.disposeBag)
-                } else {//加载更多
+                } else { //加载更多
                     self.answerS.pageIndex += 1
                     //拉取数据
                     self.service.getAnswer(id: self.section.id!, pageIndex: self.answerS.pageIndex, side: .SY)
@@ -163,37 +149,13 @@ class DebateDetailViewModel {
                             if data.count > 0 {
                                 self.answerS.models.value += data
                                 //结束刷新
-                                self.answerS.refreshStateObserver.value = .endFooterRefresh
-                            } else {//没有更多数据
+                                self.outputsS.refreshStateObserver.value = .endFooterRefresh
+                            } else { //没有更多数据
                                 //结束刷新
-                                self.answerS.refreshStateObserver.value = .endRefreshWithoutData
+                                self.outputsS.refreshStateObserver.value = .endRefreshWithoutData
                             }
                         })
                         .disposed(by: self.answerS.disposeBag)
-                }
-            })
-            .disposed(by: self.answerS.disposeBag)
-        self.answerS.refreshStateObserver.asObservable()
-            .subscribe(onNext: { state in
-                switch state {
-                case .noData:
-                    self.outputsS.emptyStateObserver.value = .empty(size: nil)
-                    break
-                case .beginHeaderRefresh:
-                    break
-                case .endHeaderRefresh:
-                    self.answerS.tableView.switchRefreshHeader(to: .normal(.success, 0))
-                    break
-                case .beginFooterRefresh:
-                    break
-                case .endFooterRefresh:
-                    self.answerS.tableView.switchRefreshFooter(to: .normal)
-                    break
-                case .endRefreshWithoutData:
-                    self.answerS.tableView.switchRefreshFooter(to: .noMoreData)
-                    break
-                default:
-                    break
                 }
             })
             .disposed(by: self.answerS.disposeBag)
@@ -216,26 +178,31 @@ extension DebateDetailSectionModel: SectionModelType {
 public struct DebateDetailViewModelInput2 {
     var followTap: PublishSubject<Bool>
     var followCheck: PublishSubject<Void>
+    var answerCheck: PublishSubject<Void>
 }
 public struct DebateDetailViewModelOutput2 {
-    var followResult: Variable<Result2>
-    var followCheck: Variable<Result2>
+    var followResult: Variable<ResultType>
+    var followCheck: Variable<ResultType>
+    var answerCheck: Variable<ResultType>
 }
 class DebateDetailViewModel2 {
+
+    //MARK: - 私有成员
     fileprivate struct DebateDetaillModel {
         var disposeBag: DisposeBag
         var section: Debate
     }
-    //私有成员
     fileprivate var detailModel: DebateDetaillModel!
     fileprivate var service = DebateService.instance
-    //inputs
+    
+    //MARK: - inputs
     public var inputs: DebateDetailViewModelInput2! = {
-        return DebateDetailViewModelInput2(followTap: PublishSubject(), followCheck: PublishSubject())
+        return DebateDetailViewModelInput2(followTap: PublishSubject(), followCheck: PublishSubject(), answerCheck: PublishSubject())
     }()
-    //outputs
+
+    //MARK: - outputs
     public var outputs: DebateDetailViewModelOutput2! = {
-        return DebateDetailViewModelOutput2(followResult: Variable<Result2>(.empty), followCheck: Variable<Result2>(.none))
+        return DebateDetailViewModelOutput2(followResult: Variable<ResultType>(.empty), followCheck: Variable<ResultType>(.none), answerCheck: Variable<ResultType>(.none))
     }()
     
     init(disposeBag: DisposeBag, section: Debate) {
@@ -250,6 +217,20 @@ class DebateDetailViewModel2 {
                 self.service.followCheck(self.detailModel.section.id!).asObservable()
                     .subscribe(onNext: { result in
                         self.outputs.followCheck.value = result
+                    })
+                    .disposed(by: self.detailModel.disposeBag)
+            })
+            .disposed(by: self.detailModel.disposeBag)
+        self.inputs.answerCheck.asObserver()
+            .subscribe(onNext: {
+                guard ServiceUtil.loginCheck(true)  else {
+                    return
+                }
+                HUD.show(.progress)
+                self.service.answerCheck(self.detailModel.section.id!).asObservable()
+                    .subscribe(onNext: { result in
+                        HUD.hide()
+                        self.outputs.answerCheck.value = result
                     })
                     .disposed(by: self.detailModel.disposeBag)
             })

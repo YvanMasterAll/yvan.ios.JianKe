@@ -8,6 +8,9 @@
 
 import UIKit
 
+/// https://github.com/raulriera/TextFieldEffects
+/// TextField
+
 extension String {
     /**
     true if self contains characters.

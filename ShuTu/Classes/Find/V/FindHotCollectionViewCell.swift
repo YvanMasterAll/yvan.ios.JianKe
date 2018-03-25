@@ -31,7 +31,7 @@ class FindHotCollectionViewCell: FSPagerViewCell {
         //内阴影
         view.layer.shadowRadius = 8
         view.layer.shadowOpacity = 0.8
-        view.layer.shadowColor = GMColor.grey500Color().cgColor
+        view.layer.shadowColor = STColor.grey500Color().cgColor
         view.layer.shadowOffset = CGSize.zero
         view.generateInnerShadow()
     }
@@ -39,7 +39,8 @@ class FindHotCollectionViewCell: FSPagerViewCell {
 }
 
 extension FindHotCollectionViewCell {
-    //初始化
+
+    //MARK: - 初始化
     fileprivate func commonInit() {
         self.backgroundColor = UIColor.white
         self.needShadow = false

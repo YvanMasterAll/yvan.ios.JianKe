@@ -116,6 +116,20 @@ class TLPhotoLibrary {
         }
         return image
     }
+    
+    class func fullResolutionImagePath(asset: PHAsset, handler: @escaping (String) -> Swift.Void) {
+        var imagePath = ""
+        let option = PHContentEditingInputRequestOptions.init()
+        option.canHandleAdjustmentData = {(adjustmeta: PHAdjustmentData)
+            -> Bool in
+            return true
+        }
+        asset.requestContentEditingInput(with: option) { (contentEditingInput:PHContentEditingInput?, info: [AnyHashable : Any]) in
+            let originPath = contentEditingInput!.fullSizeImageURL!.absoluteString
+            imagePath = String(originPath[originPath.index(originPath.startIndex, offsetBy: 7)...])
+            handler(imagePath)
+        }
+    }
 }
 
 //MARK: - Load Collection

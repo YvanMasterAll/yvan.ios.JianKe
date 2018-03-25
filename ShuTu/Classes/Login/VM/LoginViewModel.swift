@@ -16,10 +16,10 @@ public protocol LoginViewModelInput {
     var loginTap: PublishSubject<Void>{ get }
 }
 public protocol LoginViewModelOutput {
-    var usernameUsable: Driver<Result2>{ get }
+    var usernameUsable: Driver<ResultType>{ get }
     var passwordUsable: Driver<Bool>{ get }
     var loginButtonEnabled: Driver<Bool>{ get }
-    var loginResult: Driver<Result2>{ get }
+    var loginResult: Driver<ResultType>{ get }
 }
 public protocol LoginViewModelType {
     var inputs: LoginViewModelInput { get }
@@ -27,16 +27,19 @@ public protocol LoginViewModelType {
 }
 
 public class LoginViewModel: LoginViewModelInput, LoginViewModelOutput, LoginViewModelType {
-    //inputs
+
+    //MARK: - inputs
     public var username = PublishSubject<String?>()
     public var password = PublishSubject<String?>()
     public var loginTap = PublishSubject<Void>()
-    //outputs
-    public var usernameUsable: Driver<Result2>
+
+    //MARK: - outputs
+    public var usernameUsable: Driver<ResultType>
     public var passwordUsable: Driver<Bool>
     public var loginButtonEnabled: Driver<Bool>
-    public var loginResult: Driver<Result2>
-    //get
+    public var loginResult: Driver<ResultType>
+
+    //MARK: - gets
     public var inputs: LoginViewModelInput { return self }
     public var outputs: LoginViewModelOutput { return self }
     
@@ -46,7 +49,7 @@ public class LoginViewModel: LoginViewModelInput, LoginViewModelOutput, LoginVie
         usernameUsable = username.asDriver(onErrorJustReturn: nil)
             .flatMapLatest { username in
                 return service.validateUsername(username!)
-                    .asDriver(onErrorJustReturn: Error001)
+                    .asDriver(onErrorJustReturn: ErrorFailed)
             }
         passwordUsable = password
             .map{ $0!.count > 0 }
@@ -63,7 +66,7 @@ public class LoginViewModel: LoginViewModelInput, LoginViewModelOutput, LoginVie
                 //显示等待
                 HUD.show(.progress)
                 return service.signIn(username!, password!)
-                    .asDriver(onErrorJustReturn: Error001)
+                    .asDriver(onErrorJustReturn: ErrorFailed)
             }
     }
 }

@@ -26,7 +26,7 @@ class DebateDetailTableViewCell: UITableViewCell {
         }
     }
     
-    //声明区域
+    //MARK: - 声明区域
     open var navigationController: UINavigationController!
     open var section: Debate!
     
@@ -40,7 +40,7 @@ class DebateDetailTableViewCell: UITableViewCell {
         // Configure the view for the selected state
     }
     
-    //私有成员
+    //MARK: - 私有成员
     fileprivate var viewModel: DebateDetailViewModel! {
         return DebateDetailViewModel(section: self.section)
     }
@@ -48,14 +48,16 @@ class DebateDetailTableViewCell: UITableViewCell {
 }
 
 extension DebateDetailTableViewCell {
-    //SegmengControl Changed
+    
+    //MARK: SegmengControl Action
     @objc fileprivate func segmentControlChanged(sender: UISegmentedControl) {
         self.pagerView.scrollToItem(at: sender.selectedSegmentIndex, animated: true)
     }
 }
 
 extension DebateDetailTableViewCell: FSPagerViewDelegate, FSPagerViewDataSource {
-    //FSPagerViewDataSource & FSPagerViewDelegate
+    
+    //MARK: - FSPagerViewDataSource & FSPagerViewDelegate
     public func numberOfItems(in pagerView: FSPagerView) -> Int {
         return 2
     }

@@ -34,7 +34,7 @@
                                 <color key="textColor" red="0.61960784310000006" green="0.61960784310000006" blue="0.61960784310000006" alpha="1" colorSpace="calibratedRGB"/>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="logo" translatesAutoresizingMaskIntoConstraints="NO" id="1RB-Z5-q1e">
+                            <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="thumbnail_anonymous" translatesAutoresizingMaskIntoConstraints="NO" id="1RB-Z5-q1e">
                                 <rect key="frame" x="14" y="0.0" width="18" height="18"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="18" id="4cN-na-48M"/>
@@ -84,6 +84,6 @@
         </tableViewCell>
     </objects>
     <resources>
-        <image name="logo" width="174" height="174"/>
+        <image name="thumbnail_anonymous" width="398" height="402"/>
     </resources>
 </document>

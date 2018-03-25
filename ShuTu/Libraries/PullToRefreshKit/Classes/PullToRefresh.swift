@@ -9,6 +9,9 @@
 import Foundation
 import UIKit
 
+/// https://github.com/LeoMobileDeveloper/PullToRefreshKit
+/// 下拉刷新上拉加载
+
 // MARK: - Header API  -
 
 @objc public enum RefreshResult:Int{

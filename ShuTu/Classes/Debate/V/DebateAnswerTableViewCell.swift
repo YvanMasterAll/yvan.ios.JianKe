@@ -14,7 +14,7 @@ class DebateAnswerTableViewCell: UITableViewCell {
     @IBOutlet weak var score: UILabel!
     @IBOutlet weak var answer: UILabel!
     
-    //私有成员
+    //MARK: - 私有成员
     fileprivate var isInit = false
     
     override func awakeFromNib() {
@@ -29,13 +29,13 @@ class DebateAnswerTableViewCell: UITableViewCell {
 }
 
 extension DebateAnswerTableViewCell {
-    //初始化
+
+    //MARK: - 初始化
     fileprivate func setupUI() {
         //头像圆形
         self.thumbnail.layer.cornerRadius = self.thumbnail.frame.size.width / 2
         self.thumbnail.layer.masksToBounds = true
     }
-    //添加约束
     public func setupConstraint() {
         guard !self.isInit else {
             return

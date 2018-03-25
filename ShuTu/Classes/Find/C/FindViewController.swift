@@ -67,26 +67,26 @@ class FindViewController: BaseViewController {
         super.didReceiveMemoryWarning()
     }
     
-    //私有成员
+    //MARK: - 私有成员
     fileprivate var disposeBag = DisposeBag()
     fileprivate var viewModel: FindViewModel!
-    fileprivate lazy var emptyView1: EmptyView = {
-        return EmptyView.init(target: self.pagerView1)
+    fileprivate lazy var emptyView1: STEmptyView = {
+        return STEmptyView.init(target: self.pagerView1)
     }()
-    fileprivate lazy var emptyView2: EmptyView = {
-        return EmptyView.init(target: self.pagerView2)
+    fileprivate lazy var emptyView2: STEmptyView = {
+        return STEmptyView.init(target: self.pagerView2)
     }()
-    fileprivate lazy var emptyView3: EmptyView = {
-        return EmptyView.init(target: self.collectionView)
+    fileprivate lazy var emptyView3: STEmptyView = {
+        return STEmptyView.init(target: self.collectionView)
     }()
     fileprivate var models1: [Debate] = []
     fileprivate var models2: [DebateCollect] = []
     fileprivate var models3: [User] = []
-
 }
 
 extension FindViewController {
-    //初始化
+
+    //MARK: - 初始化
     fileprivate func setupUI() {
         //CollectionView
         self.collectionViewHeightConstraint.constant = 62 * 3
@@ -100,7 +100,7 @@ extension FindViewController {
                 let result = response.1
                 switch result {
                 case .failed:
-                    self?.emptyView1.show(type: .empty2, frame: CGRect.init(origin: CGPoint.init(x: 0, y: 0), size: CGSize.init(width: SW, height: (self?.pagerView1.frame.height)!)))
+                    self?.emptyView1.show(type: .empty(type: .cry, options: nil), frame: CGRect.init(origin: CGPoint.init(x: 0, y: 0), size: CGSize.init(width: SW, height: (self?.pagerView1.frame.height)!)))
                     break
                 case .ok:
                     self?.models1 = data
@@ -119,7 +119,7 @@ extension FindViewController {
                 switch result {
                 case .failed:
                     guard let _ = self else { return }
-                    self!.emptyView2.show(type: .empty2, frame: CGRect.init(origin: CGPoint.init(x: 0, y: 0), size: CGSize.init(width: SW, height: self!.pagerView2.frame.height)))
+                    self!.emptyView2.show(type: .empty(type: .cry, options: nil), frame: CGRect.init(origin: CGPoint.init(x: 0, y: 0), size: CGSize.init(width: SW, height: self!.pagerView2.frame.height)))
                     break
                 case .ok:
                     self?.models2 = data
@@ -138,7 +138,7 @@ extension FindViewController {
                 switch result {
                 case .failed:
                     guard let _ = self else { return }
-                    self!.emptyView3.show(type: .empty2, frame: CGRect.init(origin: CGPoint.init(x: 0, y: 0), size: CGSize.init(width: SW, height: self!.collectionView.frame.height)))
+                    self!.emptyView3.show(type: .empty(type: .cry, options: nil), frame: CGRect.init(origin: CGPoint.init(x: 0, y: 0), size: CGSize.init(width: SW, height: self!.collectionView.frame.height)))
                     break
                 case .ok:
                     self?.models3 = data
@@ -161,7 +161,8 @@ extension FindViewController {
 }
 
 extension FindViewController: FSPagerViewDelegate, FSPagerViewDataSource, UICollectionViewDelegate, UICollectionViewDataSource {
-    //FSPagerView Delegate && DataSource
+    
+    //MARK: - FSPagerView Delegate && DataSource
     public func numberOfItems(in pagerView: FSPagerView) -> Int {
         if pagerView.tag == 10003 {
             return self.models1.count
@@ -195,7 +196,8 @@ extension FindViewController: FSPagerViewDelegate, FSPagerViewDataSource, UIColl
     func pagerView(_ pagerView: FSPagerView, shouldHighlightItemAt index: Int) -> Bool {
         return false
     }
-    //CollectionViewDelegate && DataSource
+    
+    //MARK: - CollectionViewDelegate && DataSource
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         collectionView.deselectItem(at: indexPath, animated: true)
     }

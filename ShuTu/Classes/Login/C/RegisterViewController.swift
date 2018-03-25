@@ -31,7 +31,7 @@ class RegisterViewController: BaseViewController {
         self.dismiss(animated: true, completion: nil)
     }
     
-    //声明区域
+    //MARK: - 声明区域
     open var block: RegisterBlock?
     
     override func viewDidLoad() {
@@ -45,13 +45,14 @@ class RegisterViewController: BaseViewController {
         super.didReceiveMemoryWarning()
     }
 
-    //私有成员
+    //MARK: - 私有成员
     fileprivate var viewModel: RegisterViewModel!
     fileprivate let disposeBag = DisposeBag()
 }
 
 extension RegisterViewController {
-    //初始化
+
+    //MARK: - 初始化
     fileprivate func setupUI() {
         
     }
@@ -106,6 +107,8 @@ extension RegisterViewController {
             .asObservable()
             .subscribe(onNext: { [weak self] result in
                 switch result {
+                case .exist:
+                    HUD.flash(.label("用户已注册"))
                 case .failed:
                     HUD.flash(.label("注册失败"))
                 case .ok:
@@ -130,7 +133,7 @@ extension RegisterViewController {
             .disposed(by: disposeBag)
     }
     
-    //按钮状态变更
+    //MARK: - 按钮状态变更
     fileprivate func applyVerifyButton(enabled: Bool) {
         self.verifyButton.isEnabled = enabled
         if enabled {

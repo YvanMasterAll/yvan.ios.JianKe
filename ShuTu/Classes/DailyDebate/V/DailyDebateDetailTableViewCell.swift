@@ -13,15 +13,17 @@ import RxSwift
 
 class DailyDebateDetailTableViewCell: UITableViewCell {
     
-    @IBOutlet weak var webView: WKWebView! {
+    @IBOutlet weak var webView: BaseWKWebView! {
         didSet {
             //WebView
             self.webView.scrollView.showsVerticalScrollIndicator = false
+            self.webView.scrollView.showsHorizontalScrollIndicator = false
             self.webView.navigationDelegate = self
+            self.webView.scrollView.delegate = self
         }
     }
     
-    //声明区域
+    //MARK: - 声明区域
     open var section: Debate! {
         didSet {
             self.setupUI()
@@ -29,7 +31,7 @@ class DailyDebateDetailTableViewCell: UITableViewCell {
     }
     open var viewModel: DailyDebateDetailViewModel! {
         didSet {
-            //self.bindRx()
+            self.bindRx()
         }
     }
     open var disposeBag: DisposeBag!
@@ -43,69 +45,88 @@ class DailyDebateDetailTableViewCell: UITableViewCell {
 
     }
     
-    //私有成员
-    fileprivate lazy var emptyView: EmptyView = {
-        let emptyView = EmptyView(target: self)
-        emptyView.delegate = self
-        return emptyView
-    }()
+    //MARK: - 私有成员
+    fileprivate var scrollDragging: Bool = false
+    fileprivate var parentTableStatus: TableState = .headBottom
+    fileprivate var contentOffset: CGPoint!
 
 }
 
 extension DailyDebateDetailTableViewCell {
-    //初始化
+
+    //MARK: - 初始化
     fileprivate func setupUI() {
         //加载描述
         self.webViewLoad(data: section.description!)
     }
     fileprivate func bindRx() {
-        //Rx
-        viewModel.outputs.emptyStateObserver.asObservable()
+        //TableStatus
+        TableStatus.asObserver()
             .subscribe(onNext: { [weak self] state in
-                switch state {
-                case .loading(let type):
-                    guard let _ = self else { return }
-                    self!.emptyView.show(type: .loading(type: type), frame: CGRect(x: self!.webView.frame.origin.x, y: self!.webView.frame.origin.y, width: SW, height: SH - 280 - 34))
-                    break
-                case .empty:
-                    self?.emptyView.hide()
-                default:
-                    break
-                }
+                self?.parentTableStatus = state
             })
-            .disposed(by: disposeBag)
+            .disposed(by: self.disposeBag)
         //首次加载
         viewModel.inputs.refreshData.onNext(())
     }
-    //WebView Load Data
+    
+    /// 加载内容
     fileprivate func webViewLoad(data: String){
-        webView.loadHTMLString(data, baseURL: nil)
-        self.emptyView.show(type: .loading(type: .indicator1), frame: CGRect(x: self.webView.frame.origin.x, y: self.webView.frame.origin.y, width: SW, height: SH - 280 - 34))
+        webView.loadHTMLString(ServiceUtil.updateHtmlStyle(data, 20, 13), baseURL: nil)
     }
 }
 
-extension DailyDebateDetailTableViewCell: WKNavigationDelegate, EmptyViewDelegate {
-    // WKNavigationDelegate
-    // --------------------
-    //页面开始加载
-    func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
+extension DailyDebateDetailTableViewCell: WKNavigationDelegate, UIScrollViewDelegate {
+    
+    //MARK: - WKNavigationDelegate
+    func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) { //页面开始加载
+        self.webView.showBaseEmptyView()
+    }
+    func webView(_ webView: WKWebView, didCommit navigation: WKNavigation!) { //内容开始返回
         
     }
-    //内容开始返回
-    func webView(_ webView: WKWebView, didCommit navigation: WKNavigation!) {
-        
+    func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) { //页面加载完
+        self.webView.hideEmptyView()
     }
-    //页面加载完
-    func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
-        self.emptyView.hide()
+    func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) { //页面加载失败
+        self.webView.hideEmptyView()
     }
-    //页面加载失败
-    func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
-        self.emptyView.hide()
+    
+    //MARK: - ScrollView Delegate
+    func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
+        self.scrollDragging = true
+        self.contentOffset = scrollView.contentOffset
     }
-    //EmptyViewDelegate
-    func emptyViewClicked() {
-        //重新加载
-        viewModel.inputs.refreshData.onNext(())
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        if self.scrollDragging {
+            let direction = self.contentOffset.y - scrollView.contentOffset.y
+            switch self.parentTableStatus {
+            case .headTop:
+                if direction > 0 && scrollView.contentOffset.y <= 0 {
+                    self.webView.scrollView.contentOffset.y = 0
+                    SonTableStatus.onNext(.canParentScroll)
+                } else {
+                    SonTableStatus.onNext(.noParentScroll)
+                }
+                break
+            case .headBottom:
+                if direction < 0 && scrollView.contentOffset.y > 0 {
+                    self.webView.scrollView.contentOffset.y = 0
+                    SonTableStatus.onNext(.canParentScroll)
+                } else {
+                    SonTableStatus.onNext(.noParentScroll)
+                }
+                break
+            case .headMid:
+                self.webView.scrollView.contentOffset.y = 0
+                SonTableStatus.onNext(.canParentScroll)
+                break
+            default:
+                break
+            }
+        }
+    }
+    func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
+        self.scrollDragging = false
     }
 }

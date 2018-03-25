@@ -17,7 +17,8 @@
 //  Copyright (c) 2014 Encore Dev Labs LLC. All rights reserved.
 //
 
-///功能强大的函数处理库
+/// https://github.com/ankurp/Dollar
+/// 功能强大的函数处理库
 
 /**
  ///chunk -> 数组分块

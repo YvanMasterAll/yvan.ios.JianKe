@@ -26,14 +26,14 @@ class DailyDebateTableViewCell: UITableViewCell {
         didSet {
             self.view.backgroundColor = UIColor.clear
             self.view.layer.shadowOffset = CGSize(width: 2, height: 2)
-            self.view.layer.shadowColor = GMColor.grey800Color().cgColor
+            self.view.layer.shadowColor = STColor.grey800Color().cgColor
             self.view.layer.shadowOpacity = 0.5
             self.view.layer.shadowRadius = 1
         }
     }
     @IBOutlet weak var title: UILabel!
     
-    //声明区域
+    //MARK: - 声明区域
     open var isImageSet: Bool = false
     
     override func awakeFromNib() {
@@ -48,7 +48,7 @@ class DailyDebateTableViewCell: UITableViewCell {
         super.setSelected(selected, animated: animated)
     }
     
-    ///设置图片白底
+    /// 设置图片白底
     open func setImage() {
         guard !self.isImageSet else { return }
         self.isImageSet = true

@@ -48,7 +48,7 @@ class DebateViewController: BaseViewController {
         }
     }
     
-    //声明区
+    //MARK: - 声明区域
     fileprivate let disposeBag = DisposeBag()
     fileprivate var viewModel: DebateViewModel!
     fileprivate var dataSource: RxTableViewSectionedReloadDataSource<DebateSectionModel>!
@@ -64,11 +64,11 @@ class DebateViewController: BaseViewController {
     override func reload() {
         self.tableView.switchRefreshHeader(to: .refreshing)
     }
-
 }
 
 extension DebateViewController {
-    //初始化
+
+    //MARK: - 初始化
     fileprivate func setupUI() {
         //TableView
         self.tableView.tableFooterView = UIView() //消除底部视图
@@ -88,10 +88,9 @@ extension DebateViewController {
         self.addDebate.addGestureRecognizer(tapGes)
         self.addDebate.isUserInteractionEnabled = true
         //阴影
-        GeneralFactory.generateRectShadow(layer: self.searchBar.layer, rect: CGRect.init(x: 0, y: self.searchBar.frame.height, width: SW, height: 0.5), color: GMColor.grey800Color().cgColor)
+        GeneralFactory.generateRectShadow(layer: self.searchBar.layer, rect: CGRect.init(x: 0, y: self.searchBar.frame.height, width: SW, height: 0.5), color: STColor.grey800Color().cgColor)
         self.view.bringSubview(toFront: self.searchBar)
     }
-    //绑定 Rx
     fileprivate func bindRx() {
         //ViewModel
         viewModel =  DebateViewModel(disposeBag: self.disposeBag, tableView: self.tableView, pagerView: pagerView)
@@ -128,10 +127,19 @@ extension DebateViewController {
             .drive(tableView.rx.items(dataSource: dataSource))
             .disposed(by: disposeBag)
         viewModel.refreshStateObserver.asObservable()
-            .subscribe(onNext: { state in
+            .subscribe(onNext: { [unowned self] state in
                 switch state {
+                case .noNet:
+                    self.tableView.switchRefreshHeader(to: .normal(.none, 0))
+                    if self.hasRequested {
+                        HUD.flash(.label("网络走失了"))
+                    } else {
+                        self.showBaseEmptyView()
+                    }
+                    break
                 case .noData:
-                    self.showBaseEmptyView()
+                    self.tableView.switchRefreshHeader(to: .normal(.success, 0))
+                    self.tableView.switchRefreshFooter(to: FooterRefresherState.removed)
                     break
                 case .beginHeaderRefresh:
                     break
@@ -154,7 +162,8 @@ extension DebateViewController {
         //刷新
         self.tableView.switchRefreshHeader(to: .refreshing)
     }
-    //跳转到添加辩题页
+    
+    //MARK: - 按钮事件
     @objc fileprivate func gotoAddDebate() {
         let debateAddNewVC = GeneralFactory.getVCfromSb("Debate", "DebateAddNew") as! DebateAddNewViewController
         
@@ -163,7 +172,6 @@ extension DebateViewController {
         self.navigationController?.pushViewController(debateAddNewVC, animated: true)
         self.hidesBottomBarWhenPushed = false
     }
-    //跳转到搜索页
     @objc fileprivate func gotoSearchPage() {
         let debateSearchVC = GeneralFactory.getVCfromSb("Debate", "DebateSearch") as! DebateSearchViewController
         
@@ -175,7 +183,8 @@ extension DebateViewController {
 }
 
 extension DebateViewController: UITableViewDelegate, FSPagerViewDelegate, FSPagerViewDataSource {
-    //FSPagerViewDataSource & FSPagerViewDelegate
+    
+    //MARK: - FSPagerViewDataSource & FSPagerViewDelegate
     public func numberOfItems(in pagerView: FSPagerView) -> Int {
         self.pageControl.numberOfPages = self.viewModel.carsouselData.count
         return self.viewModel.carsouselData.count
@@ -200,7 +209,8 @@ extension DebateViewController: UITableViewDelegate, FSPagerViewDelegate, FSPage
         }
         self.pageControl.currentPage = pagerView.currentIndex // Or Use KVO with property "currentIndex"
     }
-    //TableViewDelegate
+    
+    //MAKR: - TableViewDelegate
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         //取消cell选中状态
         tableView.deselectRow(at: indexPath, animated: true)

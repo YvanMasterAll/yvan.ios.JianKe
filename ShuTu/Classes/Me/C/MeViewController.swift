@@ -13,6 +13,7 @@ import RxCocoa
 
 class MeViewController: BaseViewController {
 
+    @IBOutlet weak var username: UILabel!
     @IBOutlet weak var fans: UIView! {
         didSet {
             self.fans.isUserInteractionEnabled = true
@@ -40,9 +41,6 @@ class MeViewController: BaseViewController {
             self.thumbnail.isUserInteractionEnabled = true
             let tapGes = UITapGestureRecognizer.init(target: self, action: #selector(self.gotoMeEdit))
             self.thumbnail.addGestureRecognizer(tapGes)
-            if let t = Environment.protrait {
-                self.thumbnail.kf.setImage(with: URL.init(string: t))
-            }
         }
     }
     @IBOutlet weak var tableView: UITableView! {
@@ -66,14 +64,33 @@ class MeViewController: BaseViewController {
     override func loginIn() {
         self.headerView.isHidden = false
         self.headerView2.isHidden = true
+        self.setupUserInfo()
     }
 
-    override func loginOut() {
+    override func logOut() {
         self.headerView.isHidden = true
         self.headerView2.isHidden = false
     }
     
-    //私有成员
+    override func userinfoUpdated() {
+        if let u = Environment.userinfo {
+            self.userinfo = u
+            self.setupUserInfo()
+        }
+    }
+    
+    override func userinfoPartUpdated() {
+        if let f = Environment.follows {
+            self.userinfo?.follows = f
+        }
+        if let f = Environment.followtopics {
+            self.userinfo?.followtopics = f
+        }
+        self.setupUserInfo()
+    }
+    
+    //MARK: - 私有成员
+    fileprivate var userinfo: UserInfo?
     fileprivate lazy var headerView2: UIView = { //用户未登录的表头
         let view = UIView.init(frame: CGRect.init(x: 0, y: 0, width: 0, height: 0))
         let button = UIButton.init(frame: CGRect.zero)
@@ -108,13 +125,20 @@ class MeViewController: BaseViewController {
 }
 
 extension MeViewController {
-    //初始化
+
+    //MARK: - 初始化
     fileprivate func setupUI() {
         //判断用户是否登录
         if !isLogin {
             self.headerView.isHidden = true
             self.headerView2.isHidden = false
         }
+        //初始化用户信息
+        if let u = Environment.userinfo {
+            self.userinfo = u
+            self.setupUserInfo()
+        }
+        self.userinfoRefresh(nil)
         //获取菜单数据
         self.setupMenuData()
     }
@@ -131,32 +155,20 @@ extension MeViewController {
         let label1 = self.followTopic.viewWithTag(10001) as! UILabel
         let label2 = self.followPerson.viewWithTag(10002) as! UILabel
         let label3 = self.fans.viewWithTag(10003) as! UILabel
-        label1.text = "\(Environment.followtopics ?? 0)"
-        label2.text = "\(Environment.followpersons ?? 0)"
-        label3.text = "\(Environment.fans ?? 0)"
-        if isLogin {
-            MeService.instance.userinfo().asObservable()
-                .subscribe(onNext: { response in
-                    let userinfo = response.0
-                    let result = response.1
-                    switch result {
-                    case .ok:
-                        label1.text = "\(userinfo?.followtopics ?? 0)"
-                        label2.text = "\(userinfo?.follows ?? 0)"
-                        label3.text = "\(userinfo?.fans ?? 0)"
-                        break
-                    default:
-                        break
-                    }
-                })
-                .disposed(by: self.disposeBag)
+        username.text = "\(userinfo?.nickname ?? "")"
+        if let t = userinfo?.portrait {
+            self.thumbnail.kf.setImage(with: URL.init(string: t))
         }
+        label1.text = "\(userinfo?.followtopics ?? 0)"
+        label2.text = "\(userinfo?.follows ?? 0)"
+        label3.text = "\(userinfo?.fans ?? 0)"
     }
     
-    //按钮事件
+    //MARK: - 按钮事件
     @objc fileprivate func gotoMeEdit() {
-        let meeditVC = GeneralFactory.getVCfromSb("Me", "MeEdit")
-        
+        guard let userinfo = Environment.userinfo else { return }
+        let meeditVC = GeneralFactory.getVCfromSb("Me", "MeEdit") as! MeEditViewController
+        meeditVC.userinfo = userinfo
         self.slideMenuController()?.pushViewControllerFromMain(meeditVC, close: true)
     }
     @objc fileprivate func gotoLogin() {
@@ -188,7 +200,8 @@ extension MeViewController {
 }
 
 extension MeViewController: UITableViewDelegate, UITableViewDataSource {
-    //TableView Delegate && DataSource
+    
+    //MARK: - TableView Delegate && DataSource
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         //取消选中
         tableView.deselectRow(at: indexPath, animated: true)
@@ -199,7 +212,9 @@ extension MeViewController: UITableViewDelegate, UITableViewDataSource {
         }
         switch indexPath.row {
         case 0:
-            let meSpaceVC = GeneralFactory.getVCfromSb("Me", "MeSpace")
+            guard let userinfo = Environment.userinfo else { return }
+            let meSpaceVC = GeneralFactory.getVCfromSb("Me", "MeSpace") as! MeSpaceViewController
+            meSpaceVC.userinfo = userinfo
             self.slideMenuController()?.pushViewControllerFromMain(meSpaceVC, close: true)
             break
         case 1:
@@ -230,8 +245,9 @@ extension MeViewController: UITableViewDelegate, UITableViewDataSource {
             let alertController = UIAlertController(title: "提示", message: "退出登录？", preferredStyle: .alert)
             let cancelAction = UIAlertAction(title: "取消", style: .cancel, handler: nil)
             let okAction = UIAlertAction(title: "确定", style: .default, handler: { _ in
+                UserService.instance.logout()
                 Environment.clearUserInfo()
-                LoginStatus.onNext(LoginState.out)
+                AppStatus.onNext(AppState.logout)
             })
             alertController.addAction(cancelAction)
             alertController.addAction(okAction)

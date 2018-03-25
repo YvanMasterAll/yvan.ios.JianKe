@@ -11,10 +11,10 @@ import RxCocoa
 import RxSwift
 
 public struct DebateAnswerAddNewViewModelInput {
-    var sendTap: PublishSubject<(Int, String, AnswerSide)>
+    var sendTap: PublishSubject<(Int, String, AnswerSide, Bool)>
 }
 public struct DebateAnswerAddNewViewModelOutput {
-    var sendResult: Variable<Result2>
+    var sendResult: Variable<ResultType>
 }
 public class DebateAnswerAddNewViewModel {
     fileprivate struct DebateAnswerAddNewModel {
@@ -24,10 +24,10 @@ public class DebateAnswerAddNewViewModel {
     fileprivate let answerAddNew: DebateAnswerAddNewModel!
     fileprivate let service = DebateService.instance
     open var inputs: DebateAnswerAddNewViewModelInput! = {
-        return DebateAnswerAddNewViewModelInput(sendTap: PublishSubject<(Int, String, AnswerSide)>())
+        return DebateAnswerAddNewViewModelInput(sendTap: PublishSubject<(Int, String, AnswerSide, Bool)>())
     }()
     open var outputs: DebateAnswerAddNewViewModelOutput! = {
-        return DebateAnswerAddNewViewModelOutput(sendResult: Variable<Result2>(.none))
+        return DebateAnswerAddNewViewModelOutput(sendResult: Variable<ResultType>(.none))
     }()
     
     init(disposeBag: DisposeBag) {
@@ -35,8 +35,8 @@ public class DebateAnswerAddNewViewModel {
         //Rx
         self.inputs.sendTap
             .asObserver()
-            .subscribe(onNext: { (topicid, viewpoint, side) in
-                self.service.answerAdd(topicid, side, viewpoint)
+            .subscribe(onNext: { (topicid, viewpoint, side, anony) in
+                self.service.answerAdd(topicid, side, anony, viewpoint)
                     .asObservable()
                     .subscribe(onNext: { result in
                         self.outputs.sendResult.value = result
